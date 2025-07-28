@@ -73,8 +73,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cache: 'no-cache',
       });
 
+      // Clone response to avoid "body stream already read" errors
+      const responseClone = response.clone();
+
       // Read response text once, then parse
-      const responseText = await response.text();
+      const responseText = await responseClone.text();
       let data;
 
       try {
