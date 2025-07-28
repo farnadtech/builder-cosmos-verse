@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import CreateProject from "./pages/CreateProject";
 import Arbitration from "./pages/Arbitration";
+import VerificationForm from "./pages/VerificationForm";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./pages/PlaceholderPage";
 
@@ -40,7 +41,7 @@ const App = () => (
               <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
               <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
               <Route path="/help" element={<PlaceholderPage title="راهنما" description="راهنمای استفاده از سیستم" />} />
-              <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوالات پرتکرار" />} />
+              <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوال��ت پرتکرار" />} />
               <Route path="/terms" element={<PlaceholderPage title="قوانین و مقررات" description="شرایط و قوانین استفاده" />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
