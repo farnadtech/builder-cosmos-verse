@@ -227,9 +227,26 @@ INSERT INTO system_settings (key, value, description) VALUES
 ('support_email', 'support@zemano.ir', 'Support email address'),
 ('support_phone', '+982112345678', 'Support phone number');
 
+-- Project applications table
+CREATE TABLE project_applications (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+    contractor_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    proposal TEXT NOT NULL,
+    estimated_days INTEGER,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for new tables
+CREATE INDEX idx_project_applications_project ON project_applications(project_id);
+CREATE INDEX idx_project_applications_contractor ON project_applications(contractor_id);
+CREATE INDEX idx_project_applications_status ON project_applications(status);
+
 -- Create default admin user (password: admin123)
 INSERT INTO users (first_name, last_name, email, phone_number, password_hash, role, is_verified, is_active) VALUES
-('مدیر', 'سیستم', 'admin@zemano.ir', '+989123456789', '$2b$10$rQZ1vBV5rZ3cZ5Z5Z5Z5ZO3Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5', 'admin', TRUE, TRUE);
+('مدیر', 'سیستم', 'admin@zemano.ir', '+989123456789', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', TRUE, TRUE);
 
 -- Create wallet for admin user
 INSERT INTO wallets (user_id, balance) VALUES (1, 0.00);
