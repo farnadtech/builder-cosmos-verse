@@ -10,6 +10,8 @@ import { AlertCircle, Upload, Camera, CheckCircle, FileText } from "lucide-react
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
+import { PersianDateInput } from "@/components/ui/persian-date-input";
+import moment from "moment-jalaali";
 
 interface VerificationData {
   firstName: string;
@@ -25,7 +27,7 @@ interface VerificationData {
 }
 
 const provinces = [
-  "تهران", "اصفهان", "فارس", "خراسان رضوی", "کرمان", "خوزستان", "مازندران",
+  "تهران", "اصفهان", "فارس", "خراسان رضوی", "ک��مان", "خوزستان", "مازندران",
   "آذربایجان شرقی", "آذربایجان غربی", "کرمانشاه", "گیلان", "لرستان", "مرکزی",
   "هرمزگان", "همدان", "یزد", "کردستان", "ایلام", "بوشهر", "زنجان",
   "سمنان", "قزوین", "قم", "گلستان", "خراسان شمالی", "خراسان جنوبی",
@@ -260,7 +262,7 @@ export default function VerificationForm() {
             <CardTitle>
               {currentStep === 1 && "اطلاعات شخصی"}
               {currentStep === 2 && "اطلاعات آدرس"}
-              {currentStep === 3 && "آپلود مدارک"}
+              {currentStep === 3 && "آپ��ود مدارک"}
               {currentStep === 4 && "تأیید شماره موبایل"}
             </CardTitle>
             <CardDescription>
@@ -472,7 +474,7 @@ export default function VerificationForm() {
                   
                   {!otpSent ? (
                     <Button onClick={sendOTP} disabled={loading}>
-                      {loading ? "در حا�� ارسال..." : "ارسال کد تأیید"}
+                      {loading ? "در حال ارسال..." : "ارسال کد تأیید"}
                     </Button>
                   ) : (
                     <div className="space-y-4">
