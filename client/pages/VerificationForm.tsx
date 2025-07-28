@@ -181,7 +181,7 @@ export default function VerificationForm() {
       return false;
     }
     if (!formData.birthDate) {
-      setError("تاریخ تولد الزامی است");
+      setError("تاریخ تولد ا��زامی است");
       return false;
     }
 
@@ -357,7 +357,7 @@ export default function VerificationForm() {
             ></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>اطلاعا�� پایه</span>
+            <span>اطلاعات پایه</span>
             <span>آدرس</span>
             <span>مدارک</span>
             {!user?.isVerified && <span>تأیید</span>}
@@ -412,7 +412,7 @@ export default function VerificationForm() {
                       onChange={(e) =>
                         handleInputChange("lastName", e.target.value)
                       }
-                      placeholder="نام خانوادگی خود را وارد کنید"
+                      placeholder="نام خانواد��ی خود را وارد کنید"
                     />
                   </div>
                 </div>
@@ -579,6 +579,18 @@ export default function VerificationForm() {
                     <li>• در عکس سلفی، کارت ملی را کنار صورت خود نگه دارید</li>
                   </ul>
                 </div>
+
+                {user?.isVerified && (
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-800">
+                      <CheckCircle className="w-5 h-5" />
+                      <span className="font-medium">شماره موبایل تایید شده</span>
+                    </div>
+                    <p className="text-sm text-green-700 mt-1">
+                      شماره موبایل شما قبلاً تایید شده است. پس از آپلود مدارک، احراز هویت تکمیل خواهد شد.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
