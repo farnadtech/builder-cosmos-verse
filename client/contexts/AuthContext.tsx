@@ -92,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return { success: true, message: 'ورود با موفقیت انجام شد' };
       } else {
-        return { success: false, message: data.message || 'خطا در ورود' };
+        return { success: false, message: data.message || 'خطا در و��ود' };
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -102,15 +102,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (userData: RegisterData): Promise<{ success: boolean; message: string }> => {
     try {
+      console.log('Attempting registration with data:', userData);
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
+        // Add cache control to prevent duplicate requests
+        cache: 'no-cache',
       });
 
+      console.log('Registration response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Registration error response:', errorText);
+
+        try {
+          const errorData = JSON.parse(errorText);
+          return { success: false, message: errorData.message || 'خطا در ثبت نام' };
+        } catch {
+          return { success: false, message: 'خطا در ثبت نام' };
+        }
+      }
+
       const data = await response.json();
+      console.log('Registration response data:', data);
 
       if (data.success) {
         const newUser: User = {
@@ -128,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('zemano_refresh_token', data.data.tokens.refreshToken);
         localStorage.setItem('zemano_user', JSON.stringify(newUser));
 
-        return { success: true, message: 'ثبت نام با موفقیت انجام شد' };
+        return { success: true, message: data.message || 'ثبت نام با موفقیت انجام شد' };
       } else {
         return { success: false, message: data.message || 'خطا در ثبت نام' };
       }
