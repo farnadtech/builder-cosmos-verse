@@ -33,6 +33,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/verification" element={<VerificationForm />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/create" element={<CreateProject />} />
@@ -41,7 +42,7 @@ const App = () => (
               <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
               <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
               <Route path="/help" element={<PlaceholderPage title="راهنما" description="راهنمای استفاده از سیستم" />} />
-              <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوال��ت پرتکرار" />} />
+              <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوالات پرتکرار" />} />
               <Route path="/terms" element={<PlaceholderPage title="قوانین و مقررات" description="شرایط و قوانین استفاده" />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
