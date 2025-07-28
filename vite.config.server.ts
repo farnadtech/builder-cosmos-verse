@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import path from "path";
+import { fileURLToPath, URL } from "node:url";
 
 // Server build configuration
 export default defineConfig({
