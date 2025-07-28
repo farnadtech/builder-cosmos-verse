@@ -63,8 +63,8 @@ class SMSService {
 
       // Mark OTP as used
       await query(
-        'UPDATE otp_codes SET is_used = true WHERE id = $1',
-        [result.rows[0].id]
+        'UPDATE otp_codes SET is_used = $1 WHERE id = $2',
+        [1, result.rows[0].id]
       );
 
       return true;
@@ -134,7 +134,7 @@ class SMSService {
 
         console.log(`📱 OTP for ${phoneNumber}: ${otpCode} (or use 123456 for development)`);
 
-        const message = `ضمانو\nکد ��ایید: ${otpCode}\nاین کد تا 5 دقیقه معتبر است.\nzemano.ir`;
+        const message = `ضمانو\nکد تایید: ${otpCode}\nاین کد تا 5 دقیقه معتبر است.\nzemano.ir`;
 
         // Try to send SMS, but don't fail if SMS service is unavailable
         const smsSent = await this.sendSMS(phoneNumber, message);
