@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from "node:url";
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, "server/node-build.ts"),
+      entry: fileURLToPath(new URL("server/node-build.ts", import.meta.url)),
       name: "server",
       fileName: "production",
       formats: ["es"],
