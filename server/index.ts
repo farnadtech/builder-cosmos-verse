@@ -54,7 +54,7 @@ export function createServer() {
     message: {
       success: false,
       message: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تلاش کنید.',
-      messageFA: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تل��ش کنید.'
+      messageFA: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تلاش کنید.'
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -102,6 +102,7 @@ export function createServer() {
   app.use('/api/chat', chatRoutes);
   app.use('/api/arbitration', arbitrationRoutes);
   app.use('/api/payment', paymentRoutes);
+  app.use('/api/contracts', contractRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/upload', uploadRoutes);
 
