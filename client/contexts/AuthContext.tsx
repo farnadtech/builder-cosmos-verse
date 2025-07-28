@@ -226,9 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cache: 'no-cache',
       });
 
-      const responseClone = response.clone();
-      const responseText = await responseClone.text();
-      const data = JSON.parse(responseText);
+      const data = await response.json();
 
       if (data.success && user) {
         setUser({ ...user, isVerified: true });
