@@ -53,8 +53,8 @@ class SMSService {
 
       const result = await query(
         `SELECT id FROM otp_codes
-         WHERE phone_number = $1 AND code = $2 AND expires_at > NOW() AND is_used = false`,
-        [phoneNumber, code]
+         WHERE phone_number = $1 AND code = $2 AND expires_at > CURRENT_TIMESTAMP AND is_used = $3`,
+        [phoneNumber, code, 0]
       );
 
       if (result.rows.length === 0) {
