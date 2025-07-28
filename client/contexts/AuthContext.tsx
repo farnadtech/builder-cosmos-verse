@@ -126,14 +126,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log('Registration response status:', response.status);
       console.log('Registration response headers:', response.headers);
+      console.log('Response body used:', response.bodyUsed);
+
+      // Clone the response to avoid "body stream already read" errors
+      const responseClone = response.clone();
 
       // Read the response body once as text, then parse as needed
       let responseText: string;
       try {
-        responseText = await response.text();
+        responseText = await responseClone.text();
         console.log('Registration response text:', responseText);
       } catch (readError) {
         console.error('Error reading response:', readError);
+        console.error('Response bodyUsed:', response.bodyUsed);
+        console.error('Clone bodyUsed:', responseClone.bodyUsed);
         return { success: false, message: 'خطا در خواندن پاسخ سرور' };
       }
 
