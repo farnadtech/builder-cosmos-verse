@@ -16,6 +16,8 @@ import Projects from "./pages/Projects";
 import CreateProject from "./pages/CreateProject";
 import Arbitration from "./pages/Arbitration";
 import VerificationForm from "./pages/VerificationForm";
+import InviteContractor from "./pages/InviteContractor";
+import AcceptProject from "./pages/AcceptProject";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./pages/PlaceholderPage";
 
