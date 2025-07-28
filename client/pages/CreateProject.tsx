@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { faIR } from "date-fns/locale";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 interface Milestone {
   id: string;
@@ -416,7 +417,7 @@ export default function CreateProject() {
                 مراحل انجام کار
               </CardTitle>
               <CardDescription>
-                پروژه را به مراحل مختلف تقسیم کنید تا پرداخت‌ها مرحله‌ای انجام شود
+                پروژه را به مراحل مختلف تقسیم ��نید تا پرداخت‌ها مرحله‌ای انجام شود
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -527,7 +528,7 @@ export default function CreateProject() {
               {/* Total Amount Summary */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">مجموع مبالغ مراحل:</span>
+                  <span className="font-medium">مجموع م��الغ مراحل:</span>
                   <span className="text-lg font-bold">
                     {totalMilestonesAmount.toLocaleString('fa-IR')} ریال
                   </span>
