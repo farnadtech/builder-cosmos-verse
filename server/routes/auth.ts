@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { body, validationResult } from 'express-validator';
 import { query } from '../database/connection';
-import { generateAccessToken, generateRefreshToken, refreshToken } from '../middleware/auth';
+import { generateAccessToken, generateRefreshToken, refreshToken, authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 import { smsService } from '../services/sms';
 import multer from 'multer';
 import path from 'path';
@@ -192,7 +192,7 @@ router.post('/login', loginValidation, async (req: Request, res: Response) => {
       return res.status(401).json({
         success: false,
         message: 'حساب کاربری شما غیرفعال شده است',
-        messageFA: 'حساب کاربری شما غیرفعال شده است'
+        messageFA: 'حساب کاربری ��ما غیرفعال شده است'
       });
     }
 
