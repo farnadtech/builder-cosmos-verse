@@ -1,15 +1,38 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, Upload, Camera, CheckCircle, FileText } from "lucide-react";
+import {
+  AlertCircle,
+  Upload,
+  Camera,
+  CheckCircle,
+  FileText,
+} from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { PersianDateInput } from "@/components/ui/persian-date-input";
 import moment from "moment-jalaali";
 
@@ -27,11 +50,36 @@ interface VerificationData {
 }
 
 const provinces = [
-  "تهران", "اصفهان", "فارس", "خراسان رضوی", "کرمان", "خوزستان", "مازندران",
-  "آذربایجان شرقی", "آذربایجان غربی", "کرمانشاه", "گیلان", "لرستان", "مرکزی",
-  "هرمزگان", "همدان", "یزد", "کردستان", "ایلام", "بوشهر", "زنجان",
-  "سمنان", "قزوین", "قم", "گلستان", "خراسان شمالی", "خراسان جنوبی",
-  "البرز", "اردبیل", "چهارمحال و بختیاری", "کهگیلویه و بویراحمد"
+  "تهران",
+  "اصفهان",
+  "فارس",
+  "خراسان رضوی",
+  "کرمان",
+  "خوزستان",
+  "مازندران",
+  "آذربایجان شرقی",
+  "آذربایجان غربی",
+  "کرمانشاه",
+  "گیلان",
+  "لرستان",
+  "مرکزی",
+  "هرمزگان",
+  "همدان",
+  "یزد",
+  "کردستان",
+  "ایلام",
+  "بوشهر",
+  "زنجان",
+  "سمنان",
+  "قزوین",
+  "قم",
+  "گلستان",
+  "خراسان شمالی",
+  "خراسان جنوبی",
+  "البرز",
+  "اردبیل",
+  "چهارمحال و بختیاری",
+  "کهگیلویه و بویراحمد",
 ];
 
 export default function VerificationForm() {
@@ -53,22 +101,26 @@ export default function VerificationForm() {
   });
 
   const handleInputChange = (field: keyof VerificationData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     setError("");
   };
 
-  const handleFileUpload = (field: 'nationalCardImage' | 'selfieImage', file: File) => {
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+  const handleFileUpload = (
+    field: "nationalCardImage" | "selfieImage",
+    file: File,
+  ) => {
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB limit
       setError("حجم فایل نباید بیشتر از ۵ مگابایت باشد");
       return;
     }
-    
-    if (!file.type.startsWith('image/')) {
+
+    if (!file.type.startsWith("image/")) {
       setError("فقط فایل‌های تصویری مجاز هستند");
       return;
     }
 
-    setFormData(prev => ({ ...prev, [field]: file }));
+    setFormData((prev) => ({ ...prev, [field]: file }));
   };
 
   const sendOTP = async () => {
@@ -79,14 +131,14 @@ export default function VerificationForm() {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           phoneNumber: formData.phoneNumber,
-          type: 'verification'
+          type: "verification",
         }),
       });
 
@@ -134,7 +186,7 @@ export default function VerificationForm() {
     try {
       const birth = moment(formData.birthDate);
       const today = moment();
-      const age = today.diff(birth, 'years');
+      const age = today.diff(birth, "years");
 
       if (age < 18) {
         setError("سن شما باید بیشتر از ۱۸ سال باشد");
@@ -174,11 +226,11 @@ export default function VerificationForm() {
 
   const nextStep = () => {
     setError("");
-    
+
     if (currentStep === 1 && !validateStep1()) return;
     if (currentStep === 2 && !validateStep2()) return;
     if (currentStep === 3 && !validateStep3()) return;
-    
+
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
@@ -197,36 +249,36 @@ export default function VerificationForm() {
     setLoading(true);
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('firstName', formData.firstName);
-      formDataToSend.append('lastName', formData.lastName);
-      formDataToSend.append('nationalId', formData.nationalId);
-      formDataToSend.append('phoneNumber', formData.phoneNumber);
-      formDataToSend.append('province', formData.province);
-      formDataToSend.append('city', formData.city);
-      formDataToSend.append('birthDate', formData.birthDate);
-      formDataToSend.append('otpCode', formData.otpCode);
-      
+      formDataToSend.append("firstName", formData.firstName);
+      formDataToSend.append("lastName", formData.lastName);
+      formDataToSend.append("nationalId", formData.nationalId);
+      formDataToSend.append("phoneNumber", formData.phoneNumber);
+      formDataToSend.append("province", formData.province);
+      formDataToSend.append("city", formData.city);
+      formDataToSend.append("birthDate", formData.birthDate);
+      formDataToSend.append("otpCode", formData.otpCode);
+
       if (formData.nationalCardImage) {
-        formDataToSend.append('nationalCardImage', formData.nationalCardImage);
+        formDataToSend.append("nationalCardImage", formData.nationalCardImage);
       }
       if (formData.selfieImage) {
-        formDataToSend.append('selfieImage', formData.selfieImage);
+        formDataToSend.append("selfieImage", formData.selfieImage);
       }
 
-      const response = await fetch('/api/auth/verify-identity', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-identity", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('zemano_token')}`,
+          Authorization: `Bearer ${localStorage.getItem("zemano_token")}`,
         },
         body: formDataToSend,
       });
 
       if (response.ok) {
         // Redirect based on user role
-        if (user?.role === 'employer') {
-          navigate('/projects/create');
+        if (user?.role === "employer") {
+          navigate("/projects/create");
         } else {
-          navigate('/dashboard');
+          navigate("/dashboard");
         }
       } else {
         const data = await response.json();
@@ -243,8 +295,12 @@ export default function VerificationForm() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto max-w-2xl px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">احراز هویت کامل</h1>
-          <p className="text-gray-600">برای استفاده از تمام امکانات پلتفرم، لطفاً اطلاعات زیر را تکمیل کنید</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            احراز هویت کامل
+          </h1>
+          <p className="text-gray-600">
+            برای استفاده از تمام امکانات پلتفرم، لطفاً اطلاعات زیر را تکمیل کنید
+          </p>
         </div>
 
         {/* Progress Bar */}
@@ -254,12 +310,17 @@ export default function VerificationForm() {
               <div
                 key={step}
                 className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
-                  ${step <= currentStep 
-                    ? 'bg-zemano-600 text-white' 
-                    : 'bg-gray-200 text-gray-500'
+                  ${
+                    step <= currentStep
+                      ? "bg-zemano-600 text-white"
+                      : "bg-gray-200 text-gray-500"
                   }`}
               >
-                {step < currentStep ? <CheckCircle className="w-4 h-4" /> : step}
+                {step < currentStep ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  step
+                )}
               </div>
             ))}
           </div>
@@ -289,7 +350,8 @@ export default function VerificationForm() {
               {currentStep === 1 && "لطفاً اطلاعات شخصی خود را وارد کنید"}
               {currentStep === 2 && "آدرس محل سکونت خود را مشخص کنید"}
               {currentStep === 3 && "تصاویر مدارک هویتی خود را آپلود کنید"}
-              {currentStep === 4 && "کد تأیید ارسال شده به موبایل خود را وارد کنید"}
+              {currentStep === 4 &&
+                "کد تأیید ارسال شده به موبایل خود را وارد کنید"}
             </CardDescription>
           </CardHeader>
 
@@ -310,7 +372,9 @@ export default function VerificationForm() {
                     <Input
                       id="firstName"
                       value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("firstName", e.target.value)
+                      }
                       placeholder="نام خود را وارد کنید"
                     />
                   </div>
@@ -319,7 +383,9 @@ export default function VerificationForm() {
                     <Input
                       id="lastName"
                       value={formData.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("lastName", e.target.value)
+                      }
                       placeholder="نام خانوادگی خود را وارد کنید"
                     />
                   </div>
@@ -330,7 +396,9 @@ export default function VerificationForm() {
                   <Input
                     id="nationalId"
                     value={formData.nationalId}
-                    onChange={(e) => handleInputChange('nationalId', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("nationalId", e.target.value)
+                    }
                     placeholder="شماره ملی ۱۰ رقم��"
                     maxLength={10}
                   />
@@ -341,7 +409,9 @@ export default function VerificationForm() {
                   <Input
                     id="phoneNumber"
                     value={formData.phoneNumber}
-                    onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("phoneNumber", e.target.value)
+                    }
                     placeholder="۰۹۱۲۳۴۵۶۷۸۹"
                     dir="ltr"
                   />
@@ -354,7 +424,11 @@ export default function VerificationForm() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="province">استان</Label>
-                  <Select onValueChange={(value) => handleInputChange('province', value)}>
+                  <Select
+                    onValueChange={(value) =>
+                      handleInputChange("province", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="استان خود را انتخاب کنید" />
                     </SelectTrigger>
@@ -373,7 +447,7 @@ export default function VerificationForm() {
                   <Input
                     id="city"
                     value={formData.city}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    onChange={(e) => handleInputChange("city", e.target.value)}
                     placeholder="شهر خود را وارد کنید"
                   />
                 </div>
@@ -382,7 +456,7 @@ export default function VerificationForm() {
                   id="birthDate"
                   label="تاریخ تولد (شمسی)"
                   value={formData.birthDate}
-                  onChange={(value) => handleInputChange('birthDate', value)}
+                  onChange={(value) => handleInputChange("birthDate", value)}
                 />
               </div>
             )}
@@ -422,7 +496,8 @@ export default function VerificationForm() {
                           accept="image/*"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) handleFileUpload('nationalCardImage', file);
+                            if (file)
+                              handleFileUpload("nationalCardImage", file);
                           }}
                         />
                       </label>
@@ -462,7 +537,7 @@ export default function VerificationForm() {
                           accept="image/*"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) handleFileUpload('selfieImage', file);
+                            if (file) handleFileUpload("selfieImage", file);
                           }}
                         />
                       </label>
@@ -488,7 +563,7 @@ export default function VerificationForm() {
                   <p className="text-gray-600 mb-4">
                     کد تأیید به شماره {formData.phoneNumber} ارسال شد
                   </p>
-                  
+
                   {!otpSent ? (
                     <Button onClick={sendOTP} disabled={loading}>
                       {loading ? "در حال ارسال..." : "ارسال کد تأیید"}
@@ -500,7 +575,9 @@ export default function VerificationForm() {
                         <InputOTP
                           maxLength={6}
                           value={formData.otpCode}
-                          onChange={(value) => handleInputChange('otpCode', value)}
+                          onChange={(value) =>
+                            handleInputChange("otpCode", value)
+                          }
                           dir="rtl"
                           containerClassName="flex-row-reverse"
                         >
@@ -517,7 +594,7 @@ export default function VerificationForm() {
                           </InputOTPGroup>
                         </InputOTP>
                       </div>
-                      
+
                       <Button
                         variant="outline"
                         onClick={sendOTP}
@@ -543,9 +620,7 @@ export default function VerificationForm() {
               </Button>
 
               {currentStep < 4 ? (
-                <Button onClick={nextStep}>
-                  مرحله بعد
-                </Button>
+                <Button onClick={nextStep}>مرحله بعد</Button>
               ) : (
                 <Button
                   onClick={submitVerification}

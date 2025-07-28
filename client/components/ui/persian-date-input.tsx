@@ -12,13 +12,13 @@ interface PersianDateInputProps {
   className?: string;
 }
 
-export function PersianDateInput({ 
-  value, 
-  onChange, 
-  label, 
-  error, 
-  id, 
-  className 
+export function PersianDateInput({
+  value,
+  onChange,
+  label,
+  error,
+  id,
+  className,
 }: PersianDateInputProps) {
   const [persianDate, setPersianDate] = useState("");
 
@@ -28,28 +28,29 @@ export function PersianDateInput({
       try {
         const gregorianDate = moment(value);
         if (gregorianDate.isValid()) {
-          const persian = gregorianDate.format('jYYYY/jMM/jDD');
+          const persian = gregorianDate.format("jYYYY/jMM/jDD");
           setPersianDate(persian);
         }
       } catch (error) {
-        console.error('Date conversion error:', error);
+        console.error("Date conversion error:", error);
       }
     }
   }, []);
 
   const handleDateChange = (inputValue: string) => {
     // Remove any non-digit characters except /
-    let cleanValue = inputValue.replace(/[^\d/]/g, '');
+    let cleanValue = inputValue.replace(/[^\d/]/g, "");
 
     // Auto-format: add slashes automatically
-    if (cleanValue.length >= 4 && !cleanValue.includes('/')) {
+    if (cleanValue.length >= 4 && !cleanValue.includes("/")) {
       // If user types 4 digits, add first slash
-      cleanValue = cleanValue.slice(0, 4) + '/' + cleanValue.slice(4);
+      cleanValue = cleanValue.slice(0, 4) + "/" + cleanValue.slice(4);
     }
-    if (cleanValue.length >= 7 && cleanValue.split('/').length === 2) {
+    if (cleanValue.length >= 7 && cleanValue.split("/").length === 2) {
       // If user has YYYY/MM format, add second slash
-      const parts = cleanValue.split('/');
-      cleanValue = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
+      const parts = cleanValue.split("/");
+      cleanValue =
+        parts[0] + "/" + parts[1].slice(0, 2) + "/" + parts[1].slice(2);
     }
 
     // Limit to YYYY/MM/DD format
@@ -68,30 +69,33 @@ export function PersianDateInput({
 
       try {
         // Create moment-jalaali date
-        const jDate = moment(`${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`, 'jYYYY/jMM/jDD');
+        const jDate = moment(
+          `${year}/${month.padStart(2, "0")}/${day.padStart(2, "0")}`,
+          "jYYYY/jMM/jDD",
+        );
 
         if (jDate.isValid()) {
           // Convert to Gregorian and send back
-          const gregorianDate = jDate.format('YYYY-MM-DD');
+          const gregorianDate = jDate.format("YYYY-MM-DD");
           onChange(gregorianDate);
         } else {
-          onChange('');
+          onChange("");
         }
       } catch (error) {
-        onChange('');
+        onChange("");
       }
     } else {
-      onChange('');
+      onChange("");
     }
   };
 
   const calculateAge = (birthDate: string): number => {
     if (!birthDate) return 0;
-    
+
     try {
       const birth = moment(birthDate);
       const today = moment();
-      return today.diff(birth, 'years');
+      return today.diff(birth, "years");
     } catch {
       return 0;
     }
@@ -112,9 +116,11 @@ export function PersianDateInput({
         className="text-center"
       />
       {age > 0 && (
-        <p className={`text-sm mt-1 ${ageError ? 'text-red-500' : 'text-gray-600'}`}>
+        <p
+          className={`text-sm mt-1 ${ageError ? "text-red-500" : "text-gray-600"}`}
+        >
           سن: {age} سال
-          {ageError && ' (سن باید بین ۱۸ تا ۱۲۰ سال باشد)'}
+          {ageError && " (سن باید بین ۱۸ تا ۱۲۰ سال باشد)"}
         </p>
       )}
       {error && !ageError && (
