@@ -80,6 +80,43 @@ export default function ProtectedRoute({
     }
   }
 
+  // Check verification requirement
+  if (requiresVerification && !user.isVerified) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center py-20">
+        <div className="container mx-auto px-4">
+          <Card className="max-w-md mx-auto text-center">
+            <CardHeader className="space-y-6">
+              <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto">
+                <AlertCircle className="w-8 h-8 text-yellow-600" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl font-bold mb-2">احراز هویت مورد نیاز</CardTitle>
+                <CardDescription className="text-lg">
+                  برای دسترسی به این صفحه باید احراز هویت خود را تکمیل کنید
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600 hover:from-zemano-600 hover:to-zemano-700">
+                <Link to="/verification">
+                  تکمیل احراز هویت
+                </Link>
+              </Button>
+              <div className="pt-4">
+                <Button variant="ghost" asChild>
+                  <Link to="/dashboard">
+                    بازگشت به داشبورد
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   // Check role permission
   if (requiredRole && !requiredRole.includes(user.role)) {
     return (
@@ -93,7 +130,7 @@ export default function ProtectedRoute({
               <div>
                 <CardTitle className="text-2xl font-bold mb-2">دسترسی محدود</CardTitle>
                 <CardDescription className="text-lg">
-                  ��ما دسترسی لازم برای مشاهده این صفحه را ندارید
+                  شما دسترسی لازم برای مشاهده این صفحه را ندارید
                 </CardDescription>
               </div>
             </CardHeader>
