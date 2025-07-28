@@ -8,6 +8,7 @@ import path from "path";
 
 // Import database connection
 import { testConnection } from "./database/connection";
+import { initializeDatabase } from "./scripts/initDatabase";
 
 // Import routes
 import authRoutes from "./routes/auth";
