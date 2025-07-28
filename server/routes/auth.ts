@@ -10,6 +10,17 @@ import fs from 'fs';
 
 const router = Router();
 
+// Simple test endpoint
+router.post('/test', async (req: Request, res: Response) => {
+  try {
+    console.log('Test endpoint called with body:', req.body);
+    res.json({ success: true, message: 'Test successful', body: req.body });
+  } catch (error) {
+    console.error('Test endpoint error:', error);
+    res.status(500).json({ success: false, message: 'Test failed' });
+  }
+});
+
 // Configure multer for verification documents
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -254,7 +265,7 @@ router.post('/login', loginValidation, async (req: Request, res: Response) => {
     console.error('Login error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطای سیستمی در ورود',
+      message: 'خطای سیستمی در ��رود',
       messageFA: 'خطای سیستمی در ورود'
     });
   }
@@ -321,7 +332,7 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     } else {
       res.status(400).json({
         success: false,
-        message: 'ک�� تایید نامعتبر یا منقضی شده است',
+        message: 'کد تایید نامعتبر یا منقضی شده است',
         messageFA: 'کد تایید نامعتبر یا منقضی شده است'
       });
     }
@@ -438,7 +449,7 @@ router.post('/reset-password', async (req: Request, res: Response) => {
     console.error('Reset password error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطای سیستمی در تغییر رمز عبو��'
+      message: 'خطای سیس��می در تغییر رمز عبو��'
     });
   }
 });
