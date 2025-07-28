@@ -308,12 +308,12 @@ export default function Register() {
                 </div>
 
                 {/* Register Button */}
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-gradient-to-r from-zemano-500 to-zemano-600 hover:from-zemano-600 hover:to-zemano-700 text-lg py-6"
-                  disabled={!formData.agreeToTerms}
+                  disabled={!formData.agreeToTerms || isLoading}
                 >
-                  ایجاد حساب کاربری
+                  {isLoading ? "در حال ثبت نام..." : "ایجاد حساب کاربری"}
                 </Button>
 
                 {/* Login Link */}
