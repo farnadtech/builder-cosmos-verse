@@ -357,7 +357,7 @@ export default function VerificationForm() {
             ></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>اطلاعات پایه</span>
+            <span>اطلاعا�� پایه</span>
             <span>آدرس</span>
             <span>مدارک</span>
             {!user?.isVerified && <span>تأیید</span>}
@@ -583,7 +583,7 @@ export default function VerificationForm() {
             )}
 
             {/* Step 4: OTP Verification */}
-            {currentStep === 4 && (
+            {currentStep === 4 && !user?.isVerified && (
               <div className="space-y-6">
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">
