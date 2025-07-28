@@ -164,8 +164,17 @@ export function createServer() {
     });
   });
 
-  // Initialize database connection
-  testConnection().catch(console.error);
+  // Initialize database connection and schema
+  async function initDb() {
+    try {
+      await testConnection();
+      await initializeDatabase();
+    } catch (error) {
+      console.error('Database initialization failed:', error);
+    }
+  }
+
+  initDb();
 
   return app;
 }
