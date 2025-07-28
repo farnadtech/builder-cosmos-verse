@@ -13,6 +13,7 @@ import { toast } from "sonner";
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,14 +26,75 @@ export default function Register() {
     agreeToNewsletters: false
   });
 
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const validateForm = () => {
+    if (!formData.firstName.trim()) {
+      toast.error("نام الزامی است");
+      return false;
+    }
+    if (!formData.lastName.trim()) {
+      toast.error("نام خانوادگی الزامی است");
+      return false;
+    }
+    if (!formData.email.trim()) {
+      toast.error("ایمیل الزامی است");
+      return false;
+    }
+    if (!formData.phoneNumber.trim()) {
+      toast.error("شماره موبایل الزامی است");
+      return false;
+    }
+    if (formData.password.length < 8) {
+      toast.error("رمز عبور باید حداقل 8 کاراکتر باشد");
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("رمز عبور و تکرار آن یکسان نیست");
+      return false;
+    }
+    if (!formData.agreeToTerms) {
+      toast.error("باید قوانین و مقررات را بپذیرید");
+      return false;
+    }
+    return true;
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    console.log("Registration attempt:", formData);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        password: formData.password,
+        role: formData.userRole
+      });
+
+      if (result.success) {
+        toast.success(result.message);
+        navigate("/dashboard");
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("خطا در ثبت نام");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
