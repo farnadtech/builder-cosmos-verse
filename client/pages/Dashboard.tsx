@@ -3,20 +3,24 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Briefcase, 
-  Wallet, 
-  MessageSquare, 
-  Gavel, 
-  FileText, 
-  Clock, 
-  CheckCircle, 
+import {
+  Briefcase,
+  Wallet,
+  MessageSquare,
+  Gavel,
+  FileText,
+  Clock,
+  CheckCircle,
   AlertCircle,
   TrendingUp,
   Users,
   DollarSign,
-  Plus
+  Plus,
+  Settings,
+  BarChart3
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Mock data - این باید از API دریافت شود
 const mockData = {
