@@ -11,6 +11,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import OTPVerification from "./pages/OTPVerification";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import CreateProject from "./pages/CreateProject";
