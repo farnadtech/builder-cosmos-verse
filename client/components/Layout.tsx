@@ -45,12 +45,32 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/login">ورود</Link>
-            </Button>
-            <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600 hover:from-zemano-600 hover:to-zemano-700">
-              <Link to="/register">ثبت نام</Link>
-            </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-gray-600">
+                  سلام، {user.firstName}
+                </span>
+                <Button variant="ghost" asChild>
+                  <Link to="/dashboard">
+                    <User className="h-4 w-4 ml-2" />
+                    داشبورد
+                  </Link>
+                </Button>
+                <Button variant="ghost" onClick={logout}>
+                  <LogOut className="h-4 w-4 ml-2" />
+                  خروج
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">ورود</Link>
+                </Button>
+                <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600 hover:from-zemano-600 hover:to-zemano-700">
+                  <Link to="/register">ثبت نام</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
