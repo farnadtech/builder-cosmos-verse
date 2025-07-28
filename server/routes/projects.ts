@@ -45,7 +45,7 @@ const upload = multer({
 const createProjectValidation = [
   body('title').trim().isLength({ min: 5, max: 255 }).withMessage('عنوان پروژه باید بین 5 تا 255 کاراکتر باشد'),
   body('description').trim().isLength({ min: 20 }).withMessage('توضیحات پروژه باید حداقل 20 کاراکتر باشد'),
-  body('category').trim().isLength({ min: 2, max: 100 }).withMessage('دسته‌بندی پروژه الزامی است'),
+  body('category').trim().isLength({ min: 2, max: 100 }).withMessage('دست��‌بندی پروژه الزامی است'),
   body('budget').isFloat({ min: 10000 }).withMessage('بودجه پروژه باید حداقل 10,000 ریال باشد'),
   body('deadline').isISO8601().withMessage('تاریخ پایان پروژه نامعتبر است'),
   body('milestones').isArray({ min: 1 }).withMessage('حداقل یک مرحله برای پروژ�� تعریف کنید'),
@@ -546,6 +546,295 @@ router.post('/:id/assign', authenticateToken, requireEmployer, param('id').isInt
     res.status(500).json({
       success: false,
       message: 'خطا در تخصیص پروژه'
+    });
+  }
+});
+
+// Generate invite link for project (employer only)
+router.post('/:id/invite-link', authenticateToken, requireEmployer, param('id').isInt(), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'شناسه پروژه نامعتبر است'
+      });
+    }
+
+    const projectId = req.params.id;
+
+    // Verify project ownership
+    const projectResult = await query(
+      'SELECT id, title FROM projects WHERE id = $1 AND employer_id = $2',
+      [projectId, req.user!.id]
+    );
+
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'پروژه یافت نشد یا دسترسی ندارید'
+      });
+    }
+
+    // Generate unique invite token
+    const inviteToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    // Save invite
+    await query(
+      `INSERT INTO project_invites (project_id, invite_token, expires_at, created_at)
+       VALUES ($1, $2, $3, NOW())`,
+      [projectId, inviteToken, expiresAt]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        inviteToken,
+        expiresAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Generate invite link error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطا در تولید لینک دعوت'
+    });
+  }
+});
+
+// Send project invite (employer only)
+router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt(), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'شناسه پروژه نامعتبر است'
+      });
+    }
+
+    const projectId = req.params.id;
+    const { method, email, phoneNumber, message, inviteLink } = req.body;
+
+    // Verify project ownership
+    const projectResult = await query(
+      'SELECT id, title FROM projects WHERE id = $1 AND employer_id = $2',
+      [projectId, req.user!.id]
+    );
+
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'پروژه یافت نشد یا دسترسی ندارید'
+      });
+    }
+
+    const project = projectResult.rows[0];
+
+    // Update project status to waiting for acceptance
+    await query(
+      'UPDATE projects SET status = \'waiting_for_acceptance\', updated_at = NOW() WHERE id = $1',
+      [projectId]
+    );
+
+    // Save invite record
+    const inviteToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    await query(
+      `INSERT INTO project_invites (project_id, invite_token, contractor_email, contractor_phone, message, expires_at, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+      [projectId, inviteToken, email || null, phoneNumber || null, message, expiresAt]
+    );
+
+    // TODO: Implement actual email/SMS sending based on method
+    console.log('Sending invite:', { method, email, phoneNumber, message, inviteLink });
+
+    res.json({
+      success: true,
+      message: 'دعوت‌نامه با موفقیت ارسال شد'
+    });
+
+  } catch (error) {
+    console.error('Send invite error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطا در ارسال دعوت‌نامه'
+    });
+  }
+});
+
+// Get project by invite token (public)
+router.get('/invite/:token', async (req, res: Response) => {
+  try {
+    const { token } = req.params;
+
+    // Get invite and project info
+    const result = await query(`
+      SELECT
+        p.*,
+        e.first_name as employer_first_name,
+        e.last_name as employer_last_name,
+        pi.status as invite_status,
+        pi.expires_at
+      FROM project_invites pi
+      JOIN projects p ON pi.project_id = p.id
+      JOIN users e ON p.employer_id = e.id
+      WHERE pi.invite_token = $1
+    `, [token]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'لینک دعوت نامعتبر یا منقضی شده است'
+      });
+    }
+
+    const data = result.rows[0];
+
+    // Check if invite is expired
+    if (new Date() > new Date(data.expires_at)) {
+      return res.status(400).json({
+        success: false,
+        message: 'لینک دعوت منقضی شده است'
+      });
+    }
+
+    // Get milestones
+    const milestonesResult = await query(
+      'SELECT * FROM milestones WHERE project_id = $1 ORDER BY order_index',
+      [data.id]
+    );
+
+    // Mock employer rating and completed projects (should come from actual data)
+    const projectData = {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      budget: data.budget,
+      deadline: data.deadline,
+      status: data.status,
+      milestones: milestonesResult.rows,
+      employer: {
+        firstName: data.employer_first_name,
+        lastName: data.employer_last_name,
+        rating: 4.5, // Mock data
+        completedProjects: 12 // Mock data
+      },
+      attachments: [], // TODO: Get actual attachments
+      contractTerms: `قرارداد همکاری برای پروژه "${data.title}"
+
+شرایط عمومی:
+- پرداخت بر اساس مراحل تعریف شده انجام می‌شود
+- رعایت کیفیت و مهلت‌های تعیین شده الزامی است
+- در صورت اختلاف، پرونده به داوری ارجاع می‌شود
+- تمام حقوق طرفین محفوظ است
+
+مسئولیت‌های مجری:
+- اجرای پروژه طبق مشخصات ارائه شده
+- ارائه گزارش پیشرفت به‌موقع
+- رعایت استانداردهای کیفی
+
+مسئولیت‌های کارفرما:
+- پرداخت به‌موقع طبق مراحل تعریف شده
+- ارائه اطلاعات و منابع مورد نیاز
+- بازخورد سریع به درخواست‌های مجری`
+    };
+
+    res.json({
+      success: true,
+      data: {
+        project: projectData
+      }
+    });
+
+  } catch (error) {
+    console.error('Get project by invite error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطا در دریافت اطلاعات پروژه'
+    });
+  }
+});
+
+// Accept project invitation (contractor only)
+router.post('/accept/:token', authenticateToken, requireContractor, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { token } = req.params;
+
+    // Get invite and project info
+    const result = await query(`
+      SELECT
+        pi.*,
+        p.id as project_id,
+        p.title,
+        p.status as project_status
+      FROM project_invites pi
+      JOIN projects p ON pi.project_id = p.id
+      WHERE pi.invite_token = $1
+    `, [token]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'لینک دعوت نامعتبر است'
+      });
+    }
+
+    const invite = result.rows[0];
+
+    // Check if invite is expired
+    if (new Date() > new Date(invite.expires_at)) {
+      return res.status(400).json({
+        success: false,
+        message: 'لینک دعوت منقضی شده است'
+      });
+    }
+
+    // Check if invite is already accepted
+    if (invite.status === 'accepted') {
+      return res.status(400).json({
+        success: false,
+        message: 'این دعوت قبلاً پذیرش شده است'
+      });
+    }
+
+    // Check if project is still waiting for acceptance
+    if (invite.project_status !== 'waiting_for_acceptance') {
+      return res.status(400).json({
+        success: false,
+        message: 'این پروژه دیگر قابل پذیرش نیست'
+      });
+    }
+
+    // Accept the invitation
+    await query(
+      'UPDATE project_invites SET status = \'accepted\', accepted_at = NOW() WHERE invite_token = $1',
+      [token]
+    );
+
+    // Update project with contractor and change status to active
+    await query(
+      'UPDATE projects SET contractor_id = $1, status = \'active\', updated_at = NOW() WHERE id = $2',
+      [req.user!.id, invite.project_id]
+    );
+
+    // TODO: Generate PDF contract
+    // TODO: Send notifications to both parties
+
+    res.json({
+      success: true,
+      message: 'پروژه با موفقیت پذیرش شد'
+    });
+
+  } catch (error) {
+    console.error('Accept project error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطا در پذیرش پروژه'
     });
   }
 });
