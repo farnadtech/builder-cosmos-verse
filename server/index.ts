@@ -55,7 +55,7 @@ export function createServer() {
     message: {
       success: false,
       message: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تلاش کنید.',
-      messageFA: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تلاش کنید.'
+      messageFA: 'تعداد درخواست‌های شما از حد مجاز بیشت�� است. لطفاً بعداً تلاش کنید.'
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -170,7 +170,7 @@ export function createServer() {
 }
 
 // Start server if this file is run directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const app = createServer();
   const port = process.env.PORT || 8080;
 
