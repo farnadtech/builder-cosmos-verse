@@ -19,6 +19,7 @@ interface AuthContextType {
   logout: () => void;
   verifyOTP: (phoneNumber: string, code: string) => Promise<{ success: boolean; message: string }>;
   sendOTP: (phoneNumber: string) => Promise<{ success: boolean; message: string }>;
+  verifyIdentity: (formData: FormData) => Promise<{ success: boolean; message: string }>;
 }
 
 interface RegisterData {
