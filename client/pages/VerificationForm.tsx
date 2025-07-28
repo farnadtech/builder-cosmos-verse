@@ -86,6 +86,9 @@ export default function VerificationForm() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Total steps: 3 if phone verified, 4 if not
+  const totalSteps = user?.isVerified ? 3 : 4;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -147,7 +150,7 @@ export default function VerificationForm() {
         setError("");
       } else {
         const data = await response.json();
-        setError(data.message || "خطا در ارسال کد تأیید");
+        setError(data.message || "خطا ��ر ارسال کد تأیید");
       }
     } catch (err) {
       setError("خطا در ارسال کد تأیید");
@@ -417,7 +420,7 @@ export default function VerificationForm() {
                     onChange={(e) =>
                       handleInputChange("nationalId", e.target.value)
                     }
-                    placeholder="شماره ملی ۱۰ رقم��"
+                    placeholder="شم��ره ملی ۱۰ رقم��"
                     maxLength={10}
                   />
                 </div>
