@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { body, validationResult } from "express-validator";
-import { query } from "../database/connection";
+import { sqliteQuery as query } from "../database/sqlite-connection";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -294,7 +294,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response) => {
       return res.status(401).json({
         success: false,
         message: "حساب کاربری شما غیرفعال شده است",
-        messageFA: "حساب کاربری ��ما غیرفعال شده است",
+        messageFA: "حساب کاربری ��ما ��یرفعال شده است",
       });
     }
 
