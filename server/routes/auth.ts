@@ -150,11 +150,19 @@ router.post('/register', registerValidation, async (req: Request, res: Response)
 
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'خطای سیستمی در ثبت نام',
-      messageFA: 'خطای سیستمی در ثبت نام'
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
     });
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: 'خطای سیستمی در ثبت نام',
+        messageFA: 'خطای سیستمی در ثبت نام'
+      });
+    }
   }
 });
 
@@ -313,7 +321,7 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     } else {
       res.status(400).json({
         success: false,
-        message: 'کد تایید نامعتبر یا منقضی شده است',
+        message: 'ک�� تایید نامعتبر یا منقضی شده است',
         messageFA: 'کد تایید نامعتبر یا منقضی شده است'
       });
     }
