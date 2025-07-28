@@ -24,25 +24,27 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/projects" element={<PlaceholderPage title="پروژه‌ها" description="لیست پروژه‌ها" />} />
-            <Route path="/projects/create" element={<CreateProject />} />
-            <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
-            <Route path="/arbitration" element={<PlaceholderPage title="داوری" description="سیستم داوری" />} />
-            <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
-            <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
-            <Route path="/help" element={<PlaceholderPage title="راهنما" description="راهنمای استفاده از سیستم" />} />
-            <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوالات پرتکرار" />} />
-            <Route path="/terms" element={<PlaceholderPage title="قوانین و مقررات" description="شرایط و قوانین استفاده" />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
+        <AuthProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/projects" element={<PlaceholderPage title="پروژه‌ها" description="لیست پروژه‌ها" />} />
+              <Route path="/projects/create" element={<CreateProject />} />
+              <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
+              <Route path="/arbitration" element={<PlaceholderPage title="داوری" description="سیستم داوری" />} />
+              <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
+              <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
+              <Route path="/help" element={<PlaceholderPage title="راهنما" description="راهنمای استفاده از سیستم" />} />
+              <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوالات پرتکرار" />} />
+              <Route path="/terms" element={<PlaceholderPage title="قوانین و مقررات" description="شرایط و قوانین استفاده" />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
