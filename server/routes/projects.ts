@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { body, param, query as queryValidator, validationResult } from 'express-validator';
 import { authenticateToken, AuthenticatedRequest, requireEmployer, requireContractor } from '../middleware/auth';
-import { query, executeTransaction } from '../database/connection';
+import { query, executeTransaction } from '../database/query-wrapper';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -442,7 +442,7 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
 
     res.status(201).json({
       success: true,
-      message: 'درخواست شما با موفقیت ارسال شد'
+      message: 'درخواست شما ��ا موفقیت ارسال شد'
     });
 
   } catch (error) {
@@ -531,7 +531,7 @@ router.post('/:id/assign', authenticateToken, requireEmployer, param('id').isInt
       [
         contractorId,
         'پروژه به شما تخصیص یافت',
-        `پروژه "${project.title}" به شما تخصیص یافت`,
+        `پرو��ه "${project.title}" به شما تخصیص یافت`,
         JSON.stringify({ projectId })
       ]
     );
@@ -834,7 +834,7 @@ router.post('/accept/:token', authenticateToken, requireContractor, async (req: 
     console.error('Accept project error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطا در پذیرش پروژه'
+      message: 'خطا د�� پذیرش پروژه'
     });
   }
 });
