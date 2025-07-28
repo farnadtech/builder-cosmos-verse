@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { Shield, Menu, User, Wallet, MessageSquare, FileText, Gavel } from "lucide-react";
+import { Shield, Menu, User, Wallet, MessageSquare, FileText, Gavel, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -47,7 +48,7 @@ export default function Layout({ children }: LayoutProps) {
               <Link to="/login">ورود</Link>
             </Button>
             <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600 hover:from-zemano-600 hover:to-zemano-700">
-              <Link to="/register">ثبت نام</Link>
+              <Link to="/register">ثبت ن��م</Link>
             </Button>
           </div>
 
