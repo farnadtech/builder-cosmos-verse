@@ -341,10 +341,12 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
       success: true,
       message: 'پروژه با موفقیت ایجاد شد',
       data: {
-        projectId,
-        title,
-        budget: parseFloat(budget),
-        milestonesCount: milestonesData.length
+        project: {
+          id: projectId,
+          title,
+          budget: parseFloat(budget),
+          milestonesCount: milestonesData.length
+        }
       }
     });
 
