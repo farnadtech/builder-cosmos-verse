@@ -28,8 +28,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<PlaceholderPage title="داشبورد" description="پنل کاربری" />} />
-            <Route path="/projects" element={<PlaceholderPage title="پروژه‌ها" description="مدیریت پروژه‌ها" />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/projects" element={<PlaceholderPage title="پروژه‌ها" description="لیست پروژه‌ها" />} />
+            <Route path="/projects/create" element={<CreateProject />} />
             <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
             <Route path="/arbitration" element={<PlaceholderPage title="داوری" description="سیستم داوری" />} />
             <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
