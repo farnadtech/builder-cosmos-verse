@@ -24,8 +24,8 @@ const App = () => (
         <Layout>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<PlaceholderPage title="ورود" description="صفحه ورود کاربران" />} />
-            <Route path="/register" element={<PlaceholderPage title="ثبت نام" description="صفحه ثبت نام کاربران جدید" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<PlaceholderPage title="داشبورد" description="پنل کاربری" />} />
             <Route path="/projects" element={<PlaceholderPage title="پروژه‌ها" description="مدیریت پروژه‌ها" />} />
             <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
