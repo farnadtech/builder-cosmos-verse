@@ -37,20 +37,39 @@ export function PersianDateInput({
     }
   }, []);
 
-  const handleDateChange = (persianInput: string) => {
-    setPersianDate(persianInput);
-    
+  const handleDateChange = (inputValue: string) => {
+    // Remove any non-digit characters except /
+    let cleanValue = inputValue.replace(/[^\d/]/g, '');
+
+    // Auto-format: add slashes automatically
+    if (cleanValue.length >= 4 && !cleanValue.includes('/')) {
+      // If user types 4 digits, add first slash
+      cleanValue = cleanValue.slice(0, 4) + '/' + cleanValue.slice(4);
+    }
+    if (cleanValue.length >= 7 && cleanValue.split('/').length === 2) {
+      // If user has YYYY/MM format, add second slash
+      const parts = cleanValue.split('/');
+      cleanValue = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
+    }
+
+    // Limit to YYYY/MM/DD format
+    if (cleanValue.length > 10) {
+      cleanValue = cleanValue.slice(0, 10);
+    }
+
+    setPersianDate(cleanValue);
+
     // Validate Persian date format (YYYY/MM/DD)
     const persianDateRegex = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/;
-    const match = persianInput.match(persianDateRegex);
-    
+    const match = cleanValue.match(persianDateRegex);
+
     if (match) {
       const [, year, month, day] = match;
-      
+
       try {
         // Create moment-jalaali date
         const jDate = moment(`${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`, 'jYYYY/jMM/jDD');
-        
+
         if (jDate.isValid()) {
           // Convert to Gregorian and send back
           const gregorianDate = jDate.format('YYYY-MM-DD');
