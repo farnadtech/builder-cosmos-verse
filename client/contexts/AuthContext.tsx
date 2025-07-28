@@ -117,43 +117,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Registration response status:', response.status);
       console.log('Registration response headers:', response.headers);
 
-      if (!response.ok) {
-        console.log('Response not ok, reading error...');
-        let errorMessage = 'خطا در ثبت نام';
-
-        try {
-          const errorText = await response.text();
-          console.error('Registration error response:', errorText);
-
-          if (errorText) {
-            try {
-              const errorData = JSON.parse(errorText);
-              errorMessage = errorData.message || errorMessage;
-            } catch (parseError) {
-              console.error('Error parsing error response:', parseError);
-              errorMessage = errorText || errorMessage;
-            }
-          }
-        } catch (readError) {
-          console.error('Error reading error response:', readError);
-        }
-
-        return { success: false, message: errorMessage };
+      // Read the response body once as text, then parse as needed
+      let responseText: string;
+      try {
+        responseText = await response.text();
+        console.log('Registration response text:', responseText);
+      } catch (readError) {
+        console.error('Error reading response:', readError);
+        return { success: false, message: 'خطا در خواندن پاسخ سرور' };
       }
 
-      console.log('Response ok, reading JSON...');
-      let data;
+      // Parse the response text as JSON
+      let data: any;
       try {
-        data = await response.json();
+        data = JSON.parse(responseText);
         console.log('Registration response data:', data);
-      } catch (jsonError) {
-        console.error('Error parsing JSON response:', jsonError);
-        console.error('Response details:', {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries())
-        });
+      } catch (parseError) {
+        console.error('Error parsing response as JSON:', parseError);
+        console.error('Raw response:', responseText);
+
+        // If response is not ok and we can't parse JSON, use the text as error message
+        if (!response.ok) {
+          return { success: false, message: responseText || 'خطا در ثبت نام' };
+        }
+
         return { success: false, message: 'خطا در پردازش پاسخ سرور' };
+      }
+
+      // Handle error responses
+      if (!response.ok) {
+        const errorMessage = data?.message || data?.messageFA || 'خطا در ثبت نام';
+        return { success: false, message: errorMessage };
       }
 
       if (data.success) {
