@@ -92,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return { success: true, message: 'ورود با موفقیت انجام شد' };
       } else {
-        return { success: false, message: data.message || 'خطا در و��ود' };
+        return { success: false, message: data.message || 'خطا در ورود' };
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -115,19 +115,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       console.log('Registration response status:', response.status);
+      console.log('Registration response headers:', response.headers);
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Registration error response:', errorText);
+        console.log('Response not ok, reading error...');
+        let errorMessage = 'خطا در ثبت نام';
 
         try {
-          const errorData = JSON.parse(errorText);
-          return { success: false, message: errorData.message || 'خطا در ثبت نام' };
-        } catch {
-          return { success: false, message: 'خطا در ثبت نام' };
+          const errorText = await response.text();
+          console.error('Registration error response:', errorText);
+
+          if (errorText) {
+            try {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.message || errorMessage;
+            } catch (parseError) {
+              console.error('Error parsing error response:', parseError);
+              errorMessage = errorText || errorMessage;
+            }
+          }
+        } catch (readError) {
+          console.error('Error reading error response:', readError);
         }
+
+        return { success: false, message: errorMessage };
       }
 
+      console.log('Response ok, reading JSON...');
       const data = await response.json();
       console.log('Registration response data:', data);
 
