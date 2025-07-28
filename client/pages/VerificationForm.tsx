@@ -66,7 +66,7 @@ const provinces = [
   "هرمزگان",
   "همدان",
   "یزد",
-  "ک��دستان",
+  "کردستان",
   "ایلام",
   "بوشهر",
   "زنجان",
@@ -645,12 +645,12 @@ export default function VerificationForm() {
                 مرحله قبل
               </Button>
 
-              {currentStep < 4 ? (
+              {currentStep < totalSteps ? (
                 <Button onClick={nextStep}>مرحله بعد</Button>
               ) : (
                 <Button
                   onClick={submitVerification}
-                  disabled={loading || !otpSent}
+                  disabled={loading || (!user?.isVerified && !otpSent)}
                   className="bg-zemano-600 hover:bg-zemano-700"
                 >
                   {loading ? "در حال تأیید..." : "تکمیل احراز هویت"}
