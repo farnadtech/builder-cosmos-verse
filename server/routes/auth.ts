@@ -37,7 +37,7 @@ const upload = multer({
     if (allowedTypes.includes(fileExt)) {
       cb(null, true);
     } else {
-      cb(new Error('فقط فایل‌های تصویری مجاز هستند'));
+      cb(new Error('فقط فایل‌های تصویری مج��ز هستند'));
     }
   }
 });
@@ -124,7 +124,7 @@ router.post('/register', registerValidation, async (req: Request, res: Response)
       role: user.role
     });
 
-    res.status(201).json({
+    const responseData = {
       success: true,
       message: 'ثبت نام با موفقیت انجام شد. لطفاً شماره موبایل خود را تایید کنید',
       data: {
@@ -143,7 +143,10 @@ router.post('/register', registerValidation, async (req: Request, res: Response)
         },
         otpSent: otpResult.success
       }
-    });
+    };
+
+    console.log('Sending registration response:', responseData);
+    res.status(201).json(responseData);
 
   } catch (error) {
     console.error('Register error:', error);
@@ -420,14 +423,14 @@ router.post('/reset-password', async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: 'رمز عبور با موفقیت تغییر کرد'
+      message: 'رمز عبور با موفقیت تغییر ک��د'
     });
 
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطای سیستمی در تغییر رمز عبور'
+      message: 'خطای سیستمی در تغییر رمز عبو��'
     });
   }
 });
@@ -472,7 +475,7 @@ router.post('/verify-identity', authenticateToken, upload.fields([
     if (!isValidOTP) {
       return res.status(400).json({
         success: false,
-        message: 'کد تایید نامعتبر یا منقضی شده است'
+        message: 'کد تایید نامعتبر ی�� منقضی شده است'
       });
     }
 
