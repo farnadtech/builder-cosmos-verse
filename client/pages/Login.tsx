@@ -14,11 +14,35 @@ export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login logic
-    console.log("Login attempt:", { phoneNumber, password, rememberMe });
+
+    if (!phoneNumber.trim() || !password.trim()) {
+      toast.error("لطفاً تمام فیلدها را پر کنید");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await login(phoneNumber, password);
+
+      if (result.success) {
+        toast.success(result.message);
+        navigate("/dashboard");
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("خطا در ورود");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -37,7 +61,7 @@ export default function Login() {
             </div>
             <h1 className="text-2xl font-bold">ورود به حساب کاربری</h1>
             <p className="text-muted-foreground mt-2">
-              با شماره موبایل و رمز ��بور خود وارد شوید
+              با شماره موبایل و رمز عبور خود وارد شوید
             </p>
           </div>
 
