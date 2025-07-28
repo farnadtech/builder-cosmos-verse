@@ -248,5 +248,42 @@ CREATE INDEX idx_project_applications_status ON project_applications(status);
 INSERT INTO users (first_name, last_name, email, phone_number, password_hash, role, is_verified, is_active) VALUES
 ('مدیر', 'سیستم', 'admin@zemano.ir', '+989123456789', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', TRUE, TRUE);
 
+-- Project invites table
+CREATE TABLE project_invites (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+    invite_token VARCHAR(255) UNIQUE NOT NULL,
+    contractor_email VARCHAR(255),
+    contractor_phone VARCHAR(20),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'expired')),
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    accepted_at TIMESTAMP
+);
+
+-- Verification documents table
+CREATE TABLE verification_documents (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    national_card_image VARCHAR(255),
+    selfie_image VARCHAR(255),
+    national_id VARCHAR(20),
+    province VARCHAR(100),
+    city VARCHAR(100),
+    birth_date DATE,
+    verification_status VARCHAR(20) DEFAULT 'pending' CHECK (verification_status IN ('pending', 'approved', 'rejected')),
+    admin_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for better performance
+CREATE INDEX idx_projects_employer ON projects(employer_id);
+CREATE INDEX idx_projects_contractor ON projects(contractor_id);
+CREATE INDEX idx_projects_status ON projects(status);
+CREATE INDEX idx_project_invites_token ON project_invites(invite_token);
+CREATE INDEX idx_verification_documents_user ON verification_documents(user_id);
+
 -- Create wallet for admin user
 INSERT INTO wallets (user_id, balance) VALUES (1, 0.00);
