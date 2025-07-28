@@ -213,8 +213,9 @@ export default function CreateProject() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <ProtectedRoute requiredRole={['employer']}>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">ایجاد پروژه جدید</h1>
@@ -314,7 +315,7 @@ export default function CreateProject() {
                       {formData.attachment ? formData.attachment.name : "فایل خود را بارگذاری کنید"}
                     </p>
                     <p className="text-xs text-gray-500">
-                      فرمت‌های مجاز: JPG, PNG, PDF, DOC, ZIP (حداکثر ۱۰ مگابایت)
+                      فرمت‌��ای مجاز: JPG, PNG, PDF, DOC, ZIP (حداکثر ۱۰ مگابایت)
                     </p>
                   </label>
                 </div>
@@ -584,7 +585,8 @@ export default function CreateProject() {
             </div>
           )}
         </form>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
