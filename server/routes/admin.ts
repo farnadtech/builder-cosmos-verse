@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { authenticateToken, AuthenticatedRequest, requireAdmin } from '../middleware/auth';
-import { query, executeTransaction } from "../database/query-wrapper"';
+import { query, executeTransaction } from "../database/query-wrapper";
 import bcrypt from 'bcryptjs';
 
 const router = Router();

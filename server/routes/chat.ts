@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { body, param, query as queryValidator, validationResult } from 'express-validator';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
-import { query } from "../database/query-wrapper"';
+import { query } from "../database/query-wrapper";
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
