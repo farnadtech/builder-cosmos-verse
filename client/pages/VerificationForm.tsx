@@ -27,7 +27,7 @@ interface VerificationData {
 }
 
 const provinces = [
-  "تهران", "اصفهان", "فارس", "خراسان رضوی", "ک��مان", "خوزستان", "مازندران",
+  "تهران", "اصفهان", "فارس", "خراسان رضوی", "کرمان", "خوزستان", "مازندران",
   "آذربایجان شرقی", "آذربایجان غربی", "کرمانشاه", "گیلان", "لرستان", "مرکزی",
   "هرمزگان", "همدان", "یزد", "کردستان", "ایلام", "بوشهر", "زنجان",
   "سمنان", "قزوین", "قم", "گلستان", "خراسان شمالی", "خراسان جنوبی",
@@ -262,7 +262,7 @@ export default function VerificationForm() {
             <CardTitle>
               {currentStep === 1 && "اطلاعات شخصی"}
               {currentStep === 2 && "اطلاعات آدرس"}
-              {currentStep === 3 && "آپ��ود مدارک"}
+              {currentStep === 3 && "آپلود مدارک"}
               {currentStep === 4 && "تأیید شماره موبایل"}
             </CardTitle>
             <CardDescription>
@@ -358,15 +358,12 @@ export default function VerificationForm() {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="birthDate">تاریخ تولد</Label>
-                  <Input
-                    id="birthDate"
-                    type="date"
-                    value={formData.birthDate}
-                    onChange={(e) => handleInputChange('birthDate', e.target.value)}
-                  />
-                </div>
+                <PersianDateInput
+                  id="birthDate"
+                  label="تاریخ تولد (شمسی)"
+                  value={formData.birthDate}
+                  onChange={(value) => handleInputChange('birthDate', value)}
+                />
               </div>
             )}
 
