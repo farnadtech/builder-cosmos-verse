@@ -12,10 +12,11 @@ interface ProtectedRouteProps {
   requiresVerification?: boolean;
 }
 
-export default function ProtectedRoute({ 
-  children, 
-  requiredRole, 
-  showLoginPrompt = true 
+export default function ProtectedRoute({
+  children,
+  requiredRole,
+  showLoginPrompt = true,
+  requiresVerification = true
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
@@ -92,7 +93,7 @@ export default function ProtectedRoute({
               <div>
                 <CardTitle className="text-2xl font-bold mb-2">دسترسی محدود</CardTitle>
                 <CardDescription className="text-lg">
-                  شما دسترسی لازم برای مشاهده این صفحه را ندارید
+                  ��ما دسترسی لازم برای مشاهده این صفحه را ندارید
                 </CardDescription>
               </div>
             </CardHeader>
