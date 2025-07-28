@@ -129,6 +129,26 @@ export default function VerificationForm() {
       setError("تاریخ تولد الزامی است");
       return false;
     }
+
+    // Validate age (18-120 years)
+    try {
+      const birth = moment(formData.birthDate);
+      const today = moment();
+      const age = today.diff(birth, 'years');
+
+      if (age < 18) {
+        setError("سن شما باید بیشتر از ۱۸ سال باشد");
+        return false;
+      }
+      if (age > 120) {
+        setError("سن وارد شده معتبر نیست");
+        return false;
+      }
+    } catch (error) {
+      setError("تاریخ تولد وارد شده صحیح نیست");
+      return false;
+    }
+
     return true;
   };
 
@@ -466,7 +486,7 @@ export default function VerificationForm() {
               <div className="space-y-6">
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">
-                    کد تأیید به شماره {formData.phoneNumber} ارسال شد
+                    کد تأ��ید به شماره {formData.phoneNumber} ارسال شد
                   </p>
                   
                   {!otpSent ? (
