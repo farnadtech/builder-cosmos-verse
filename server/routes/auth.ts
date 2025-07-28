@@ -4,8 +4,43 @@ import { body, validationResult } from 'express-validator';
 import { query } from '../database/connection';
 import { generateAccessToken, generateRefreshToken, refreshToken } from '../middleware/auth';
 import { smsService } from '../services/sms';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const router = Router();
+
+// Configure multer for verification documents
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = 'uploads/verification';
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.jpg', '.jpeg', '.png'];
+    const fileExt = path.extname(file.originalname).toLowerCase();
+
+    if (allowedTypes.includes(fileExt)) {
+      cb(null, true);
+    } else {
+      cb(new Error('فقط فایل‌های تصویری مجاز هستند'));
+    }
+  }
+});
 
 // Validation rules
 const registerValidation = [
