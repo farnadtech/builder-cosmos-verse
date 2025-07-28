@@ -146,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
 
         xhr.ontimeout = () => {
-          reject(new Error('زمان انتظار تمام شد'));
+          reject(new Error('��مان انتظار تمام شد'));
         };
 
         xhr.timeout = 30000; // 30 second timeout
@@ -161,25 +161,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, message: errorMessage };
       }
 
-      if (data.success) {
+      if (data.data.success) {
         const newUser: User = {
-          id: data.data.user.id,
-          firstName: data.data.user.firstName,
-          lastName: data.data.user.lastName,
-          email: data.data.user.email,
-          phoneNumber: data.data.user.phoneNumber,
-          role: data.data.user.role,
-          isVerified: data.data.user.isVerified
+          id: data.data.data.user.id,
+          firstName: data.data.data.user.firstName,
+          lastName: data.data.data.user.lastName,
+          email: data.data.data.user.email,
+          phoneNumber: data.data.data.user.phoneNumber,
+          role: data.data.data.user.role,
+          isVerified: data.data.data.user.isVerified
         };
 
         setUser(newUser);
-        localStorage.setItem('zemano_token', data.data.tokens.accessToken);
-        localStorage.setItem('zemano_refresh_token', data.data.tokens.refreshToken);
+        localStorage.setItem('zemano_token', data.data.data.tokens.accessToken);
+        localStorage.setItem('zemano_refresh_token', data.data.data.tokens.refreshToken);
         localStorage.setItem('zemano_user', JSON.stringify(newUser));
 
-        return { success: true, message: data.message || 'ثبت نام با موفقیت انجام شد' };
+        return { success: true, message: data.data.message || 'ثبت نام با موفقیت انجام شد' };
       } else {
-        return { success: false, message: data.message || 'خطا در ثبت نام' };
+        return { success: false, message: data.data.message || 'خطا ��ر ثبت نام' };
       }
     } catch (error) {
       console.error('Register error:', error);
