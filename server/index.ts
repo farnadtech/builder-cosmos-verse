@@ -67,7 +67,7 @@ export function createServer() {
     max: 5, // Limit each IP to 5 requests per windowMs for auth
     message: {
       success: false,
-      message: 'تعداد تلاش‌های ورود از حد مجاز بیشتر ا��ت. لطفاً 15 دقیقه بعد تلاش کنید.',
+      message: 'تعداد تلاش‌های ورود از حد مجاز بیشتر است. لطفاً 15 دقیقه بعد تلاش کنید.',
       messageFA: 'تعداد تلاش‌های ورود از حد مجاز بیشتر است. لطفاً 15 دقیقه بعد تلاش کنید.'
     }
   });
@@ -104,6 +104,7 @@ export function createServer() {
   app.use('/api/arbitration', arbitrationRoutes);
   app.use('/api/payment', paymentRoutes);
   app.use('/api/contracts', contractRoutes);
+  app.use('/api/notifications', notificationRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/upload', uploadRoutes);
 
@@ -147,7 +148,7 @@ export function createServer() {
     // Default error response
     res.status(err.status || 500).json({
       success: false,
-      message: err.message || '��طای داخلی سرور',
+      message: err.message || 'خطای داخلی سرور',
       messageFA: err.messageFA || 'خطای داخلی سرور',
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
     });
