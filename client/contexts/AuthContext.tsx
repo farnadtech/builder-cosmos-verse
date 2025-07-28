@@ -117,55 +117,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('Attempting registration with data:', userData);
 
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-        // Add cache control to prevent duplicate requests
-        cache: 'no-cache',
+      // Use XMLHttpRequest as a fallback to avoid response body consumption issues
+      const data = await new Promise<any>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/auth/register');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Cache-Control', 'no-cache');
+
+        xhr.onload = () => {
+          try {
+            const responseData = JSON.parse(xhr.responseText);
+            resolve({
+              data: responseData,
+              status: xhr.status,
+              ok: xhr.status >= 200 && xhr.status < 300
+            });
+          } catch (parseError) {
+            resolve({
+              data: { message: xhr.responseText || 'خطا در پردازش پاسخ' },
+              status: xhr.status,
+              ok: false
+            });
+          }
+        };
+
+        xhr.onerror = () => {
+          reject(new Error('خطا در ارتباط با سرور'));
+        };
+
+        xhr.ontimeout = () => {
+          reject(new Error('زمان انتظار تمام شد'));
+        };
+
+        xhr.timeout = 30000; // 30 second timeout
+        xhr.send(JSON.stringify(userData));
       });
 
-      console.log('Registration response status:', response.status);
-      console.log('Registration response headers:', response.headers);
-      console.log('Response body used:', response.bodyUsed);
-
-      // Clone the response to avoid "body stream already read" errors
-      const responseClone = response.clone();
-
-      // Read the response body once as text, then parse as needed
-      let responseText: string;
-      try {
-        responseText = await responseClone.text();
-        console.log('Registration response text:', responseText);
-      } catch (readError) {
-        console.error('Error reading response:', readError);
-        console.error('Response bodyUsed:', response.bodyUsed);
-        console.error('Clone bodyUsed:', responseClone.bodyUsed);
-        return { success: false, message: 'خطا در خواندن پاسخ سرور' };
-      }
-
-      // Parse the response text as JSON
-      let data: any;
-      try {
-        data = JSON.parse(responseText);
-        console.log('Registration response data:', data);
-      } catch (parseError) {
-        console.error('Error parsing response as JSON:', parseError);
-        console.error('Raw response:', responseText);
-
-        // If response is not ok and we can't parse JSON, use the text as error message
-        if (!response.ok) {
-          return { success: false, message: responseText || 'خطا در ثبت نام' };
-        }
-
-        return { success: false, message: 'خطا در پردازش پاسخ سرور' };
-      }
+      console.log('Registration response:', data);
 
       // Handle error responses
-      if (!response.ok) {
-        const errorMessage = data?.message || data?.messageFA || 'خطا در ثبت نام';
+      if (!data.ok) {
+        const errorMessage = data.data?.message || data.data?.messageFA || 'خطا در ثبت نام';
         return { success: false, message: errorMessage };
       }
 
