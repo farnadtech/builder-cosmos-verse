@@ -101,10 +101,8 @@ async function createAdminUser() {
 }
 
 // Run if called directly
-if (require.main === module) {
-  createAdminUser().then(() => {
-    process.exit(0);
-  });
-}
+createAdminUser().then(() => {
+  process.exit(0);
+});
 
 export { createAdminUser };
