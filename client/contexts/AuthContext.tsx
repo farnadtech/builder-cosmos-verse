@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const data = result.data;
 
-      if (response.ok && data.success) {
+      if (result.ok && data.success) {
         const userData: User = {
           id: data.data.user.id,
           firstName: data.data.user.firstName,
