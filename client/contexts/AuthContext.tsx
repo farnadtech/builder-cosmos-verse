@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('zemano_refresh_token', data.data.tokens.refreshToken);
         localStorage.setItem('zemano_user', JSON.stringify(userData));
 
-        return { success: true, message: 'ورود با موفقیت انجام شد' };
+        return { success: true, message: 'ورود با موفقیت انجا�� شد' };
       } else {
         return { success: false, message: data.message || 'خطا در ورود' };
       }
@@ -178,6 +178,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Verify OTP error:', error);
       return { success: false, message: 'خطا در تایید کد' };
+    }
+  };
+
+  const verifyIdentity = async (formData: FormData): Promise<{ success: boolean; message: string }> => {
+    try {
+      const token = localStorage.getItem('zemano_token');
+      const response = await fetch('/api/auth/verify-identity', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success && user) {
+        const updatedUser = { ...user, isVerified: true };
+        setUser(updatedUser);
+        localStorage.setItem('zemano_user', JSON.stringify(updatedUser));
+      }
+
+      return { success: data.success, message: data.message };
+    } catch (error) {
+      console.error('Verify identity error:', error);
+      return { success: false, message: 'خطا در احراز هویت' };
     }
   };
 
