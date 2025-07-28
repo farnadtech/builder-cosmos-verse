@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('zemano_refresh_token', data.data.tokens.refreshToken);
         localStorage.setItem('zemano_user', JSON.stringify(userData));
 
-        return { success: true, message: 'ورود با موفقیت انجا�� شد' };
+        return { success: true, message: 'ورود با موفقیت انجام شد' };
       } else {
         return { success: false, message: data.message || 'خطا در ورود' };
       }
@@ -222,7 +222,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     verifyOTP,
-    sendOTP
+    sendOTP,
+    verifyIdentity
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
