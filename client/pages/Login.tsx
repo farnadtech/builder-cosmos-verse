@@ -23,7 +23,7 @@ export default function Login() {
     e.preventDefault();
 
     if (!phoneNumber.trim() || !password.trim()) {
-      toast.error("لطفاً تمام فیلدها را پر کنید");
+      toast.error("لطفاً تمام فیلدها ��ا پر کنید");
       return;
     }
 
@@ -137,11 +137,12 @@ export default function Login() {
                 </div>
 
                 {/* Login Button */}
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-gradient-to-r from-zemano-500 to-zemano-600 hover:from-zemano-600 hover:to-zemano-700 text-lg py-6"
+                  disabled={isLoading}
                 >
-                  ورود
+                  {isLoading ? "در حال ورود..." : "ورود"}
                 </Button>
 
                 {/* Divider */}
