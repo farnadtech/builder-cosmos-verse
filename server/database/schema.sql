@@ -41,7 +41,7 @@ CREATE TABLE projects (
     budget DECIMAL(15, 2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'IRR',
     deadline DATE,
-    status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'assigned', 'in_progress', 'completed', 'cancelled', 'disputed')),
+    status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'waiting_for_acceptance', 'assigned', 'in_progress', 'completed', 'cancelled', 'disputed')),
     attachment_path VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
