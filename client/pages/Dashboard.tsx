@@ -74,7 +74,12 @@ const mockData = {
 };
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
   // تابع برای تبدیل نقش به فارسی
   const getRoleName = (role: string) => {
@@ -93,7 +98,7 @@ export default function Dashboard() {
       case 'open': return 'باز';
       case 'assigned': return 'تخصیص یافته';
       case 'in_progress': return 'در حال انجام';
-      case 'completed': return 'تکمیل شده';
+      case 'completed': return 'تکمیل شد��';
       case 'cancelled': return 'لغو شده';
       case 'disputed': return 'در حال داوری';
       default: return status;
