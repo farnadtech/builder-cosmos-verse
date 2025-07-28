@@ -95,7 +95,7 @@ export default function VerificationForm() {
         setError("");
       } else {
         const data = await response.json();
-        setError(data.message || "خطا در ا��سال کد تأیید");
+        setError(data.message || "خطا در ارسال کد تأیید");
       }
     } catch (err) {
       setError("خطا در ارسال کد تأیید");
@@ -289,7 +289,7 @@ export default function VerificationForm() {
               {currentStep === 1 && "لطفاً اطلاعات شخصی خود را وارد کنید"}
               {currentStep === 2 && "آدرس محل سکونت خود را مشخص کنید"}
               {currentStep === 3 && "تصاویر مدارک هویتی خود را آپلود کنید"}
-              {currentStep === 4 && "کد تأیید ارسال شده به موبایل خود را و��رد کنید"}
+              {currentStep === 4 && "کد تأیید ارسال شده به موبایل خود را وارد کنید"}
             </CardDescription>
           </CardHeader>
 
@@ -320,7 +320,7 @@ export default function VerificationForm() {
                       id="lastName"
                       value={formData.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      placeholder="نام خان��ادگی خود را وارد کنید"
+                      placeholder="نام خانوادگی خود را وارد کنید"
                     />
                   </div>
                 </div>
@@ -501,7 +501,7 @@ export default function VerificationForm() {
                           maxLength={6}
                           value={formData.otpCode}
                           onChange={(value) => handleInputChange('otpCode', value)}
-                          dir="ltr"
+                          dir="rtl"
                           containerClassName="flex-row-reverse"
                         >
                           <InputOTPGroup>
