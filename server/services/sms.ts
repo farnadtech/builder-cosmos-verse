@@ -31,8 +31,8 @@ class SMSService {
     
     // Delete any existing unused OTP for this phone number
     await query(
-      'DELETE FROM otp_codes WHERE phone_number = $1 AND is_used = false',
-      [phoneNumber]
+      'DELETE FROM otp_codes WHERE phone_number = $1 AND is_used = $2',
+      [phoneNumber, 0]
     );
 
     // Store new OTP
@@ -134,7 +134,7 @@ class SMSService {
 
         console.log(`📱 OTP for ${phoneNumber}: ${otpCode} (or use 123456 for development)`);
 
-        const message = `ضمانو\nکد تایید: ${otpCode}\nاین کد تا 5 دقیقه معتبر است.\nzemano.ir`;
+        const message = `ضمانو\nکد ��ایید: ${otpCode}\nاین کد تا 5 دقیقه معتبر است.\nzemano.ir`;
 
         // Try to send SMS, but don't fail if SMS service is unavailable
         const smsSent = await this.sendSMS(phoneNumber, message);
