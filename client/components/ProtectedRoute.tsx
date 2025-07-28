@@ -2,13 +2,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, LogIn } from "lucide-react";
+import { Lock, LogIn, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string[];
   showLoginPrompt?: boolean;
+  requiresVerification?: boolean;
 }
 
 export default function ProtectedRoute({ 
