@@ -86,7 +86,7 @@ export default function Register() {
 
       if (result.success) {
         toast.success(result.message);
-        navigate("/dashboard");
+        navigate("/verification");
       } else {
         toast.error(result.message);
       }
@@ -113,7 +113,7 @@ export default function Register() {
             </div>
             <h1 className="text-2xl font-bold">ایجاد حساب کاربری</h1>
             <p className="text-muted-foreground mt-2">
-              به جمع کاربران ضمانو بپیوندید
+              ��ه جمع کاربران ضمانو بپیوندید
             </p>
           </div>
 
