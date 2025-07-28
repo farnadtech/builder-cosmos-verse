@@ -29,7 +29,7 @@ interface VerificationData {
 const provinces = [
   "تهران", "اصفهان", "فارس", "خراسان رضوی", "کرمان", "خوزستان", "مازندران",
   "آذربایجان شرقی", "آذربایجان غربی", "کرمانشاه", "گیلان", "لرستان", "مرکزی",
-  "هرمزگان", "همدان", "یزد", "کردستا��", "ایلام", "بوشهر", "زنجان",
+  "هرمزگان", "همدان", "یزد", "کردستان", "ایلام", "بوشهر", "زنجان",
   "سمنان", "قزوین", "قم", "گلستان", "خراسان شمالی", "خراسان جنوبی",
   "البرز", "اردبیل", "چهارمحال و بختیاری", "کهگیلویه و بویراحمد"
 ];
@@ -95,7 +95,7 @@ export default function VerificationForm() {
         setError("");
       } else {
         const data = await response.json();
-        setError(data.message || "خطا در ارسال کد تأیید");
+        setError(data.message || "خطا در ا��سال کد تأیید");
       }
     } catch (err) {
       setError("خطا در ارسال کد تأیید");
@@ -110,7 +110,7 @@ export default function VerificationForm() {
       return false;
     }
     if (!formData.nationalId || formData.nationalId.length !== 10) {
-      setError("ش��اره ملی باید ۱۰ رقم باشد");
+      setError("شماره ملی باید ۱۰ رقم باشد");
       return false;
     }
     if (!formData.phoneNumber) {
@@ -216,7 +216,7 @@ export default function VerificationForm() {
       const response = await fetch('/api/auth/verify-identity', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('zemano_token')}`,
         },
         body: formDataToSend,
       });
@@ -243,7 +243,7 @@ export default function VerificationForm() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto max-w-2xl px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">احراز هوی�� کامل</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">احراز هویت کامل</h1>
           <p className="text-gray-600">برای استفاده از تمام امکانات پلتفرم، لطفاً اطلاعات زیر را تکمیل کنید</p>
         </div>
 
@@ -289,7 +289,7 @@ export default function VerificationForm() {
               {currentStep === 1 && "لطفاً اطلاعات شخصی خود را وارد کنید"}
               {currentStep === 2 && "آدرس محل سکونت خود را مشخص کنید"}
               {currentStep === 3 && "تصاویر مدارک هویتی خود را آپلود کنید"}
-              {currentStep === 4 && "کد تأیید ارسال شده به موبایل خود را وارد کنید"}
+              {currentStep === 4 && "کد تأیید ارسال شده به موبایل خود را و��رد کنید"}
             </CardDescription>
           </CardHeader>
 
@@ -320,7 +320,7 @@ export default function VerificationForm() {
                       id="lastName"
                       value={formData.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      placeholder="نام خانوادگی خود را وارد کنید"
+                      placeholder="نام خان��ادگی خود را وارد کنید"
                     />
                   </div>
                 </div>
@@ -331,7 +331,7 @@ export default function VerificationForm() {
                     id="nationalId"
                     value={formData.nationalId}
                     onChange={(e) => handleInputChange('nationalId', e.target.value)}
-                    placeholder="شماره م��ی ۱۰ رقم��"
+                    placeholder="شماره ملی ۱۰ رقم��"
                     maxLength={10}
                   />
                 </div>
