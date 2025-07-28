@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, message: 'خطا در اتصال به سرور' };
+      return { success: false, message: 'خطا در ��تصال به سرور' };
     }
   };
 
@@ -256,7 +256,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cache: 'no-cache',
       });
 
-      const responseText = await response.text();
+      const responseClone = response.clone();
+      const responseText = await responseClone.text();
       const data = JSON.parse(responseText);
 
       if (data.success && user) {
