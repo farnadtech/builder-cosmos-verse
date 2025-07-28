@@ -221,7 +221,7 @@ export default function VerificationForm() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto max-w-2xl px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">احراز هویت کامل</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">احراز هویت کام��</h1>
           <p className="text-gray-600">برای استفاده از تمام امکانات پلتفرم، لطفاً اطلاعات زیر را تکمیل کنید</p>
         </div>
 
@@ -482,17 +482,19 @@ export default function VerificationForm() {
                           maxLength={6}
                           value={formData.otpCode}
                           onChange={(value) => handleInputChange('otpCode', value)}
+                          dir="ltr"
+                          containerClassName="flex-row-reverse"
                         >
                           <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={5} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={3} />
                           </InputOTPGroup>
                           <InputOTPSeparator />
                           <InputOTPGroup>
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={0} />
                           </InputOTPGroup>
                         </InputOTP>
                       </div>
