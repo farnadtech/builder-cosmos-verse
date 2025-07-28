@@ -66,7 +66,7 @@ const provinces = [
   "هرمزگان",
   "همدان",
   "یزد",
-  "کردستان",
+  "ک��دستان",
   "ایلام",
   "بوشهر",
   "زنجان",
@@ -332,7 +332,7 @@ export default function VerificationForm() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            {[1, 2, 3, 4].map((step) => (
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
               <div
                 key={step}
                 className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
@@ -353,14 +353,14 @@ export default function VerificationForm() {
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-zemano-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / 4) * 100}%` }}
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>اطلاعات پایه</span>
             <span>آدرس</span>
             <span>مدارک</span>
-            <span>تأیید</span>
+            {!user?.isVerified && <span>تأیید</span>}
           </div>
         </div>
 
