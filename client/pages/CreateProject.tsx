@@ -192,18 +192,29 @@ export default function CreateProject() {
     setIsSubmitting(true);
 
     try {
-      // TODO: Implement API call to create project
-      console.log("Creating project:", {
-        ...formData,
-        milestones,
-        totalAmount: totalMilestonesAmount
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('zemano_token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          milestones,
+          totalAmount: totalMilestonesAmount
+        }),
       });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (response.ok) {
+        const data = await response.json();
+        const projectId = data.project.id;
 
-      // Navigate to dashboard on success
-      navigate("/dashboard");
+        // Navigate to invite contractor page
+        navigate(`/projects/${projectId}/invite`);
+      } else {
+        const errorData = await response.json();
+        setErrors({ submit: errorData.message || "خطا در ایجاد پروژه" });
+      }
     } catch (error) {
       console.error("Error creating project:", error);
       setErrors({ submit: "خطا در ایجاد پروژه. لطفاً دوباره تلاش کنید." });
@@ -344,7 +355,7 @@ export default function CreateProject() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Budget */}
                 <div className="space-y-2">
-                  <Label htmlFor="budget">بودجه کل (ریال) *</Label>
+                  <Label htmlFor="budget">بودجه ��ل (ریال) *</Label>
                   <Input
                     id="budget"
                     type="number"
