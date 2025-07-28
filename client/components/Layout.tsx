@@ -119,12 +119,32 @@ export default function Layout({ children }: LayoutProps) {
                 </Link>
               </nav>
               <div className="flex flex-col space-y-2 pt-4 border-t">
-                <Button variant="ghost" asChild>
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>ورود</Link>
-                </Button>
-                <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600">
-                  <Link to="/register" onClick={() => setMobileMenuOpen(false)}>ثبت نام</Link>
-                </Button>
+                {user ? (
+                  <>
+                    <div className="text-sm text-gray-600 py-2">
+                      سلام، {user.firstName}
+                    </div>
+                    <Button variant="ghost" asChild>
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                        <User className="h-4 w-4 ml-2" />
+                        داشبورد
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" onClick={() => { logout(); setMobileMenuOpen(false); }}>
+                      <LogOut className="h-4 w-4 ml-2" />
+                      خروج
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" asChild>
+                      <Link to="/login" onClick={() => setMobileMenuOpen(false)}>ورود</Link>
+                    </Button>
+                    <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600">
+                      <Link to="/register" onClick={() => setMobileMenuOpen(false)}>ثبت نام</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
