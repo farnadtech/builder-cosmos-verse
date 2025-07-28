@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+          <nav className="hidden md:flex items-center gap-8">
             <Link to="/projects" className="text-sm font-medium transition-colors hover:text-zemano-600">
               پروژه‌ها
             </Link>
@@ -42,7 +42,7 @@ export default function Layout({ children }: LayoutProps) {
           </nav>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
+          <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" asChild>
               <Link to="/login">ورود</Link>
             </Button>
