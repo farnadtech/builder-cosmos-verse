@@ -17,6 +17,7 @@ import chatRoutes from "./routes/chat";
 import arbitrationRoutes from "./routes/arbitration";
 import paymentRoutes from "./routes/payment";
 import contractRoutes from "./routes/contracts";
+import notificationRoutes from "./routes/notifications";
 import adminRoutes from "./routes/admin";
 import uploadRoutes from "./routes/upload";
 import { handleDemo } from "./routes/demo";
@@ -66,7 +67,7 @@ export function createServer() {
     max: 5, // Limit each IP to 5 requests per windowMs for auth
     message: {
       success: false,
-      message: 'تعداد تلاش‌های ورود از حد مجاز بیشتر است. لطفاً 15 دقیقه بعد تلاش کنید.',
+      message: 'تعداد تلاش‌های ورود از حد مجاز بیشتر ا��ت. لطفاً 15 دقیقه بعد تلاش کنید.',
       messageFA: 'تعداد تلاش‌های ورود از حد مجاز بیشتر است. لطفاً 15 دقیقه بعد تلاش کنید.'
     }
   });
@@ -146,7 +147,7 @@ export function createServer() {
     // Default error response
     res.status(err.status || 500).json({
       success: false,
-      message: err.message || 'خطای داخلی سرور',
+      message: err.message || '��طای داخلی سرور',
       messageFA: err.messageFA || 'خطای داخلی سرور',
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
     });
