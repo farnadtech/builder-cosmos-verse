@@ -5,6 +5,7 @@ import { query, executeTransaction } from '../database/connection';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 
 const router = Router();
 
