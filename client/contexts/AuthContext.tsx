@@ -70,11 +70,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ phoneNumber, password }),
+        cache: 'no-cache',
       });
 
-      const data = await response.json();
+      // Read response text once, then parse
+      const responseText = await response.text();
+      let data;
 
-      if (data.success) {
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Login JSON parse error:', parseError);
+        return { success: false, message: 'خطا در پردازش پاسخ سرور' };
+      }
+
+      if (response.ok && data.success) {
         const userData: User = {
           id: data.data.user.id,
           firstName: data.data.user.firstName,
