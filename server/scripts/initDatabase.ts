@@ -86,7 +86,7 @@ export async function initializeDatabase(): Promise<void> {
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   initializeDatabase()
     .then(() => {
       console.log('Database initialization completed');
