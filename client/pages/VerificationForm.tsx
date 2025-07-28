@@ -150,7 +150,7 @@ export default function VerificationForm() {
         setError("");
       } else {
         const data = await response.json();
-        setError(data.message || "خطا ��ر ارسال کد تأیید");
+        setError(data.message || "خطا در ارسال کد تأیید");
       }
     } catch (err) {
       setError("خطا در ارسال کد تأیید");
@@ -234,7 +234,7 @@ export default function VerificationForm() {
     if (currentStep === 2 && !validateStep2()) return;
     if (currentStep === 3 && !validateStep3()) return;
 
-    if (currentStep < 4) {
+    if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -420,7 +420,7 @@ export default function VerificationForm() {
                     onChange={(e) =>
                       handleInputChange("nationalId", e.target.value)
                     }
-                    placeholder="شم��ره ملی ۱۰ رقم��"
+                    placeholder="شماره ملی ۱۰ رقم��"
                     maxLength={10}
                   />
                 </div>
