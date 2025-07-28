@@ -33,10 +33,10 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/projects" element={<PlaceholderPage title="پروژه‌ها" description="لیست پروژه‌ها" />} />
+              <Route path="/projects" element={<Projects />} />
               <Route path="/projects/create" element={<CreateProject />} />
               <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
-              <Route path="/arbitration" element={<PlaceholderPage title="داوری" description="سیستم داوری" />} />
+              <Route path="/arbitration" element={<Arbitration />} />
               <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
               <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
               <Route path="/help" element={<PlaceholderPage title="راهنما" description="راهنمای استفاده از سیستم" />} />
