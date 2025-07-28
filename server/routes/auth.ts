@@ -49,7 +49,7 @@ const registerValidation = [
   body('email').isEmail().withMessage('فرمت ایمیل صحیح نیست').normalizeEmail(),
   body('phoneNumber').matches(/^(\+98|0)?9\d{9}$/).withMessage('شماره موبایل صحیح نیست'),
   body('password').isLength({ min: 8 }).withMessage('رمز عبور باید حداقل 8 کاراکتر باشد'),
-  body('role').isIn(['employer', 'contractor']).withMessage('نقش کاربری نامعتبر است')
+  body('role').isIn(['employer', 'contractor']).withMessage('نقش کاربری نامعتبر اس��')
 ];
 
 const loginValidation = [
@@ -428,6 +428,114 @@ router.post('/reset-password', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'خطای سیستمی در تغییر رمز عبور'
+    });
+  }
+});
+
+// Complete identity verification
+router.post('/verify-identity', authenticateToken, upload.fields([
+  { name: 'nationalCardImage', maxCount: 1 },
+  { name: 'selfieImage', maxCount: 1 }
+]), async (req: AuthenticatedRequest, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      nationalId,
+      phoneNumber,
+      province,
+      city,
+      birthDate,
+      otpCode
+    } = req.body;
+
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+    // Validation
+    if (!firstName || !lastName || !nationalId || !phoneNumber || !province || !city || !birthDate || !otpCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'تمام فیلدهای الزامی را پر کنید'
+      });
+    }
+
+    if (!files.nationalCardImage || !files.selfieImage) {
+      return res.status(400).json({
+        success: false,
+        message: 'آپلود تصاویر مدارک الزامی است'
+      });
+    }
+
+    // Verify OTP
+    const normalizedPhone = phoneNumber.replace(/^(\+98|0)/, '+98');
+    const isValidOTP = await smsService.verifyOTP(normalizedPhone, otpCode);
+    if (!isValidOTP) {
+      return res.status(400).json({
+        success: false,
+        message: 'کد تایید نامعتبر یا منقضی شده است'
+      });
+    }
+
+    // Update user information
+    await query(
+      `UPDATE users SET
+         first_name = $1,
+         last_name = $2,
+         national_id = $3,
+         phone_number = $4,
+         birth_date = $5,
+         address = $6,
+         is_verified = true,
+         updated_at = NOW()
+       WHERE id = $7`,
+      [firstName, lastName, nationalId, normalizedPhone, birthDate, `${city}, ${province}`, req.user!.id]
+    );
+
+    // Save verification documents
+    await query(
+      `INSERT INTO verification_documents (
+         user_id,
+         national_card_image,
+         selfie_image,
+         national_id,
+         province,
+         city,
+         birth_date,
+         verification_status,
+         created_at
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'approved', NOW())`,
+      [
+        req.user!.id,
+        files.nationalCardImage[0].path,
+        files.selfieImage[0].path,
+        nationalId,
+        province,
+        city,
+        birthDate
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: 'احراز هویت با موفقیت تکمیل شد'
+    });
+
+  } catch (error) {
+    console.error('Verify identity error:', error);
+
+    // Clean up uploaded files on error
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    if (files) {
+      Object.values(files).flat().forEach(file => {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'خطای سیستمی در احراز هویت'
     });
   }
 });
