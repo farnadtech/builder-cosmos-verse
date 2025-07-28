@@ -64,28 +64,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (phoneNumber: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ phoneNumber, password }),
-        cache: 'no-cache',
+      // Use XMLHttpRequest to avoid response body consumption issues
+      const result = await new Promise<any>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/auth/login');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Cache-Control', 'no-cache');
+
+        xhr.onload = () => {
+          try {
+            const responseData = JSON.parse(xhr.responseText);
+            resolve({
+              data: responseData,
+              status: xhr.status,
+              ok: xhr.status >= 200 && xhr.status < 300
+            });
+          } catch (parseError) {
+            resolve({
+              data: { message: xhr.responseText || 'خطا در پردازش پاسخ' },
+              status: xhr.status,
+              ok: false
+            });
+          }
+        };
+
+        xhr.onerror = () => reject(new Error('خطا در ارتباط با سرور'));
+        xhr.ontimeout = () => reject(new Error('زمان انتظار تمام شد'));
+        xhr.timeout = 30000;
+        xhr.send(JSON.stringify({ phoneNumber, password }));
       });
 
-      // Clone response to avoid "body stream already read" errors
-      const responseClone = response.clone();
-
-      // Read response text once, then parse
-      const responseText = await responseClone.text();
-      let data;
-
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Login JSON parse error:', parseError);
-        return { success: false, message: 'خطا در پردازش پاسخ سرور' };
-      }
+      const data = result.data;
 
       if (response.ok && data.success) {
         const userData: User = {
@@ -146,7 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
 
         xhr.ontimeout = () => {
-          reject(new Error('��مان انتظار تمام شد'));
+          reject(new Error('زمان انتظار تمام شد'));
         };
 
         xhr.timeout = 30000; // 30 second timeout
@@ -179,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return { success: true, message: data.data.message || 'ثبت نام با موفقیت انجام شد' };
       } else {
-        return { success: false, message: data.data.message || 'خطا ��ر ثبت نام' };
+        return { success: false, message: data.data.message || 'خطا در ثبت نام' };
       }
     } catch (error) {
       console.error('Register error:', error);
