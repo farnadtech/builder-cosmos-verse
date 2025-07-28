@@ -248,6 +248,25 @@ export default function VerificationForm() {
 
     setLoading(true);
     try {
+      // First verify OTP
+      const otpResponse = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phoneNumber: formData.phoneNumber,
+          code: formData.otpCode,
+        }),
+      });
+
+      const otpData = await otpResponse.json();
+      if (!otpData.success) {
+        setError(otpData.message || "کد تأیید نامعتبر است");
+        return;
+      }
+
+      // Then submit identity verification with all documents
       const formDataToSend = new FormData();
       formDataToSend.append("firstName", formData.firstName);
       formDataToSend.append("lastName", formData.lastName);
@@ -256,7 +275,6 @@ export default function VerificationForm() {
       formDataToSend.append("province", formData.province);
       formDataToSend.append("city", formData.city);
       formDataToSend.append("birthDate", formData.birthDate);
-      formDataToSend.append("otpCode", formData.otpCode);
 
       if (formData.nationalCardImage) {
         formDataToSend.append("nationalCardImage", formData.nationalCardImage);
@@ -343,7 +361,7 @@ export default function VerificationForm() {
             <CardTitle>
               {currentStep === 1 && "اطلاعات شخصی"}
               {currentStep === 2 && "اطلاعات آدرس"}
-              {currentStep === 3 && "آپلود مدارک"}
+              {currentStep === 3 && "��پلود مدارک"}
               {currentStep === 4 && "تأیید شماره موبایل"}
             </CardTitle>
             <CardDescription>
