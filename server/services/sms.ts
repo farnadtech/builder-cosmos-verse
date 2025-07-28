@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { query } from '../database/connection';
+import { query } from '../database/query-wrapper';
 
 interface SMSConfig {
   username: string;
