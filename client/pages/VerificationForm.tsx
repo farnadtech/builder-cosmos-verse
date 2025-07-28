@@ -247,26 +247,31 @@ export default function VerificationForm() {
   };
 
   const submitVerification = async () => {
-    if (!validateStep4()) return;
+    // If this is step 4 and we need OTP verification
+    if (currentStep === 4 && !user?.isVerified) {
+      if (!validateStep4()) return;
+    }
 
     setLoading(true);
     try {
-      // First verify OTP
-      const otpResponse = await fetch("/api/auth/verify-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phoneNumber: formData.phoneNumber,
-          code: formData.otpCode,
-        }),
-      });
+      // Only verify OTP if user is not already verified
+      if (!user?.isVerified && formData.otpCode) {
+        const otpResponse = await fetch("/api/auth/verify-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phoneNumber: formData.phoneNumber,
+            code: formData.otpCode,
+          }),
+        });
 
-      const otpData = await otpResponse.json();
-      if (!otpData.success) {
-        setError(otpData.message || "کد تأیید نامعتبر است");
-        return;
+        const otpData = await otpResponse.json();
+        if (!otpData.success) {
+          setError(otpData.message || "کد تأیید نامعتبر است");
+          return;
+        }
       }
 
       // Then submit identity verification with all documents
