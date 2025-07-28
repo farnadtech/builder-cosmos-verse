@@ -64,7 +64,7 @@ export function createServer() {
   // Stricter rate limiting for auth endpoints
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 requests per windowMs for auth
+    max: 20, // Increased limit for auth endpoints to allow development/testing
     message: {
       success: false,
       message: 'تعداد تلاش‌های ورود از حد مجاز بیشتر است. لطفاً 15 دقیقه بعد تلاش کنید.',
