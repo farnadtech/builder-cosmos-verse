@@ -16,6 +16,7 @@ import walletRoutes from "./routes/wallet";
 import chatRoutes from "./routes/chat";
 import arbitrationRoutes from "./routes/arbitration";
 import paymentRoutes from "./routes/payment";
+import contractRoutes from "./routes/contracts";
 import adminRoutes from "./routes/admin";
 import uploadRoutes from "./routes/upload";
 import { handleDemo } from "./routes/demo";
@@ -53,7 +54,7 @@ export function createServer() {
     message: {
       success: false,
       message: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تلاش کنید.',
-      messageFA: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تلاش کنید.'
+      messageFA: 'تعداد درخواست‌های شما از حد مجاز بیشتر است. لطفاً بعداً تل��ش کنید.'
     },
     standardHeaders: true,
     legacyHeaders: false,
