@@ -142,8 +142,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Response ok, reading JSON...');
-      const data = await response.json();
-      console.log('Registration response data:', data);
+      let data;
+      try {
+        data = await response.json();
+        console.log('Registration response data:', data);
+      } catch (jsonError) {
+        console.error('Error parsing JSON response:', jsonError);
+        console.error('Response details:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+        return { success: false, message: 'خطا در پردازش پاسخ سرور' };
+      }
 
       if (data.success) {
         const newUser: User = {
