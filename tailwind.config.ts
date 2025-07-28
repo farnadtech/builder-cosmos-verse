@@ -57,11 +57,45 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // ZEMANO brand colors
+        zemano: {
+          50: "hsl(var(--zemano-50))",
+          100: "hsl(var(--zemano-100))",
+          200: "hsl(var(--zemano-200))",
+          300: "hsl(var(--zemano-300))",
+          400: "hsl(var(--zemano-400))",
+          500: "hsl(var(--zemano-500))",
+          600: "hsl(var(--zemano-600))",
+          700: "hsl(var(--zemano-700))",
+          800: "hsl(var(--zemano-800))",
+          900: "hsl(var(--zemano-900))",
+        },
+        trust: {
+          50: "hsl(var(--trust-50))",
+          100: "hsl(var(--trust-100))",
+          500: "hsl(var(--trust-500))",
+          600: "hsl(var(--trust-600))",
+          700: "hsl(var(--trust-700))",
+        },
+        success: {
+          50: "hsl(var(--success-50))",
+          500: "hsl(var(--success-500))",
+          600: "hsl(var(--success-600))",
+        },
+        warning: {
+          50: "hsl(var(--warning-50))",
+          500: "hsl(var(--warning-500))",
+          600: "hsl(var(--warning-600))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        'vazir': ['Vazirmatn', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'inter': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
@@ -80,10 +114,30 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          from: {
+            opacity: "0",
+            transform: "translateY(10px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "slide-in-right": {
+          from: {
+            transform: "translateX(100%)",
+          },
+          to: {
+            transform: "translateX(0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
+        "slide-in-right": "slide-in-right 0.3s ease-out",
       },
     },
   },
