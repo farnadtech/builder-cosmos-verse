@@ -194,9 +194,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ phoneNumber }),
+        cache: 'no-cache',
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      const data = JSON.parse(responseText);
       return { success: data.success, message: data.message };
     } catch (error) {
       console.error('Send OTP error:', error);
@@ -212,9 +214,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ phoneNumber, code }),
+        cache: 'no-cache',
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      const data = JSON.parse(responseText);
 
       if (data.success && user) {
         setUser({ ...user, isVerified: true });
