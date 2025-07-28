@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Eye, EyeOff, Phone, Lock } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -35,13 +37,13 @@ export default function Login() {
             </div>
             <h1 className="text-2xl font-bold">ورود به حساب کاربری</h1>
             <p className="text-muted-foreground mt-2">
-              با شماره موبایل و رمز عبور خود وارد شوید
+              با شماره موبایل و رمز ��بور خود وارد شوید
             </p>
           </div>
 
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur">
             <CardHeader className="space-y-1 pb-6">
-              <CardTitle className="text-center text-xl">خو�� آمدید</CardTitle>
+              <CardTitle className="text-center text-xl">خوش آمدید</CardTitle>
               <CardDescription className="text-center">
                 اطلاعات ورود خود را وارد کنید
               </CardDescription>
