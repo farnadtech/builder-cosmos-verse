@@ -206,7 +206,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cache: 'no-cache',
       });
 
-      const responseText = await response.text();
+      const responseClone = response.clone();
+      const responseText = await responseClone.text();
       const data = JSON.parse(responseText);
       return { success: data.success, message: data.message };
     } catch (error) {
