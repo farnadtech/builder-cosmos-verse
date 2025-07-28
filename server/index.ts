@@ -7,8 +7,8 @@ import rateLimit from "express-rate-limit";
 import path from "path";
 
 // Import database connection
-import { testConnection } from "./database/connection";
-import { initializeDatabase } from "./scripts/initDatabase";
+import { testSQLiteConnection } from "./database/sqlite-connection";
+import { initializeSQLiteDatabase } from "./scripts/initSQLiteDatabase";
 
 // Import routes
 import authRoutes from "./routes/auth";
