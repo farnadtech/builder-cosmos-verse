@@ -242,9 +242,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Authorization': `Bearer ${token}`,
         },
         body: formData,
+        cache: 'no-cache',
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      const data = JSON.parse(responseText);
 
       if (data.success && user) {
         const updatedUser = { ...user, isVerified: true };
