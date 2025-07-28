@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { authenticateToken, AuthenticatedRequest, requireArbitrator } from '../middleware/auth';
-import { query, executeTransaction } from '../database/connection';
+import { query, executeTransaction } from "../database/query-wrapper"';
 
 const router = Router();
 
