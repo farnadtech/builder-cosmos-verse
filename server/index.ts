@@ -164,13 +164,13 @@ export function createServer() {
     });
   });
 
-  // Initialize database connection and schema
+  // Initialize SQLite database connection and schema
   async function initDb() {
     try {
-      await testConnection();
-      await initializeDatabase();
+      await testSQLiteConnection();
+      await initializeSQLiteDatabase();
     } catch (error) {
-      console.error('Database initialization failed:', error);
+      console.error('SQLite database initialization failed:', error);
     }
   }
 
