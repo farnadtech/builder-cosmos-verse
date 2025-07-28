@@ -399,8 +399,8 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
     if (isValid) {
       // Update user verification status
       await query(
-        "UPDATE users SET is_verified = true WHERE phone_number = $1",
-        [normalizedPhone],
+        "UPDATE users SET is_verified = $1 WHERE phone_number = $2",
+        [1, normalizedPhone],
       );
 
       res.json({
@@ -418,7 +418,7 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
     console.error("Verify OTP error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در تایید کد",
+      message: "خطای سی��تمی در تایید کد",
       messageFA: "خطای سیستمی در تایید کد",
     });
   }
@@ -464,7 +464,7 @@ router.post("/forgot-password", async (req: Request, res: Response) => {
     console.error("Forgot password error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در ارسال کد بازیابی",
+      message: "خطای سیستمی در ارسال ک�� بازیابی",
     });
   }
 });
