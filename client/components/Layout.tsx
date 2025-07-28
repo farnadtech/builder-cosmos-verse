@@ -10,6 +10,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-background font-vazir">
@@ -48,7 +49,7 @@ export default function Layout({ children }: LayoutProps) {
               <Link to="/login">ورود</Link>
             </Button>
             <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600 hover:from-zemano-600 hover:to-zemano-700">
-              <Link to="/register">ثبت ن��م</Link>
+              <Link to="/register">ثبت نام</Link>
             </Button>
           </div>
 
