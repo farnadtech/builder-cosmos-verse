@@ -45,7 +45,7 @@ const upload = multer({
 const createProjectValidation = [
   body('title').trim().isLength({ min: 5, max: 255 }).withMessage('عنوان پروژه باید بین 5 تا 255 کاراکتر باشد'),
   body('description').trim().isLength({ min: 20 }).withMessage('توضیحات پروژه باید حداقل 20 کاراکتر باشد'),
-  body('category').trim().isLength({ min: 2, max: 100 }).withMessage('دست��‌بندی پروژه الز��می است'),
+  body('category').trim().isLength({ min: 2, max: 100 }).withMessage('دست��‌بندی پروژه الزامی است'),
   body('budget').isFloat({ min: 10000 }).withMessage('بودجه پروژه باید حداقل 10,000 ریال باشد'),
   body('deadline').isISO8601().withMessage('تاریخ پایان پروژه نامعتبر است'),
   body('milestones').isArray({ min: 1 }).withMessage('حداقل یک مرحله برای پروژ�� تعریف کنید'),
@@ -282,7 +282,7 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'اطلاعات ورودی نامعتبر است',
+        message: 'اطلاع��ت ورودی نامعتبر است',
         errors: errors.array()
       });
     }
@@ -407,7 +407,7 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
     if (project.employer_id === req.user!.userId) {
       return res.status(400).json({
         success: false,
-        message: 'نمی‌توانید برا�� پروژه خود درخواست دهید'
+        message: 'نمی‌توانید برای پروژه خود درخواست دهید'
       });
     }
 
@@ -427,18 +427,18 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
     // Create application
     await query(
       `INSERT INTO project_applications (project_id, contractor_id, proposal, estimated_days, status, created_at)
-       VALUES ($1, $2, $3, $4, 'pending', NOW())`,
+       VALUES ($1, $2, $3, $4, 'pending', CURRENT_TIMESTAMP)`,
       [projectId, req.user!.userId, proposal, estimatedDays]
     );
 
     // Send notification to employer
     await query(
       `INSERT INTO notifications (user_id, title, message, type, data, created_at)
-       VALUES ($1, $2, $3, 'application', $4, NOW())`,
+       VALUES ($1, $2, $3, 'application', $4, CURRENT_TIMESTAMP)`,
       [
         project.employer_id,
         'درخواست جدید برای پروژه',
-        `درخواست جدیدی برای پروژه "${project.title}" دریافت شد`,
+        `درخواست جدیدی برای پروژه "${project.title}" د��یافت شد`,
         JSON.stringify({ projectId, contractorId: req.user!.userId })
       ]
     );
@@ -511,7 +511,7 @@ router.post('/:id/assign', authenticateToken, requireEmployer, param('id').isInt
 
     // Assign project
     await query(
-      'UPDATE projects SET contractor_id = $1, status = \'assigned\', updated_at = NOW() WHERE id = $2',
+      'UPDATE projects SET contractor_id = $1, status = \'assigned\', updated_at = CURRENT_TIMESTAMP WHERE id = $2',
       [contractorId, projectId]
     );
 
@@ -530,7 +530,7 @@ router.post('/:id/assign', authenticateToken, requireEmployer, param('id').isInt
     // Send notification to contractor
     await query(
       `INSERT INTO notifications (user_id, title, message, type, data, created_at)
-       VALUES ($1, $2, $3, 'assignment', $4, NOW())`,
+       VALUES ($1, $2, $3, 'assignment', $4, CURRENT_TIMESTAMP)`,
       [
         contractorId,
         'پروژه به شما تخصیص یافت',
@@ -586,7 +586,7 @@ router.post('/:id/invite-link', authenticateToken, requireEmployer, param('id').
     // Save invite
     await query(
       `INSERT INTO project_invites (project_id, invite_token, expires_at, created_at)
-       VALUES ($1, $2, $3, NOW())`,
+       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
       [projectId, inviteToken, expiresAt]
     );
 
@@ -638,7 +638,7 @@ router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt
 
     // Update project status to waiting for acceptance
     await query(
-      'UPDATE projects SET status = \'waiting_for_acceptance\', updated_at = NOW() WHERE id = $1',
+      'UPDATE projects SET status = \'waiting_for_acceptance\', updated_at = CURRENT_TIMESTAMP WHERE id = $1',
       [projectId]
     );
 
@@ -648,7 +648,7 @@ router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt
 
     await query(
       `INSERT INTO project_invites (project_id, invite_token, contractor_email, contractor_phone, message, expires_at, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)`,
       [projectId, inviteToken, email || null, phoneNumber || null, message, expiresAt]
     );
 
@@ -815,13 +815,13 @@ router.post('/accept/:token', authenticateToken, requireContractor, async (req: 
 
     // Accept the invitation
     await query(
-      'UPDATE project_invites SET status = \'accepted\', accepted_at = NOW() WHERE invite_token = $1',
+      'UPDATE project_invites SET status = \'accepted\', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1',
       [token]
     );
 
     // Update project with contractor and change status to active
     await query(
-      'UPDATE projects SET contractor_id = $1, status = \'active\', updated_at = NOW() WHERE id = $2',
+      'UPDATE projects SET contractor_id = $1, status = \'active\', updated_at = CURRENT_TIMESTAMP WHERE id = $2',
       [req.user!.userId, invite.project_id]
     );
 
@@ -891,7 +891,7 @@ router.patch('/:id/status', authenticateToken, param('id').isInt(), async (req: 
 
     // Update status
     await query(
-      'UPDATE projects SET status = $1, updated_at = NOW() WHERE id = $2',
+      'UPDATE projects SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
       [status, projectId]
     );
 
