@@ -291,13 +291,13 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
     const attachmentPath = req.file ? req.file.path : null;
 
     // Validate milestones total amount equals project budget
-    const milestonesData = JSON.parse(milestones);
+    const milestonesData = Array.isArray(milestones) ? milestones : JSON.parse(milestones);
     const totalMilestoneAmount = milestonesData.reduce((sum: number, m: any) => sum + parseFloat(m.amount), 0);
     
     if (Math.abs(totalMilestoneAmount - parseFloat(budget)) > 0.01) {
       return res.status(400).json({
         success: false,
-        message: 'مجموع مبالغ مراحل باید برابر بودجه کل پروژه باشد'
+        message: 'مجموع مب��لغ مراحل باید برابر بودجه کل پروژه باشد'
       });
     }
 
@@ -420,7 +420,7 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
     if (existingApplication.rows.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'قبلاً برای این پروژه درخواست داده‌اید'
+        message: 'قبلاً برای این پروژه درخواست داده‌ا��د'
       });
     }
 
@@ -758,7 +758,7 @@ router.get('/invite/:token', async (req, res: Response) => {
     console.error('Get project by invite error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دریافت اطلاعات پروژه'
+      message: 'خ��ا در دریافت اطلاعات پروژه'
     });
   }
 });
