@@ -51,7 +51,8 @@ const createProjectValidation = [
   body('milestones').isArray({ min: 1 }).withMessage('حداقل یک مرحله برای پروژ�� تعریف کنید'),
   body('milestones.*.title').trim().isLength({ min: 2 }).withMessage('عنوان مرحله الزامی است'),
   body('milestones.*.amount').isFloat({ min: 1000 }).withMessage('مبلغ مرحله باید حداقل 1,000 ریال باشد'),
-  body('milestones.*.deadline').optional().isISO8601().withMessage('تاریخ پایان مرحله نامعتبر است')
+  body('milestones.*.deadline').optional().isISO8601().withMessage('تاریخ پایان مرحله نامعتبر است'),
+  body('totalAmount').optional().isFloat({ min: 10000 }).withMessage('مبلغ کل نامعتبر است')
 ];
 
 // Get all projects with filters and pagination
@@ -897,7 +898,7 @@ router.patch('/:id/status', authenticateToken, param('id').isInt(), async (req: 
 
     res.json({
       success: true,
-      message: 'وضعیت پروژه با موفقیت به‌روزرسانی شد'
+      message: 'وضعیت پروژه با موفقیت به‌ر��زرسانی شد'
     });
 
   } catch (error) {
