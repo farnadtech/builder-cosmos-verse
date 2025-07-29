@@ -51,7 +51,13 @@ export default function AcceptProject() {
   const [error, setError] = useState("");
   const [project, setProject] = useState<ProjectData | null>(null);
 
-  console.log('🚀 AcceptProject loaded with token:', inviteToken);
+  console.log('🚀 AcceptProject component rendered');
+  console.log('🚀 URL:', window.location.href);
+  console.log('🚀 Token from params:', inviteToken);
+  console.log('🚀 User:', user);
+  console.log('🚀 Loading state:', loading);
+  console.log('🚀 Error state:', error);
+  console.log('🚀 Project state:', project);
 
   useEffect(() => {
     if (inviteToken) {
