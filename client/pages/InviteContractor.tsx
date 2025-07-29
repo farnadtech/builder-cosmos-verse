@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +34,7 @@ export default function InviteContractor() {
 
 من شما را برای همکاری در پروژه زیر دعوت می‌کنم:
 
-لطفاً لینک زیر را کلیک کنید تا جزئیات پروژه را مشاهده کرده و در صورت تمایل پذیرش کنید:
+لطفاً لینک زیر را کلیک کنید تا جزئیات پروژه را مشاهده کرده و در صورت تمایل ��ذیرش کنید:
 
 با تشکر`
   });
@@ -75,7 +75,7 @@ export default function InviteContractor() {
         }));
       } else {
         const errorData = await response.json();
-        setError(errorData.message || "خطا در تولید لینک دعوت");
+        setError(errorData.message || "��طا در تولید لینک دعوت");
       }
     } catch (err) {
       setError("خطا در ارتباط با سرور");
@@ -158,7 +158,7 @@ export default function InviteContractor() {
         setError(errorData.message || "خطا در ارسال دعوت‌نامه");
       }
     } catch (err) {
-      setError("خطا در ارسال دعوت‌نامه");
+      setError("خطا در ارسال دعوت‌��امه");
     } finally {
       setLoading(false);
     }
@@ -302,7 +302,7 @@ export default function InviteContractor() {
                     </Button>
                   </div>
                   <p className="text-sm text-gray-600">
-                    این لینک را به مجری موردنظر ارسال کنید. او با کلیک روی آن می‌تواند جزئیات پروژه را مشاهده کند.
+                    این لینک را به مجری موردنظر ارسال کنید. او با کلیک روی آن می‌تواند جزئیات پروژ�� را مشاهده کند.
                   </p>
                 </div>
               )}
