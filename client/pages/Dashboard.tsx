@@ -77,30 +77,28 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('zemano_token');
-      
+      const fetchFn = window.authenticatedFetch || fetch;
+
+      // Create headers for fallback fetch
+      const headers: HeadersInit = {};
+      if (!window.authenticatedFetch) {
+        headers['Authorization'] = `Bearer ${localStorage.getItem('zemano_token')}`;
+      }
+      headers['Content-Type'] = 'application/json';
+
       // Fetch user statistics
-      const statsResponse = await fetch('/api/dashboard/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const statsResponse = await fetchFn('/api/dashboard/stats', {
+        headers
       });
 
       // Fetch recent projects
-      const projectsResponse = await fetch('/api/dashboard/recent-projects', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const projectsResponse = await fetchFn('/api/dashboard/recent-projects', {
+        headers
       });
 
       // Fetch notifications
-      const notificationsResponse = await fetch('/api/notifications', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const notificationsResponse = await fetchFn('/api/notifications', {
+        headers
       });
 
       if (statsResponse.ok) {
