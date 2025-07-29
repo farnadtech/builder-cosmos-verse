@@ -37,6 +37,14 @@ export default function CreateProject() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check if user has completed identity verification
+  useEffect(() => {
+    if (user && !user.isVerified) {
+      // Redirect to verification page if user hasn't completed identity verification
+      navigate('/verification');
+    }
+  }, [user, navigate]);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -275,7 +283,7 @@ export default function CreateProject() {
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="عنوان جذاب و توصیفی برای پروژ�� خود بنویسید"
+                  placeholder="عنوان جذاب و توصیفی برای پروژه خود بنویسید"
                   className={errors.title ? "border-red-500" : ""}
                 />
                 {errors.title && (
@@ -451,7 +459,7 @@ export default function CreateProject() {
                 مراحل انجام کار
               </CardTitle>
               <CardDescription>
-                پروژه را به مراحل مختلف تقسیم ��نید تا پرداخت‌ها مرحله‌ا�� انجام شود
+                پروژه را به مراحل مختلف تقسیم ��نید تا پرداخت‌ها مرحله‌ای انجام شود
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
