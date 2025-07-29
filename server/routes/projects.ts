@@ -568,8 +568,11 @@ router.post('/:id/assign', authenticateToken, requireEmployer, param('id').isInt
 // Generate invite link for project (employer only)
 router.post('/:id/invite-link', authenticateToken, requireEmployer, param('id').isInt(), async (req: AuthenticatedRequest, res: Response) => {
   try {
+    console.log(`📋 Generating invite link for project ${req.params.id} by user ${req.user?.userId}`);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'شناسه پروژه نامعتبر است'
@@ -585,15 +588,18 @@ router.post('/:id/invite-link', authenticateToken, requireEmployer, param('id').
     );
 
     if (projectResult.rows.length === 0) {
+      console.log(`❌ Project ${projectId} not found or access denied for user ${req.user?.userId}`);
       return res.status(404).json({
         success: false,
         message: 'پروژه یافت نشد یا دسترسی ندارید'
       });
     }
 
-    // Generate unique invite token
-    const inviteToken = crypto.randomBytes(32).toString('hex');
+    // Generate unique invite token (shorter token to avoid URL issues)
+    const inviteToken = crypto.randomBytes(16).toString('hex'); // Reduced from 32 to 16 bytes
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    console.log(`✅ Generated invite token: ${inviteToken}`);
 
     // Save invite
     await query(
@@ -601,6 +607,8 @@ router.post('/:id/invite-link', authenticateToken, requireEmployer, param('id').
        VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
       [projectId, inviteToken, expiresAt]
     );
+
+    console.log(`✅ Invite saved to database for project ${projectId}`);
 
     res.json({
       success: true,
@@ -799,7 +807,7 @@ router.get('/invite/:token', async (req, res: Response) => {
 
 شرا��ط عمومی:
 - پرداخت بر اساس مراحل تعریف شده انجام می‌شود
-- رعایت کیفیت و مهلت‌های تعیین شده الزامی است
+- رعایت کیفیت و مهلت‌ه��ی تعیین شده الزامی است
 - در صورت اختلاف، پرونده به داوری ارجاع می‌شود
 - تمام حقوق طرفین محفوظ است
 
