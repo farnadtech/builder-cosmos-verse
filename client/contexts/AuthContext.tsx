@@ -46,20 +46,91 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Token refresh function
+  const refreshAuthToken = async (): Promise<boolean> => {
+    try {
+      const refreshToken = localStorage.getItem('zemano_refresh_token');
+      if (!refreshToken) {
+        return false;
+      }
+
+      const response = await fetch('/api/auth/refresh-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          localStorage.setItem('zemano_token', data.data.accessToken);
+          localStorage.setItem('zemano_refresh_token', data.data.refreshToken);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      return false;
+    }
+  };
+
   // Check for existing token on app start
   useEffect(() => {
     const token = localStorage.getItem('zemano_token');
     const userData = localStorage.getItem('zemano_user');
-    
+
     if (token && userData) {
       try {
         setUser(JSON.parse(userData));
       } catch (error) {
         localStorage.removeItem('zemano_token');
         localStorage.removeItem('zemano_user');
+        localStorage.removeItem('zemano_refresh_token');
       }
     }
     setIsLoading(false);
+  }, []);
+
+  // Setup axios interceptor for automatic token refresh
+  useEffect(() => {
+    // Function to make authenticated requests with automatic token refresh
+    window.authenticatedFetch = async (url: string, options: RequestInit = {}) => {
+      let token = localStorage.getItem('zemano_token');
+
+      // First attempt with current token
+      const headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+      };
+
+      let response = await fetch(url, { ...options, headers });
+
+      // If token is expired (401), try to refresh
+      if (response.status === 401) {
+        const refreshed = await refreshAuthToken();
+
+        if (refreshed) {
+          // Retry with new token
+          token = localStorage.getItem('zemano_token');
+          const newHeaders = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+          };
+          response = await fetch(url, { ...options, headers: newHeaders });
+        } else {
+          // Refresh failed, logout user
+          logout();
+          return response;
+        }
+      }
+
+      return response;
+    };
   }, []);
 
   const login = async (phoneNumber: string, password: string): Promise<{ success: boolean; message: string }> => {
@@ -273,6 +344,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('zemano_token');
     localStorage.removeItem('zemano_refresh_token');
     localStorage.removeItem('zemano_user');
+    // Remove the global fetch function
+    delete window.authenticatedFetch;
     navigate('/');
   };
 
