@@ -46,6 +46,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Logout function - defined early to avoid dependency issues
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('zemano_token');
+    localStorage.removeItem('zemano_refresh_token');
+    localStorage.removeItem('zemano_user');
+    // Remove the global fetch function
+    delete window.authenticatedFetch;
+    navigate('/');
+  }, [navigate]);
+
   // Token refresh function
   const refreshAuthToken = async (): Promise<boolean> => {
     try {
