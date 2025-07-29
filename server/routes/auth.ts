@@ -57,7 +57,7 @@ const upload = multer({
     if (allowedTypes.includes(fileExt)) {
       cb(null, true);
     } else {
-      cb(new Error("فقط فایل‌های تصویری مج��ز هستند"));
+      cb(new Error("فقط فایل‌های تصویری مجاز هستند"));
     }
   },
 });
@@ -67,7 +67,7 @@ const registerValidation = [
   body("firstName")
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage("نام باید بین 2 تا 50 کاراکتر باشد"),
+    .withMessage("��ام باید بین 2 تا 50 کاراکتر باشد"),
   body("lastName")
     .trim()
     .isLength({ min: 2, max: 50 })
@@ -81,7 +81,7 @@ const registerValidation = [
     .withMessage("رمز عبور باید حداقل 8 کاراکتر باشد"),
   body("role")
     .isIn(["employer", "contractor"])
-    .withMessage("نقش کاربری نامعتبر اس��"),
+    .withMessage("نقش کاربری نامعتبر است"),
 ];
 
 const loginValidation = [
@@ -123,7 +123,7 @@ router.post(
           success: false,
           message: "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
           messageFA:
-            "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام ��رده است",
+            "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
         });
       }
 
@@ -134,7 +134,7 @@ router.post(
       // Create user
       const userResult = await query(
         `INSERT INTO users (first_name, last_name, email, phone_number, password_hash, role, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW())
+       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
        RETURNING id, email, role`,
         [firstName, lastName, email, normalizedPhone, passwordHash, role],
       );
@@ -166,7 +166,7 @@ router.post(
       const responseData = {
         success: true,
         message:
-          "ثبت نام با موفقیت انجام شد. لطفاً شماره موبایل خود را ت��یید کنید",
+          "ثبت نام با موفقیت انجام شد. لطفاً شماره موبایل خود را تایید کنید",
         data: {
           user: {
             id: user.id,
@@ -294,7 +294,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response) => {
       return res.status(401).json({
         success: false,
         message: "حساب کاربری شما غیرفعال شده است",
-        messageFA: "حسا�� کاربری ��ما ��یرفعال شده است",
+        messageFA: "حساب کاربری شما غیرفعال شده است",
       });
     }
 
@@ -344,7 +344,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response) => {
     console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در ��رود",
+      message: "خطای سیستمی در ورود",
       messageFA: "خطای سیستمی در ورود",
     });
   }
@@ -389,7 +389,7 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: "شماره موبایل و کد تایید الزامی است",
-        messageFA: "شماره موبایل و کد ��ایید الزامی است",
+        messageFA: "شماره موبایل و کد تایید الزامی است",
       });
     }
 
@@ -411,14 +411,14 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
       res.status(400).json({
         success: false,
         message: "کد تایید نامعتبر یا منقضی شده است",
-        messageFA: "کد تایید نامعتبر یا من��ضی شده است",
+        messageFA: "کد تایید نامعتبر یا منقضی شده است",
       });
     }
   } catch (error) {
     console.error("Verify OTP error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سی��تمی در تایید کد",
+      message: "خطای سیستمی در تایید کد",
       messageFA: "خطای سیستمی در تایید کد",
     });
   }
@@ -464,7 +464,7 @@ router.post("/forgot-password", async (req: Request, res: Response) => {
     console.error("Forgot password error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در ارسال ک�� بازیابی",
+      message: "خطای سیستمی در ارسال کد بازیابی",
     });
   }
 });
@@ -484,7 +484,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
     if (newPassword.length < 8) {
       return res.status(400).json({
         success: false,
-        message: "رمز ��بور باید حداقل 8 کاراکتر باشد",
+        message: "رمز عبور باید حداقل 8 کاراکتر باشد",
       });
     }
 
@@ -518,18 +518,18 @@ router.post("/reset-password", async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: "رمز عبور با موفقیت تغییر ک��د",
+      message: "رمز عبور با موفقیت تغییر کرد",
     });
   } catch (error) {
     console.error("Reset password error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیس��می در تغییر رم�� عبو��",
+      message: "خطای سیستمی در تغییر رمز عبور",
     });
   }
 });
 
-// Complete identity verification
+// Complete identity verification - FIXED VERSION
 router.post(
   "/verify-identity",
   authenticateToken,
@@ -575,13 +575,29 @@ router.post(
         });
       }
 
-      // Check verification status and conditionally verify OTP
       const normalizedPhone = phoneNumber.replace(/^(\+98|0)/, "+98");
-      const isValidOTP = await smsService.verifyOTP(normalizedPhone, otpCode);
-      if (!isValidOTP) {
+
+      // Check if user is already verified
+      const userResult = await query(
+        "SELECT is_verified FROM users WHERE id = $1",
+        [req.user!.userId]
+      );
+      
+      const isUserVerified = userResult.rows[0]?.is_verified;
+
+      // Only verify OTP if user is not already verified
+      if (!isUserVerified && otpCode) {
+        const isValidOTP = await smsService.verifyOTP(normalizedPhone, otpCode);
+        if (!isValidOTP) {
+          return res.status(400).json({
+            success: false,
+            message: "کد تایید نامعتبر یا منقضی شده است",
+          });
+        }
+      } else if (!isUserVerified && !otpCode) {
         return res.status(400).json({
           success: false,
-          message: "کد تایید نا��عتبر ی�� منقضی شده است",
+          message: "کد تایید الزامی است",
         });
       }
 
