@@ -389,7 +389,7 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: "شماره موبایل و کد تایید الزامی است",
-        messageFA: "شماره موبایل و کد تایید الزامی است",
+        messageFA: "شماره موبایل و کد ��ایید الزامی است",
       });
     }
 
@@ -560,8 +560,7 @@ router.post(
         !phoneNumber ||
         !province ||
         !city ||
-        !birthDate ||
-        !otpCode
+        !birthDate
       ) {
         return res.status(400).json({
           success: false,
@@ -582,7 +581,7 @@ router.post(
       if (!isValidOTP) {
         return res.status(400).json({
           success: false,
-          message: "کد تایید نامعتبر ی�� منقضی شده است",
+          message: "کد تایید نا��عتبر ی�� منقضی شده است",
         });
       }
 
