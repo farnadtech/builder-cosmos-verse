@@ -21,6 +21,7 @@ import contractRoutes from "./routes/contracts";
 import notificationRoutes from "./routes/notifications";
 import adminRoutes from "./routes/admin";
 import uploadRoutes from "./routes/upload";
+import dashboardRoutes from "./routes/dashboard";
 import { handleDemo } from "./routes/demo";
 
 export function createServer() {
@@ -141,7 +142,7 @@ export function createServer() {
     if (err.type === 'entity.parse.failed') {
       return res.status(400).json({
         success: false,
-        message: 'فرمت داده‌های ارسالی نامعتبر است',
+        message: '��رمت داده‌های ارسالی نامعتبر است',
         messageFA: 'فرمت داده‌های ارسالی نامعتبر است'
       });
     }
