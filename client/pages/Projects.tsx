@@ -61,7 +61,9 @@ export default function Projects() {
 
       if (response.ok) {
         const data = await response.json();
-        setProjects(data.data || []);
+        // Handle both paginated and non-paginated responses
+        const projectsData = data.data?.projects || data.data || [];
+        setProjects(projectsData);
       } else {
         console.error('خطا در دریافت پروژه‌ها');
       }
