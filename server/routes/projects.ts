@@ -302,18 +302,22 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
       });
     }
 
-    // Create project and milestones in transaction
-    const queries = [
-      {
-        text: `INSERT INTO projects (title, description, category, budget, deadline, employer_id, attachment_path, status, created_at)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, 'open', CURRENT_TIMESTAMP)
-               RETURNING id`,
-        params: [title, description, category, parseFloat(budget), deadline, req.user!.userId, attachmentPath]
-      }
-    ];
+    // Create project
+    const projectResult = await query(
+      `INSERT INTO projects (title, description, category, budget, deadline, employer_id, attachment_path, status, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'open', CURRENT_TIMESTAMP)
+       RETURNING id`,
+      [title, description, category, parseFloat(budget), deadline, req.user!.userId, attachmentPath]
+    );
 
-    const results = await executeTransaction(queries);
-    const projectId = results[0].rows[0].id;
+    const projectId = projectResult.rows[0]?.id;
+
+    if (!projectId) {
+      return res.status(500).json({
+        success: false,
+        message: 'خطا در ایجاد پروژه'
+      });
+    }
 
     // Insert milestones
     for (let i = 0; i < milestonesData.length; i++) {
