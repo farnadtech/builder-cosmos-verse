@@ -120,7 +120,9 @@ export default function Dashboard() {
 
       if (notificationsResponse.ok) {
         const notificationsData = await notificationsResponse.json();
-        setNotifications(notificationsData.data || []);
+        // Handle nested structure: data.notifications
+        const notifications = notificationsData.data?.notifications || notificationsData.data || [];
+        setNotifications(Array.isArray(notifications) ? notifications : []);
       }
 
     } catch (error) {
@@ -324,7 +326,7 @@ export default function Dashboard() {
                         <CardTitle>پروژه‌های اخیر</CardTitle>
                         <Button asChild variant="outline" size="sm">
                           <Link to="/projects">
-                            مشاهده همه
+                            مشاهد�� همه
                           </Link>
                         </Button>
                       </div>
