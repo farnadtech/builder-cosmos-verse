@@ -1,23 +1,29 @@
-import { useParams } from "react-router-dom";
-
 export default function AcceptProjectTest() {
-  console.log('🧪 AcceptProjectTest component loading...');
-  
-  const params = useParams();
-  const { inviteToken } = params;
-  
-  console.log('📋 URL params:', params);
-  console.log('🔑 Extracted inviteToken:', inviteToken);
-  
+  // Minimal component with no hooks to test if routing works at all
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center p-8 bg-white rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-4">تست صفحه پذیرش پروژه</h1>
-        <p className="text-gray-600 mb-2">Token: {inviteToken || 'وجود ندارد'}</p>
-        <p className="text-gray-600">URL: {window.location.href}</p>
-        <pre className="text-xs bg-gray-100 p-2 mt-4 rounded">
-          {JSON.stringify(params, null, 2)}
-        </pre>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f3f4f6',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <div style={{
+        textAlign: 'center',
+        padding: '32px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+      }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
+          تست صفحه پذیرش پروژه
+        </h1>
+        <p style={{ color: '#6b7280', marginBottom: '8px' }}>
+          URL: {window.location.href}
+        </p>
+        <p style={{ color: '#6b7280' }}>
+          صفحه با موفقیت بارگذاری شد
+        </p>
       </div>
     </div>
   );
