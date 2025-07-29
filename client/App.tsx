@@ -19,6 +19,7 @@ import Arbitration from "./pages/Arbitration";
 import VerificationForm from "./pages/VerificationForm";
 import InviteContractor from "./pages/InviteContractor";
 import AcceptProject from "./pages/AcceptProject";
+import AcceptProjectTest from "./pages/AcceptProjectTest";
 import ProjectDetails from "./pages/ProjectDetails";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./pages/PlaceholderPage";
