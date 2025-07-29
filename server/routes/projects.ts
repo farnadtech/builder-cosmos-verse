@@ -349,7 +349,7 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
       );
     }
 
-    res.status(201).json({
+    const responseData = {
       success: true,
       message: 'پروژه با موفقیت ایجاد شد',
       data: {
@@ -360,7 +360,10 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
           milestonesCount: milestonesData.length
         }
       }
-    });
+    };
+
+    console.log('Sending response:', responseData);
+    res.status(201).json(responseData);
 
   } catch (error) {
     console.error('Create project error:', error);
