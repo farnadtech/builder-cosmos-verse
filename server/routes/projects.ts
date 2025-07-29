@@ -102,7 +102,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     if (myProjects === 'true') {
       whereConditions.push(`(p.employer_id = $${++paramCount} OR p.contractor_id = $${++paramCount})`);
-      queryParams.push(req.user!.id, req.user!.id);
+      queryParams.push(req.user!.userId, req.user!.userId);
       paramCount++;
     }
 
