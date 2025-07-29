@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,6 +86,9 @@ export default function VerificationForm() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Total steps: 3 if phone verified, 4 if not
+  const totalSteps = user?.isVerified ? 3 : 4;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -99,6 +102,13 @@ export default function VerificationForm() {
     birthDate: "",
     otpCode: "",
   });
+
+  // Redirect if user is already verified
+  useEffect(() => {
+    if (user?.isVerified) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleInputChange = (field: keyof VerificationData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -174,11 +184,11 @@ export default function VerificationForm() {
 
   const validateStep2 = () => {
     if (!formData.province || !formData.city) {
-      setError("انتخاب استان و شهر الزامی است");
+      setError("انتخاب ��ستان و شهر الزامی است");
       return false;
     }
     if (!formData.birthDate) {
-      setError("تاریخ تولد الزامی است");
+      setError("تاریخ تولد ا��زامی است");
       return false;
     }
 
@@ -231,7 +241,7 @@ export default function VerificationForm() {
     if (currentStep === 2 && !validateStep2()) return;
     if (currentStep === 3 && !validateStep3()) return;
 
-    if (currentStep < 4) {
+    if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -244,10 +254,34 @@ export default function VerificationForm() {
   };
 
   const submitVerification = async () => {
-    if (!validateStep4()) return;
+    // If this is step 4 and we need OTP verification
+    if (currentStep === 4 && !user?.isVerified) {
+      if (!validateStep4()) return;
+    }
 
     setLoading(true);
     try {
+      // Only verify OTP if user is not already verified
+      if (!user?.isVerified && formData.otpCode) {
+        const otpResponse = await fetch("/api/auth/verify-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phoneNumber: formData.phoneNumber,
+            code: formData.otpCode,
+          }),
+        });
+
+        const otpData = await otpResponse.json();
+        if (!otpData.success) {
+          setError(otpData.message || "کد تأیید نامعتبر است");
+          return;
+        }
+      }
+
+      // Then submit identity verification with all documents
       const formDataToSend = new FormData();
       formDataToSend.append("firstName", formData.firstName);
       formDataToSend.append("lastName", formData.lastName);
@@ -256,7 +290,6 @@ export default function VerificationForm() {
       formDataToSend.append("province", formData.province);
       formDataToSend.append("city", formData.city);
       formDataToSend.append("birthDate", formData.birthDate);
-      formDataToSend.append("otpCode", formData.otpCode);
 
       if (formData.nationalCardImage) {
         formDataToSend.append("nationalCardImage", formData.nationalCardImage);
@@ -274,12 +307,13 @@ export default function VerificationForm() {
       });
 
       if (response.ok) {
-        // Redirect based on user role
-        if (user?.role === "employer") {
-          navigate("/projects/create");
-        } else {
-          navigate("/dashboard");
-        }
+        const data = await response.json();
+        // Show success message and redirect to dashboard
+        alert(
+          data.message ||
+            "مدارک شما با موفقیت ارسال شد و در انتظار بررسی ادمین است",
+        );
+        navigate("/dashboard");
       } else {
         const data = await response.json();
         setError(data.message || "خطا در تکمیل احراز هویت");
@@ -306,7 +340,7 @@ export default function VerificationForm() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            {[1, 2, 3, 4].map((step) => (
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
               <div
                 key={step}
                 className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
@@ -327,14 +361,14 @@ export default function VerificationForm() {
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-zemano-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / 4) * 100}%` }}
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>اطلاعات پایه</span>
             <span>آدرس</span>
             <span>مدارک</span>
-            <span>تأیید</span>
+            {!user?.isVerified && <span>تأیید</span>}
           </div>
         </div>
 
@@ -343,7 +377,7 @@ export default function VerificationForm() {
             <CardTitle>
               {currentStep === 1 && "اطلاعات شخصی"}
               {currentStep === 2 && "اطلاعات آدرس"}
-              {currentStep === 3 && "آپلود مدارک"}
+              {currentStep === 3 && "��پلود مدارک"}
               {currentStep === 4 && "تأیید شماره موبایل"}
             </CardTitle>
             <CardDescription>
@@ -386,7 +420,7 @@ export default function VerificationForm() {
                       onChange={(e) =>
                         handleInputChange("lastName", e.target.value)
                       }
-                      placeholder="نام خانوادگی خود را وارد کنید"
+                      placeholder="نام خانواد��ی خود را وارد کنید"
                     />
                   </div>
                 </div>
@@ -553,11 +587,26 @@ export default function VerificationForm() {
                     <li>• در عکس سلفی، کارت ملی را کنار صورت خود نگه دارید</li>
                   </ul>
                 </div>
+
+                {user?.isVerified && (
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-800">
+                      <CheckCircle className="w-5 h-5" />
+                      <span className="font-medium">
+                        شماره موبایل تایید شده
+                      </span>
+                    </div>
+                    <p className="text-sm text-green-700 mt-1">
+                      شماره موبایل شما قبلاً تایید شده است. پس از آپلود مدارک،
+                      احرا�� هویت تکمیل خواهد شد.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
             {/* Step 4: OTP Verification */}
-            {currentStep === 4 && (
+            {currentStep === 4 && !user?.isVerified && (
               <div className="space-y-6">
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">
@@ -619,12 +668,12 @@ export default function VerificationForm() {
                 مرحله قبل
               </Button>
 
-              {currentStep < 4 ? (
+              {currentStep < totalSteps ? (
                 <Button onClick={nextStep}>مرحله بعد</Button>
               ) : (
                 <Button
                   onClick={submitVerification}
-                  disabled={loading || !otpSent}
+                  disabled={loading || (!user?.isVerified && !otpSent)}
                   className="bg-zemano-600 hover:bg-zemano-700"
                 >
                   {loading ? "در حال تأیید..." : "تکمیل احراز هویت"}

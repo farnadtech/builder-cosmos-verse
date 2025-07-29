@@ -1,97 +1,145 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Briefcase, 
-  Wallet, 
-  MessageSquare, 
-  Gavel, 
-  FileText, 
-  Clock, 
-  CheckCircle, 
+import {
+  Briefcase,
+  Wallet,
+  MessageSquare,
+  Gavel,
+  FileText,
+  Clock,
+  CheckCircle,
   AlertCircle,
   TrendingUp,
   Users,
   DollarSign,
   Plus,
   Settings,
-  BarChart3
+  BarChart3,
+  Inbox,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { toast } from "sonner";
 
-// Mock data - این باید از API دریافت شود
-const mockStats = {
-  employer: {
-    totalProjects: 12,
-    activeProjects: 3,
-    completedProjects: 8,
-    totalSpent: 45000000,
-    balance: 2500000
-  },
-  contractor: {
-    totalProjects: 8,
-    activeProjects: 2,
-    completedProjects: 6,
-    totalEarned: 32000000,
-    balance: 1500000
-  },
-  arbitrator: {
-    totalCases: 15,
-    activeCases: 4,
-    resolvedCases: 11,
-    avgRating: 4.8,
-    balance: 500000
-  },
-  admin: {
-    totalUsers: 1250,
-    totalProjects: 890,
-    totalTransactions: 2340,
-    platformRevenue: 15600000,
-    balance: 0
-  }
-};
+interface UserStats {
+  totalProjects: number;
+  activeProjects: number;
+  completedProjects: number;
+  balance: number;
+  totalSpent?: number;
+  totalEarned?: number;
+  totalUsers?: number;
+  totalTransactions?: number;
+  platformRevenue?: number;
+}
 
-const mockRecentProjects = [
-  {
-    id: 1,
-    title: "طراحی وب‌سایت فروشگاهی",
-    status: "in_progress",
-    budget: 15000000,
-    contractor: "محمد رضایی",
-    deadline: "1403/08/15"
-  },
-  {
-    id: 2,
-    title: "توسعه اپلیکیشن موبایل",
-    status: "completed",
-    budget: 25000000,
-    contractor: "زهرا محمدی",
-    deadline: "1403/07/20"
-  }
-];
+interface Project {
+  id: number;
+  title: string;
+  status: string;
+  budget: number;
+  contractor?: string;
+  employer?: string;
+  deadline?: string;
+  created_at: string;
+}
 
-const mockNotifications = [
-  {
-    id: 1,
-    title: "پیام جدید در پروژه",
-    message: "پیام جدیدی در پروژه طراحی وب‌سایت دریافت شد",
-    type: "message",
-    time: "۲ ساعت پیش"
-  },
-  {
-    id: 2,
-    title: "تکمیل مرحله",
-    message: "مرحله اول پروژه اپلیکیشن تکمیل شد",
-    type: "project",
-    time: "۱ روز پیش"
-  }
-];
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  type: string;
+  is_read: boolean;
+  created_at: string;
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<UserStats>({
+    totalProjects: 0,
+    activeProjects: 0,
+    completedProjects: 0,
+    balance: 0,
+  });
+  const [recentProjects, setRecentProjects] = useState<Project[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const fetchFn = window.authenticatedFetch || fetch;
+
+      // Create headers for fallback fetch
+      const headers: HeadersInit = {};
+      if (!window.authenticatedFetch) {
+        headers["Authorization"] =
+          `Bearer ${localStorage.getItem("zemano_token")}`;
+      }
+      headers["Content-Type"] = "application/json";
+
+      // Fetch user statistics
+      const statsResponse = await fetchFn("/api/dashboard/stats", {
+        headers,
+      });
+
+      // Fetch recent projects
+      const projectsResponse = await fetchFn("/api/dashboard/recent-projects", {
+        headers,
+      });
+
+      // Fetch notifications
+      const notificationsResponse = await fetchFn("/api/notifications", {
+        headers,
+      });
+
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        setStats(
+          statsData.data || {
+            totalProjects: 0,
+            activeProjects: 0,
+            completedProjects: 0,
+            balance: 0,
+          },
+        );
+      }
+
+      if (projectsResponse.ok) {
+        const projectsData = await projectsResponse.json();
+        const projects = projectsData.data || [];
+        setRecentProjects(Array.isArray(projects) ? projects : []);
+      }
+
+      if (notificationsResponse.ok) {
+        const notificationsData = await notificationsResponse.json();
+        // Handle nested structure: data.notifications
+        const notifications =
+          notificationsData.data?.notifications || notificationsData.data || [];
+        setNotifications(Array.isArray(notifications) ? notifications : []);
+      }
+    } catch (error) {
+      console.error("خطا در دریافت اطلاعات داشبورد:", error);
+      // Don't show error to user, just keep default empty state
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) {
     return <div>Loading...</div>;
@@ -100,39 +148,111 @@ export default function Dashboard() {
   // تابع برای تبدیل نقش به فارسی
   const getRoleName = (role: string) => {
     switch (role) {
-      case 'employer': return 'کارفرما';
-      case 'contractor': return 'مجری';
-      case 'arbitrator': return 'داور';
-      case 'admin': return 'مدیر';
-      default: return role;
+      case "employer":
+        return "کارفرما";
+      case "contractor":
+        return "مجری";
+      case "arbitrator":
+        return "داور";
+      case "admin":
+        return "مدیر";
+      default:
+        return role;
     }
   };
 
   // تابع برای تبدیل وضعیت پروژه به فارسی
   const getStatusName = (status: string) => {
     switch (status) {
-      case 'open': return 'باز';
-      case 'assigned': return 'تخصیص یافته';
-      case 'in_progress': return 'در حال انجام';
-      case 'completed': return 'تکمیل شده';
-      case 'cancelled': return 'لغو شده';
-      case 'disputed': return 'در حال داوری';
-      default: return status;
+      case "open":
+        return "باز";
+      case "assigned":
+        return "تخصیص یافته";
+      case "in_progress":
+        return "در حال انجام";
+      case "completed":
+        return "تکمیل شده";
+      case "cancelled":
+        return "لغو شده";
+      case "disputed":
+        return "در حال داوری";
+      default:
+        return status;
+    }
+  };
+
+  // تابع برای تبدیل وضعیت به رنگ
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "open":
+        return "bg-blue-100 text-blue-800";
+      case "assigned":
+        return "bg-purple-100 text-purple-800";
+      case "in_progress":
+        return "bg-yellow-100 text-yellow-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "disputed":
+        return "bg-orange-100 text-orange-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // تابع برای تبدیل نوع اعلان به رنگ
   const getNotificationColor = (type: string) => {
     switch (type) {
-      case 'message': return 'bg-blue-100 text-blue-800';
-      case 'project': return 'bg-green-100 text-green-800';
-      case 'payment': return 'bg-yellow-100 text-yellow-800';
-      case 'arbitration': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "message":
+        return "bg-blue-100 text-blue-800";
+      case "project":
+        return "bg-green-100 text-green-800";
+      case "payment":
+        return "bg-yellow-100 text-yellow-800";
+      case "arbitration":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const currentStats = mockStats[user.role as keyof typeof mockStats];
+  // تابع برای فرمت کردن قیمت
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("fa-IR").format(price);
+  };
+
+  // تابع برای فرمت کردن تاریخ
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("fa-IR");
+  };
+
+  // Empty state component
+  const EmptyState = ({
+    icon: Icon,
+    title,
+    description,
+    actionText,
+    actionLink,
+  }: {
+    icon: any;
+    title: string;
+    description: string;
+    actionText: string;
+    actionLink: string;
+  }) => (
+    <div className="text-center py-12">
+      <Icon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+      <p className="text-gray-500 mb-6">{description}</p>
+      <Button asChild>
+        <Link to={actionLink}>
+          <Plus className="h-4 w-4 mr-2" />
+          {actionText}
+        </Link>
+      </Button>
+    </div>
+  );
 
   return (
     <ProtectedRoute>
@@ -149,28 +269,36 @@ export default function Dashboard() {
                   <Badge variant={user.isVerified ? "default" : "secondary"}>
                     {getRoleName(user.role)}
                   </Badge>
-                  {user.isVerified && (
-                    <Badge className="bg-green-100 text-green-800">
-                      <CheckCircle className="w-3 h-3 ml-1" />
-                      تایید شده
+                  {!user.isVerified && (
+                    <Badge
+                      variant="outline"
+                      className="text-orange-600 border-orange-600"
+                    >
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      احراز هویت ناتمام
                     </Badge>
                   )}
                 </div>
               </div>
-              <div className="mt-4 md:mt-0 flex gap-2">
-                {user.role === 'employer' && (
-                  <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600">
-                    <Link to="/projects/create">
-                      <Plus className="w-4 h-4 ml-2" />
-                      پروژه جدید
-                    </Link>
+              <div className="mt-4 md:mt-0">
+                {user.isVerified ? (
+                  <Button
+                    variant="outline"
+                    disabled
+                    className="text-green-600 border-green-600"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    شما احراز شده‌اید
                   </Button>
-                )}
-                {user.role === 'admin' && (
-                  <Button asChild variant="outline">
-                    <Link to="/admin">
-                      <Settings className="w-4 h-4 ml-2" />
-                      پنل مدیریت
+                ) : (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="text-orange-600 border-orange-600"
+                  >
+                    <Link to="/verification">
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      احراز هویت
                     </Link>
                   </Button>
                 )}
@@ -178,376 +306,269 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Stats Cards */}
-          {user.role === 'employer' && (
+          {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل پروژه‌ها</CardTitle>
-                  <Briefcase className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.totalProjects}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +{currentStats.activeProjects} فعال
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">موجودی کیف پول</CardTitle>
-                  <Wallet className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {currentStats.balance.toLocaleString('fa-IR')} ریال
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    آماده برداشت
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل پرداختی</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {currentStats.totalSpent.toLocaleString('fa-IR')} ریال
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    از ابتدای سال
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">تکمیل شده</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.completedProjects}</div>
-                  <p className="text-xs text-muted-foreground">
-                    نرخ موفقیت ۹۵٪
-                  </p>
-                </CardContent>
-              </Card>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          )}
-
-          {user.role === 'contractor' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل پروژه‌ها</CardTitle>
-                  <Briefcase className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.totalProjects}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +{currentStats.activeProjects} فعال
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">موجودی کیف پول</CardTitle>
-                  <Wallet className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {currentStats.balance.toLocaleString('fa-IR')} ریال
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    آماده برداشت
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل درآمد</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {currentStats.totalEarned.toLocaleString('fa-IR')} ریال
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    از ابتدای سال
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">تکمیل شده</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.completedProjects}</div>
-                  <p className="text-xs text-muted-foreground">
-                    نرخ موفقیت ۹۸٪
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {user.role === 'arbitrator' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل پرونده‌ها</CardTitle>
-                  <Gavel className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.totalCases}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +{currentStats.activeCases} فعال
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">حل شده</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.resolvedCases}</div>
-                  <p className="text-xs text-muted-foreground">
-                    از {currentStats.totalCases} پرونده
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">امتیاز متوسط</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.avgRating}</div>
-                  <p className="text-xs text-muted-foreground">
-                    از ۵ امتیاز
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">موجودی</CardTitle>
-                  <Wallet className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {currentStats.balance.toLocaleString('fa-IR')} ریال
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    حق‌الزحمه داوری
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {user.role === 'admin' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل کاربران</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.totalUsers}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +۲۵ این ماه
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل پروژه‌ها</CardTitle>
-                  <Briefcase className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.totalProjects}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +۱۸ این ماه
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">کل تراکنش‌ها</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{currentStats.totalTransactions}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +۱۲۰ این ماه
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">درآمد پلتفرم</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {currentStats.platformRevenue.toLocaleString('fa-IR')} ریال
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    این ماه
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Projects/Cases */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>
-                        {user.role === 'arbitrator' ? 'پرونده‌های اخیر' : 'پروژه‌های اخیر'}
-                      </CardTitle>
-                      <CardDescription>
-                        {user.role === 'arbitrator' 
-                          ? 'وضعیت پرونده‌های داوری شما'
-                          : 'وضعیت پروژه‌های جاری شما'
-                        }
-                      </CardDescription>
+          ) : (
+            <>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          {user.role === "employer"
+                            ? "کل پروژه‌ها"
+                            : user.role === "contractor"
+                              ? "پروژه‌های من"
+                              : "کل پروژه‌ها"}
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {stats.totalProjects}
+                        </p>
+                      </div>
+                      <Briefcase className="h-8 w-8 text-muted-foreground" />
                     </div>
-                    <Button variant="outline" asChild>
-                      <Link to={user.role === 'arbitrator' ? '/arbitration' : '/projects'}>
-                        مشاهده همه
-                      </Link>
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {mockRecentProjects.map((project) => (
-                      <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="flex-1">
-                          <h3 className="font-medium text-gray-900 mb-1">{project.title}</h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span>مجری: {project.contractor}</span>
-                            <span>بودجه: {project.budget.toLocaleString('fa-IR')} ریال</span>
-                            <span>مهلت: {project.deadline}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Badge 
-                            variant={project.status === 'completed' ? 'default' : 'secondary'}
-                            className={project.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : ''}
-                          >
-                            {getStatusName(project.status)}
-                          </Badge>
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link to={`/projects/${project.id}`}>
-                              مشاهده
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                  </CardContent>
+                </Card>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          پروژه‌های فعال
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {stats.activeProjects}
+                        </p>
+                      </div>
+                      <Clock className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          پروژه‌های تکمیل شده
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {stats.completedProjects}
+                        </p>
+                      </div>
+                      <CheckCircle className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          موجودی کیف پول
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {formatPrice(stats.balance)} ریال
+                        </p>
+                      </div>
+                      <Wallet className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Main Content */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Recent Projects */}
+                <div className="lg:col-span-2">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle>پروژه‌های اخیر</CardTitle>
+                        <Button asChild variant="outline" size="sm">
+                          <Link to="/projects">مشاهده همه</Link>
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {recentProjects.length === 0 ? (
+                        <EmptyState
+                          icon={Briefcase}
+                          title="هنوز پروژه‌ای ندارید"
+                          description={
+                            user.role === "employer"
+                              ? "اولین پروژه خود را ایجاد کنید و با بهترین مجریان کار کنید"
+                              : "در پروژه‌های موجود شرکت کنید و درآمد کسب کنید"
+                          }
+                          actionText={
+                            user.role === "employer"
+                              ? "ایجاد پروژه"
+                              : "مشاهده پروژه‌ها"
+                          }
+                          actionLink={
+                            user.role === "employer"
+                              ? "/projects/create"
+                              : "/projects"
+                          }
+                        />
+                      ) : (
+                        <div className="space-y-4">
+                          {(recentProjects || []).slice(0, 5).map((project) => (
+                            <div
+                              key={project.id}
+                              className="flex items-center justify-between p-4 border rounded-lg"
+                            >
+                              <div className="flex-1">
+                                <h4 className="font-medium">{project.title}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge
+                                    className={getStatusColor(project.status)}
+                                  >
+                                    {getStatusName(project.status)}
+                                  </Badge>
+                                  {project.deadline && (
+                                    <span className="text-sm text-muted-foreground">
+                                      موعد: {formatDate(project.deadline)}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-left">
+                                <p className="font-medium">
+                                  {formatPrice(project.budget)} ریال
+                                </p>
+                                {project.contractor && (
+                                  <p className="text-sm text-muted-foreground">
+                                    مجری: {project.contractor}
+                                  </p>
+                                )}
+                                {project.employer && (
+                                  <p className="text-sm text-muted-foreground">
+                                    کارفرما: {project.employer}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Notifications */}
+                <div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>اعلان‌ها</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {notifications.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Inbox className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <p className="text-gray-500">اعلانی وجود ندارد</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {(notifications || [])
+                            .slice(0, 5)
+                            .map((notification) => (
+                              <div
+                                key={notification.id}
+                                className={`p-3 rounded-lg border ${
+                                  !notification.is_read
+                                    ? "bg-blue-50 border-blue-200"
+                                    : "bg-gray-50"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <h5 className="font-medium text-sm">
+                                      {notification.title}
+                                    </h5>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {notification.message}
+                                    </p>
+                                  </div>
+                                  <Badge
+                                    className={getNotificationColor(
+                                      notification.type,
+                                    )}
+                                    size="sm"
+                                  >
+                                    {notification.type}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  {formatDate(notification.created_at)}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
               {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>عملیات سریع</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start" asChild>
-                      <Link to="/wallet">
-                        <Wallet className="w-4 h-4 ml-2" />
-                        مدیریت کیف پول
-                      </Link>
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start" asChild>
-                      <Link to="/chat">
-                        <MessageSquare className="w-4 h-4 ml-2" />
-                        پیام‌ها
-                      </Link>
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start" asChild>
-                      <Link to="/contracts">
-                        <FileText className="w-4 h-4 ml-2" />
-                        قراردادها
-                      </Link>
-                    </Button>
-                    {(user.role === 'arbitrator' || user.role === 'admin') && (
-                      <Button variant="outline" className="w-full justify-start" asChild>
-                        <Link to="/arbitration">
-                          <Gavel className="w-4 h-4 ml-2" />
-                          پرونده‌های داوری
-                        </Link>
-                      </Button>
-                    )}
-                    {user.role === 'admin' && (
-                      <Button variant="outline" className="w-full justify-start" asChild>
-                        <Link to="/admin">
-                          <Settings className="w-4 h-4 ml-2" />
-                          پنل مدیریت
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="mt-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>عملیات سریع</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {user.role === "employer" && (
+                        <Button asChild className="h-auto p-4">
+                          <Link
+                            to="/projects/create"
+                            className="flex flex-col items-center gap-2"
+                          >
+                            <Plus className="h-6 w-6" />
+                            <span>ایجاد پروژه جدید</span>
+                          </Link>
+                        </Button>
+                      )}
 
-              {/* Recent Notifications */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>اعلان‌های اخیر</CardTitle>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to="/notifications">همه</Link>
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {mockNotifications.map((notification) => (
-                      <div key={notification.id} className="p-3 border rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-medium text-sm">{notification.title}</h4>
-                          <span className={`text-xs px-2 py-1 rounded-full ${getNotificationColor(notification.type)}`}>
-                            {notification.type}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-2">{notification.message}</p>
-                        <p className="text-xs text-gray-500">{notification.time}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                      <Button asChild variant="outline" className="h-auto p-4">
+                        <Link
+                          to="/projects"
+                          className="flex flex-col items-center gap-2"
+                        >
+                          <Briefcase className="h-6 w-6" />
+                          <span>مشاهده پروژه‌ها</span>
+                        </Link>
+                      </Button>
+
+                      <Button asChild variant="outline" className="h-auto p-4">
+                        <Link
+                          to="/wallet"
+                          className="flex flex-col items-center gap-2"
+                        >
+                          <Wallet className="h-6 w-6" />
+                          <span>کیف پول</span>
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </ProtectedRoute>

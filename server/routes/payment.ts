@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { authenticateToken, AuthenticatedRequest, requireEmployer } from '../middleware/auth';
-import { query } from '../database/connection';
+import { query } from "../database/query-wrapper";
 import { zarinpalService } from '../services/payment';
 
 const router = Router();

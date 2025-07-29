@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { query } from "../database/connection";
+import { query } from "../database/query-wrapper";
 
 interface JWTPayload {
   userId: number;
@@ -13,6 +13,7 @@ interface JWTPayload {
 export interface AuthenticatedRequest extends Request {
   user?: {
     id: number;
+    userId: number;
     email: string;
     role: string;
     firstName: string;
@@ -89,6 +90,7 @@ export const authenticateToken = async (
 
       req.user = {
         id: user.id,
+        userId: user.id,
         email: user.email,
         role: user.role,
         firstName: user.first_name,
@@ -100,6 +102,7 @@ export const authenticateToken = async (
       // Fallback to token data when database is not available
       req.user = {
         id: decoded.userId,
+        userId: decoded.userId,
         email: decoded.email,
         role: decoded.role,
         firstName: "کاربر",

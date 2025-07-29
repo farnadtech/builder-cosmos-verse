@@ -57,7 +57,7 @@ const upload = multer({
     if (allowedTypes.includes(fileExt)) {
       cb(null, true);
     } else {
-      cb(new Error("فقط فایل‌های تصویری مجاز هستند"));
+      cb(new Error("فقط فایل‌های تصویری مج��ز هستند"));
     }
   },
 });
@@ -67,7 +67,7 @@ const registerValidation = [
   body("firstName")
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage("��ام باید بین 2 تا 50 کاراکتر باشد"),
+    .withMessage("نام باید بین 2 تا 50 کاراکتر باشد"),
   body("lastName")
     .trim()
     .isLength({ min: 2, max: 50 })
@@ -81,7 +81,7 @@ const registerValidation = [
     .withMessage("رمز عبور باید حداقل 8 کاراکتر باشد"),
   body("role")
     .isIn(["employer", "contractor"])
-    .withMessage("نقش کاربری نامعتبر است"),
+    .withMessage("نقش کاربری نامعتبر اس��"),
 ];
 
 const loginValidation = [
@@ -121,8 +121,7 @@ router.post(
       if (existingUser.rows.length > 0) {
         return res.status(409).json({
           success: false,
-          message:
-            "کاربری با این ایمیل یا شماره موبایل ق��لاً ثبت نام کرده است",
+          message: "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
           messageFA:
             "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
         });
@@ -135,7 +134,7 @@ router.post(
       // Create user
       const userResult = await query(
         `INSERT INTO users (first_name, last_name, email, phone_number, password_hash, role, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())
        RETURNING id, email, role`,
         [firstName, lastName, email, normalizedPhone, passwordHash, role],
       );
@@ -295,7 +294,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response) => {
       return res.status(401).json({
         success: false,
         message: "حساب کاربری شما غیرفعال شده است",
-        messageFA: "حساب کاربری شما غیرفعال شده است",
+        messageFA: "حسا�� کاربری ��ما ��یرفعال شده است",
       });
     }
 
@@ -345,7 +344,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response) => {
     console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در ورود",
+      message: "خطای سیستمی در ��رود",
       messageFA: "خطای سیستمی در ورود",
     });
   }
@@ -390,7 +389,7 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: "شماره موبایل و کد تایید الزامی است",
-        messageFA: "شماره موبایل و کد تایید الزامی است",
+        messageFA: "شماره موبایل و کد ��ایید الزامی است",
       });
     }
 
@@ -399,10 +398,10 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
 
     if (isValid) {
       // Update user verification status
-      await query("UPDATE users SET is_verified = $1 WHERE phone_number = $2", [
-        1,
-        normalizedPhone,
-      ]);
+      await query(
+        "UPDATE users SET is_verified = $1 WHERE phone_number = $2",
+        [1, normalizedPhone],
+      );
 
       res.json({
         success: true,
@@ -412,15 +411,15 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
       res.status(400).json({
         success: false,
         message: "کد تایید نامعتبر یا منقضی شده است",
-        messageFA: "کد تایید نامعتبر یا منقضی شده است",
+        messageFA: "کد تایید نامعتبر یا من��ضی شده است",
       });
     }
   } catch (error) {
     console.error("Verify OTP error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در تایید کد",
-      messageFA: "خطای سیستمی در تایید ��د",
+      message: "خطای سی��تمی در تایید کد",
+      messageFA: "خطای سیستمی در تایید کد",
     });
   }
 });
@@ -465,7 +464,7 @@ router.post("/forgot-password", async (req: Request, res: Response) => {
     console.error("Forgot password error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در ارسال کد بازیابی",
+      message: "خطای سیستمی در ارسال ک�� بازیابی",
     });
   }
 });
@@ -519,172 +518,15 @@ router.post("/reset-password", async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: "رمز عبور با موفقیت تغییر کرد",
+      message: "رمز عبور با موفقیت تغییر ک��د",
     });
   } catch (error) {
     console.error("Reset password error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیستمی در تغییر رمز عبور",
+      message: "خطای سیس��می در تغییر رمز عبو��",
     });
   }
 });
 
-// Complete identity verification - FIXED VERSION
-router.post(
-  "/verify-identity",
-  authenticateToken,
-  upload.fields([
-    { name: "nationalCardImage", maxCount: 1 },
-    { name: "selfieImage", maxCount: 1 },
-  ]),
-  async (req: AuthenticatedRequest, res) => {
-    try {
-      const {
-        firstName,
-        lastName,
-        nationalId,
-        phoneNumber,
-        province,
-        city,
-        birthDate,
-        otpCode,
-      } = req.body;
-
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-      // Validation
-      if (
-        !firstName ||
-        !lastName ||
-        !nationalId ||
-        !phoneNumber ||
-        !province ||
-        !city ||
-        !birthDate
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: "تمام فیلدهای الزامی را پر کنید",
-        });
-      }
-
-      if (!files.nationalCardImage || !files.selfieImage) {
-        return res.status(400).json({
-          success: false,
-          message: "آپلود تصاویر مدارک الزامی است",
-        });
-      }
-
-      const normalizedPhone = phoneNumber.replace(/^(\+98|0)/, "+98");
-
-      // Check if user is already verified
-      const userResult = await query(
-        "SELECT is_verified FROM users WHERE id = $1",
-        [req.user!.userId],
-      );
-
-      const isUserVerified = userResult.rows[0]?.is_verified;
-
-      // Only verify OTP if user is not already verified
-      if (!isUserVerified && otpCode) {
-        const isValidOTP = await smsService.verifyOTP(normalizedPhone, otpCode);
-        if (!isValidOTP) {
-          return res.status(400).json({
-            success: false,
-            message: "کد تایید نامعتبر یا منقضی شده است",
-          });
-        }
-      } else if (!isUserVerified && !otpCode) {
-        return res.status(400).json({
-          success: false,
-          message: "کد تایید الزامی است",
-        });
-      }
-
-      try {
-        // Update user information
-        await query(
-          `UPDATE users SET
-           first_name = $1,
-           last_name = $2,
-           national_id = $3,
-           phone_number = $4,
-           birth_date = $5,
-           address = $6,
-           updated_at = CURRENT_TIMESTAMP
-         WHERE id = $7`,
-          [
-            firstName,
-            lastName,
-            nationalId,
-            normalizedPhone,
-            birthDate,
-            `${city}, ${province}`,
-            req.user!.userId,
-          ],
-        );
-
-        // Save verification documents
-        await query(
-          `INSERT INTO verification_documents (
-           user_id,
-           national_card_image,
-           selfie_image,
-           national_id,
-           province,
-           city,
-           birth_date,
-           verification_status,
-           created_at
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', CURRENT_TIMESTAMP)`,
-          [
-            req.user!.userId,
-            files.nationalCardImage[0].path,
-            files.selfieImage[0].path,
-            nationalId,
-            province,
-            city,
-            birthDate,
-          ],
-        );
-
-        res.json({
-          success: true,
-          message: "مدارک شما با موفقیت ارسال شد و در انتظار بررسی ادمین است",
-        });
-      } catch (dbError) {
-        console.log(
-          "Database not available for verification, using development mode",
-        );
-
-        // For development mode without database
-        res.json({
-          success: true,
-          message: "احراز هویت با موفقیت تکمیل شد (حالت توسعه)",
-        });
-      }
-    } catch (error) {
-      console.error("Verify identity error:", error);
-
-      // Clean up uploaded files on error
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      if (files) {
-        Object.values(files)
-          .flat()
-          .forEach((file) => {
-            if (fs.existsSync(file.path)) {
-              fs.unlinkSync(file.path);
-            }
-          });
-      }
-
-      res.status(500).json({
-        success: false,
-        message: "خطای سیستمی در احراز هویت",
-      });
-    }
-  },
-);
-
-export default router;
+// Complete identity verification

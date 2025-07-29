@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { query } from '../database/connection';
+import { query } from '../database/query-wrapper';
 
 interface SMSConfig {
   username: string;
@@ -31,8 +31,8 @@ class SMSService {
     
     // Delete any existing unused OTP for this phone number
     await query(
-      'DELETE FROM otp_codes WHERE phone_number = $1 AND is_used = false',
-      [phoneNumber]
+      'DELETE FROM otp_codes WHERE phone_number = $1 AND is_used = $2',
+      [phoneNumber, 0]
     );
 
     // Store new OTP
@@ -53,8 +53,8 @@ class SMSService {
 
       const result = await query(
         `SELECT id FROM otp_codes
-         WHERE phone_number = $1 AND code = $2 AND expires_at > NOW() AND is_used = false`,
-        [phoneNumber, code]
+         WHERE phone_number = $1 AND code = $2 AND expires_at > CURRENT_TIMESTAMP AND is_used = $3`,
+        [phoneNumber, code, 0]
       );
 
       if (result.rows.length === 0) {
@@ -63,8 +63,8 @@ class SMSService {
 
       // Mark OTP as used
       await query(
-        'UPDATE otp_codes SET is_used = true WHERE id = $1',
-        [result.rows[0].id]
+        'UPDATE otp_codes SET is_used = $1 WHERE id = $2',
+        [1, result.rows[0].id]
       );
 
       return true;
