@@ -121,7 +121,7 @@ router.post(
       if (existingUser.rows.length > 0) {
         return res.status(409).json({
           success: false,
-          message: "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
+          message: "کاربری با این ایمیل یا شماره موبایل ق��لاً ثبت نام کرده است",
           messageFA:
             "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
         });
@@ -419,7 +419,7 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: "خطای سیستمی در تایید کد",
-      messageFA: "خطای سیستمی در تایید کد",
+      messageFA: "خطای سیستمی در تایید ��د",
     });
   }
 });
@@ -637,7 +637,7 @@ router.post(
            birth_date,
            verification_status,
            created_at
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'approved', CURRENT_TIMESTAMP)`,
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', CURRENT_TIMESTAMP)`,
           [
             req.user!.userId,
             files.nationalCardImage[0].path,
