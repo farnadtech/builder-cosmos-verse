@@ -79,9 +79,14 @@ export default function AcceptProject() {
     console.log('Fetching project data for token:', inviteToken);
 
     try {
-      const response = await fetch(`/api/projects/invite/${inviteToken}`, {
+      const url = `/api/projects/invite/${inviteToken}`;
+      console.log('Fetching URL:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',
         headers: {
-          'Authorization': user ? `Bearer ${localStorage.getItem('zemano_token')}` : '',
+          'Content-Type': 'application/json',
+          // Remove authorization as this should be a public endpoint
         },
       });
 
@@ -189,7 +194,7 @@ export default function AcceptProject() {
           </CardHeader>
           <CardContent className="text-center">
             <Button asChild>
-              <a href="/">بازگشت به صفحه اصلی</a>
+              <a href="/">باز��شت به صفحه اصلی</a>
             </Button>
           </CardContent>
         </Card>
@@ -219,7 +224,7 @@ export default function AcceptProject() {
           <Alert className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              برای پذیرش این پروژه باید ابتدا احر��ز هویت خود را تکمیل کنید.
+              برای پذیرش این پروژه باید ابتدا احراز هویت خود را تکمیل کنید.
             </AlertDescription>
           </Alert>
         )}
@@ -424,7 +429,7 @@ export default function AcceptProject() {
                 <li>��� با پذیرش پروژه، قرارداد بین شما و کارفرما منعقد می‌شود</li>
                 <li>• پرداخت‌ها طبق مراحل تعریف شده انجام می‌��ود</li>
                 <li>• در صورت اختلاف، امکان مراجعه به داوری وجود دارد</li>
-                <li>• رعایت مهلت‌های تعیین شد�� الزامی است</li>
+                <li>• رعایت مهلت‌های تعیین شده الزامی است</li>
               </ul>
             </div>
           </div>
