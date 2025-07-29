@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { 
   ArrowLeft,
   Calendar, 
@@ -58,7 +59,7 @@ const statusLabels = {
   'open': 'باز',
   'assigned': 'تخصیص داده شده',
   'active': 'فعال',
-  'in_progress': 'در حال ��نجام',
+  'in_progress': 'در حال انجام',
   'completed': 'تکمیل شده',
   'cancelled': 'لغو شده',
   'disputed': 'مورد اختلاف',
@@ -328,7 +329,7 @@ export default function ProjectDetails() {
                     {project.status === 'open' && (
                       <Link to={`/projects/${project.id}/invite`}>
                         <Button className="w-full">
-                          دعوت ��جری
+                          دعوت مجری
                         </Button>
                       </Link>
                     )}
