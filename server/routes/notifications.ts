@@ -56,8 +56,8 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     // Get unread count
     const unreadCountResult = await query(
-      'SELECT COUNT(*) as unread_count FROM notifications WHERE user_id = $1 AND is_read = false',
-      [req.user!.id]
+      'SELECT COUNT(*) as unread_count FROM notifications WHERE user_id = $1 AND is_read = $2',
+      [req.user!.userId, 0]
     );
 
     res.json({
@@ -179,7 +179,7 @@ router.delete('/:id', authenticateToken, [
 
     res.json({
       success: true,
-      message: 'اعلان حذف شد'
+      message: 'اعلان حذف ش��'
     });
 
   } catch (error) {
