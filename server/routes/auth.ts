@@ -72,7 +72,7 @@ const registerValidation = [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage("نام خانوادگی باید بین 2 تا 50 کاراکتر باشد"),
-  body("email").isEmail().withMessage("فرمت ایمیل صحیح نیست").normalizeEmail(),
+  body("email").isEmail().withMessage("فرمت ایمیل صحیح ن��ست").normalizeEmail(),
   body("phoneNumber")
     .matches(/^(\+98|0)?9\d{9}$/)
     .withMessage("شماره موبایل صحیح نیست"),
@@ -323,7 +323,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: "ورود با موفقیت انجام شد",
+      message: "ورود با موفقیت ان��ام شد",
       data: {
         user: {
           id: user.id,
@@ -611,7 +611,6 @@ router.post(
            phone_number = $4,
            birth_date = $5,
            address = $6,
-           is_verified = 1,
            updated_at = CURRENT_TIMESTAMP
          WHERE id = $7`,
           [
