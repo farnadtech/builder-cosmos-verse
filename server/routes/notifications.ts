@@ -26,9 +26,9 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
     }
 
     if (read === 'unread') {
-      whereConditions.push('is_read = false');
+      whereConditions.push('is_read = 0');
     } else if (read === 'read') {
-      whereConditions.push('is_read = true');
+      whereConditions.push('is_read = 1');
     }
 
     const whereClause = whereConditions.join(' AND ');
@@ -135,7 +135,7 @@ router.patch('/mark-all-read', authenticateToken, async (req: AuthenticatedReque
 
     res.json({
       success: true,
-      message: 'تمام اعلان‌ها به عنوان خوانده شده علامت‌گذاری شدند',
+      message: 'تمام اعلان‌ها به عنوان خوانده شده علام��‌گذاری شدند',
       data: {
         updatedCount: updateResult.rowCount
       }
