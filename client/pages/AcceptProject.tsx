@@ -50,13 +50,17 @@ interface ProjectData {
 }
 
 export default function AcceptProject() {
-  const { inviteToken } = useParams();
+  const params = useParams();
+  const { inviteToken } = params;
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState("");
   const [project, setProject] = useState<ProjectData | null>(null);
+
+  console.log('All URL params:', params);
+  console.log('Extracted inviteToken:', inviteToken);
 
   useEffect(() => {
     console.log('AcceptProject loaded with token:', inviteToken);
@@ -185,7 +189,7 @@ export default function AcceptProject() {
           </CardHeader>
           <CardContent className="text-center">
             <Button asChild>
-              <a href="/">بازگشت به صفحه ا��لی</a>
+              <a href="/">بازگشت به صفحه اصلی</a>
             </Button>
           </CardContent>
         </Card>
@@ -215,7 +219,7 @@ export default function AcceptProject() {
           <Alert className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              برای پذیرش این پروژه باید ابتدا احراز هویت خود را تکمیل کنید.
+              برای پذیرش این پروژه باید ابتدا احر��ز هویت خود را تکمیل کنید.
             </AlertDescription>
           </Alert>
         )}
@@ -420,7 +424,7 @@ export default function AcceptProject() {
                 <li>��� با پذیرش پروژه، قرارداد بین شما و کارفرما منعقد می‌شود</li>
                 <li>• پرداخت‌ها طبق مراحل تعریف شده انجام می‌��ود</li>
                 <li>• در صورت اختلاف، امکان مراجعه به داوری وجود دارد</li>
-                <li>• رعایت مهلت‌های تعیین شده الزامی است</li>
+                <li>• رعایت مهلت‌های تعیین شد�� الزامی است</li>
               </ul>
             </div>
           </div>
