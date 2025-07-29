@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Briefcase, 
-  Wallet, 
-  MessageSquare, 
-  Gavel, 
-  FileText, 
-  Clock, 
-  CheckCircle, 
+import {
+  Briefcase,
+  Wallet,
+  MessageSquare,
+  Gavel,
+  FileText,
+  Clock,
+  CheckCircle,
   AlertCircle,
   TrendingUp,
   Users,
@@ -18,7 +24,7 @@ import {
   Plus,
   Settings,
   BarChart3,
-  Inbox
+  Inbox,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -63,7 +69,7 @@ export default function Dashboard() {
     totalProjects: 0,
     activeProjects: 0,
     completedProjects: 0,
-    balance: 0
+    balance: 0,
   });
   const [recentProjects, setRecentProjects] = useState<Project[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -82,33 +88,36 @@ export default function Dashboard() {
       // Create headers for fallback fetch
       const headers: HeadersInit = {};
       if (!window.authenticatedFetch) {
-        headers['Authorization'] = `Bearer ${localStorage.getItem('zemano_token')}`;
+        headers["Authorization"] =
+          `Bearer ${localStorage.getItem("zemano_token")}`;
       }
-      headers['Content-Type'] = 'application/json';
+      headers["Content-Type"] = "application/json";
 
       // Fetch user statistics
-      const statsResponse = await fetchFn('/api/dashboard/stats', {
-        headers
+      const statsResponse = await fetchFn("/api/dashboard/stats", {
+        headers,
       });
 
       // Fetch recent projects
-      const projectsResponse = await fetchFn('/api/dashboard/recent-projects', {
-        headers
+      const projectsResponse = await fetchFn("/api/dashboard/recent-projects", {
+        headers,
       });
 
       // Fetch notifications
-      const notificationsResponse = await fetchFn('/api/notifications', {
-        headers
+      const notificationsResponse = await fetchFn("/api/notifications", {
+        headers,
       });
 
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
-        setStats(statsData.data || {
-          totalProjects: 0,
-          activeProjects: 0,
-          completedProjects: 0,
-          balance: 0
-        });
+        setStats(
+          statsData.data || {
+            totalProjects: 0,
+            activeProjects: 0,
+            completedProjects: 0,
+            balance: 0,
+          },
+        );
       }
 
       if (projectsResponse.ok) {
@@ -120,12 +129,12 @@ export default function Dashboard() {
       if (notificationsResponse.ok) {
         const notificationsData = await notificationsResponse.json();
         // Handle nested structure: data.notifications
-        const notifications = notificationsData.data?.notifications || notificationsData.data || [];
+        const notifications =
+          notificationsData.data?.notifications || notificationsData.data || [];
         setNotifications(Array.isArray(notifications) ? notifications : []);
       }
-
     } catch (error) {
-      console.error('خطا در دریافت اطلاعات داشبورد:', error);
+      console.error("خطا در دریافت اطلاعات داشبورد:", error);
       // Don't show error to user, just keep default empty state
     } finally {
       setLoading(false);
@@ -139,63 +148,93 @@ export default function Dashboard() {
   // تابع برای تبدیل نقش به فارسی
   const getRoleName = (role: string) => {
     switch (role) {
-      case 'employer': return 'کارفرما';
-      case 'contractor': return 'مجری';
-      case 'arbitrator': return 'داور';
-      case 'admin': return 'مدیر';
-      default: return role;
+      case "employer":
+        return "کارفرما";
+      case "contractor":
+        return "مجری";
+      case "arbitrator":
+        return "داور";
+      case "admin":
+        return "مدیر";
+      default:
+        return role;
     }
   };
 
   // تابع برای تبدیل وضعیت پروژه به فارسی
   const getStatusName = (status: string) => {
     switch (status) {
-      case 'open': return 'باز';
-      case 'assigned': return 'تخصیص یافته';
-      case 'in_progress': return 'در حال انجام';
-      case 'completed': return 'تکمیل شده';
-      case 'cancelled': return 'لغو شده';
-      case 'disputed': return 'در حال داوری';
-      default: return status;
+      case "open":
+        return "باز";
+      case "assigned":
+        return "تخصیص یافته";
+      case "in_progress":
+        return "در حال انجام";
+      case "completed":
+        return "تکمیل شده";
+      case "cancelled":
+        return "لغو شده";
+      case "disputed":
+        return "در حال داوری";
+      default:
+        return status;
     }
   };
 
   // تابع برای تبدیل وضعیت به رنگ
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-800';
-      case 'assigned': return 'bg-purple-100 text-purple-800';
-      case 'in_progress': return 'bg-yellow-100 text-yellow-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      case 'disputed': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "open":
+        return "bg-blue-100 text-blue-800";
+      case "assigned":
+        return "bg-purple-100 text-purple-800";
+      case "in_progress":
+        return "bg-yellow-100 text-yellow-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "disputed":
+        return "bg-orange-100 text-orange-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // تابع برای تبدیل نوع اعلان به رنگ
   const getNotificationColor = (type: string) => {
     switch (type) {
-      case 'message': return 'bg-blue-100 text-blue-800';
-      case 'project': return 'bg-green-100 text-green-800';
-      case 'payment': return 'bg-yellow-100 text-yellow-800';
-      case 'arbitration': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "message":
+        return "bg-blue-100 text-blue-800";
+      case "project":
+        return "bg-green-100 text-green-800";
+      case "payment":
+        return "bg-yellow-100 text-yellow-800";
+      case "arbitration":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // تابع برای فرمت کردن قیمت
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price);
+    return new Intl.NumberFormat("fa-IR").format(price);
   };
 
   // تابع برای فرمت کردن تاریخ
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fa-IR');
+    return new Date(dateString).toLocaleDateString("fa-IR");
   };
 
   // Empty state component
-  const EmptyState = ({ icon: Icon, title, description, actionText, actionLink }: {
+  const EmptyState = ({
+    icon: Icon,
+    title,
+    description,
+    actionText,
+    actionLink,
+  }: {
     icon: any;
     title: string;
     description: string;
@@ -231,7 +270,10 @@ export default function Dashboard() {
                     {getRoleName(user.role)}
                   </Badge>
                   {!user.isVerified && (
-                    <Badge variant="outline" className="text-orange-600 border-orange-600">
+                    <Badge
+                      variant="outline"
+                      className="text-orange-600 border-orange-600"
+                    >
                       <AlertCircle className="h-3 w-3 mr-1" />
                       احراز هویت ناتمام
                     </Badge>
@@ -240,12 +282,20 @@ export default function Dashboard() {
               </div>
               <div className="mt-4 md:mt-0">
                 {user.isVerified ? (
-                  <Button variant="outline" disabled className="text-green-600 border-green-600">
+                  <Button
+                    variant="outline"
+                    disabled
+                    className="text-green-600 border-green-600"
+                  >
                     <CheckCircle className="h-4 w-4 mr-2" />
                     شما احراز شده‌اید
                   </Button>
                 ) : (
-                  <Button asChild variant="outline" className="text-orange-600 border-orange-600">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="text-orange-600 border-orange-600"
+                  >
                     <Link to="/verification">
                       <AlertCircle className="h-4 w-4 mr-2" />
                       احراز هویت
@@ -276,9 +326,15 @@ export default function Dashboard() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">
-                          {user.role === 'employer' ? 'کل پروژه‌ها' : user.role === 'contractor' ? 'پروژه‌های من' : 'کل پروژه‌ها'}
+                          {user.role === "employer"
+                            ? "کل پروژه‌ها"
+                            : user.role === "contractor"
+                              ? "پروژه‌های من"
+                              : "کل پروژه‌ها"}
                         </p>
-                        <p className="text-2xl font-bold">{stats.totalProjects}</p>
+                        <p className="text-2xl font-bold">
+                          {stats.totalProjects}
+                        </p>
                       </div>
                       <Briefcase className="h-8 w-8 text-muted-foreground" />
                     </div>
@@ -289,8 +345,12 @@ export default function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">پروژه‌های فعال</p>
-                        <p className="text-2xl font-bold">{stats.activeProjects}</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          پروژه‌های فعال
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {stats.activeProjects}
+                        </p>
                       </div>
                       <Clock className="h-8 w-8 text-muted-foreground" />
                     </div>
@@ -301,8 +361,12 @@ export default function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">پروژه‌های تکمیل شده</p>
-                        <p className="text-2xl font-bold">{stats.completedProjects}</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          پروژه‌های تکمیل شده
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {stats.completedProjects}
+                        </p>
                       </div>
                       <CheckCircle className="h-8 w-8 text-muted-foreground" />
                     </div>
@@ -313,8 +377,12 @@ export default function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">موجودی کیف پول</p>
-                        <p className="text-2xl font-bold">{formatPrice(stats.balance)} ریال</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          موجودی کیف پول
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {formatPrice(stats.balance)} ریال
+                        </p>
                       </div>
                       <Wallet className="h-8 w-8 text-muted-foreground" />
                     </div>
@@ -331,9 +399,7 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between">
                         <CardTitle>پروژه‌های اخیر</CardTitle>
                         <Button asChild variant="outline" size="sm">
-                          <Link to="/projects">
-                            مشاهده همه
-                          </Link>
+                          <Link to="/projects">مشاهده همه</Link>
                         </Button>
                       </div>
                     </CardHeader>
@@ -343,21 +409,34 @@ export default function Dashboard() {
                           icon={Briefcase}
                           title="هنوز پروژه‌ای ندارید"
                           description={
-                            user.role === 'employer' 
+                            user.role === "employer"
                               ? "اولین پروژه خود را ایجاد کنید و با بهترین مجریان کار کنید"
                               : "در پروژه‌های موجود شرکت کنید و درآمد کسب کنید"
                           }
-                          actionText={user.role === 'employer' ? "ایجاد پروژه" : "مشاهده پروژه‌ها"}
-                          actionLink={user.role === 'employer' ? "/projects/create" : "/projects"}
+                          actionText={
+                            user.role === "employer"
+                              ? "ایجاد پروژه"
+                              : "مشاهده پروژه‌ها"
+                          }
+                          actionLink={
+                            user.role === "employer"
+                              ? "/projects/create"
+                              : "/projects"
+                          }
                         />
                       ) : (
                         <div className="space-y-4">
                           {(recentProjects || []).slice(0, 5).map((project) => (
-                            <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div
+                              key={project.id}
+                              className="flex items-center justify-between p-4 border rounded-lg"
+                            >
                               <div className="flex-1">
                                 <h4 className="font-medium">{project.title}</h4>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <Badge className={getStatusColor(project.status)}>
+                                  <Badge
+                                    className={getStatusColor(project.status)}
+                                  >
                                     {getStatusName(project.status)}
                                   </Badge>
                                   {project.deadline && (
@@ -368,12 +447,18 @@ export default function Dashboard() {
                                 </div>
                               </div>
                               <div className="text-left">
-                                <p className="font-medium">{formatPrice(project.budget)} ریال</p>
+                                <p className="font-medium">
+                                  {formatPrice(project.budget)} ریال
+                                </p>
                                 {project.contractor && (
-                                  <p className="text-sm text-muted-foreground">مجری: {project.contractor}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    مجری: {project.contractor}
+                                  </p>
                                 )}
                                 {project.employer && (
-                                  <p className="text-sm text-muted-foreground">کارفرما: {project.employer}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    کارفرما: {project.employer}
+                                  </p>
                                 )}
                               </div>
                             </div>
@@ -398,29 +483,40 @@ export default function Dashboard() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {(notifications || []).slice(0, 5).map((notification) => (
-                            <div
-                              key={notification.id}
-                              className={`p-3 rounded-lg border ${
-                                !notification.is_read ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
-                              }`}
-                            >
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <h5 className="font-medium text-sm">{notification.title}</h5>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {notification.message}
-                                  </p>
+                          {(notifications || [])
+                            .slice(0, 5)
+                            .map((notification) => (
+                              <div
+                                key={notification.id}
+                                className={`p-3 rounded-lg border ${
+                                  !notification.is_read
+                                    ? "bg-blue-50 border-blue-200"
+                                    : "bg-gray-50"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <h5 className="font-medium text-sm">
+                                      {notification.title}
+                                    </h5>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {notification.message}
+                                    </p>
+                                  </div>
+                                  <Badge
+                                    className={getNotificationColor(
+                                      notification.type,
+                                    )}
+                                    size="sm"
+                                  >
+                                    {notification.type}
+                                  </Badge>
                                 </div>
-                                <Badge className={getNotificationColor(notification.type)} size="sm">
-                                  {notification.type}
-                                </Badge>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  {formatDate(notification.created_at)}
+                                </p>
                               </div>
-                              <p className="text-xs text-muted-foreground mt-2">
-                                {formatDate(notification.created_at)}
-                              </p>
-                            </div>
-                          ))}
+                            ))}
                         </div>
                       )}
                     </CardContent>
@@ -436,24 +532,33 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {user.role === 'employer' && (
+                      {user.role === "employer" && (
                         <Button asChild className="h-auto p-4">
-                          <Link to="/projects/create" className="flex flex-col items-center gap-2">
+                          <Link
+                            to="/projects/create"
+                            className="flex flex-col items-center gap-2"
+                          >
                             <Plus className="h-6 w-6" />
                             <span>ایجاد پروژه جدید</span>
                           </Link>
                         </Button>
                       )}
-                      
+
                       <Button asChild variant="outline" className="h-auto p-4">
-                        <Link to="/projects" className="flex flex-col items-center gap-2">
+                        <Link
+                          to="/projects"
+                          className="flex flex-col items-center gap-2"
+                        >
                           <Briefcase className="h-6 w-6" />
                           <span>مشاهده پروژه‌ها</span>
                         </Link>
                       </Button>
 
                       <Button asChild variant="outline" className="h-auto p-4">
-                        <Link to="/wallet" className="flex flex-col items-center gap-2">
+                        <Link
+                          to="/wallet"
+                          className="flex flex-col items-center gap-2"
+                        >
                           <Wallet className="h-6 w-6" />
                           <span>کیف پول</span>
                         </Link>

@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -13,7 +19,7 @@ import {
   FileText,
   Clock,
   Briefcase,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -51,7 +57,7 @@ export default function AcceptProject() {
   const [error, setError] = useState("");
   const [project, setProject] = useState<ProjectData | null>(null);
 
-  console.log('🚀 AcceptProject loaded with token:', inviteToken);
+  console.log("🚀 AcceptProject loaded with token:", inviteToken);
 
   useEffect(() => {
     if (inviteToken) {
@@ -63,21 +69,21 @@ export default function AcceptProject() {
   }, [inviteToken]);
 
   const fetchProjectData = async () => {
-    console.log('📡 Fetching project data...');
+    console.log("📡 Fetching project data...");
 
     try {
       const response = await fetch(`/api/projects/invite/${inviteToken}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
-      console.log('📡 Response status:', response.status);
+      console.log("📡 Response status:", response.status);
 
       if (response.ok) {
         const data = await response.json();
-        console.log('📡 Response data:', data);
+        console.log("📡 Response data:", data);
 
         if (data.success && data.data && data.data.project) {
           setProject(data.data.project);
@@ -89,7 +95,7 @@ export default function AcceptProject() {
         setError(errorData.message || "خطا در دریافت اطلاعات پروژه");
       }
     } catch (err) {
-      console.error('📡 Fetch error:', err);
+      console.error("📡 Fetch error:", err);
       setError("خطا در ارتباط با سرور");
     } finally {
       setLoading(false);
@@ -98,18 +104,18 @@ export default function AcceptProject() {
 
   const acceptProject = async () => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     setAccepting(true);
     try {
-      const token = localStorage.getItem('zemano_token');
+      const token = localStorage.getItem("zemano_token");
       const response = await fetch(`/api/projects/accept/${inviteToken}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
 
@@ -128,7 +134,7 @@ export default function AcceptProject() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fa-IR').format(amount) + ' ریال';
+    return new Intl.NumberFormat("fa-IR").format(amount) + " ریال";
   };
 
   if (loading) {
@@ -152,7 +158,7 @@ export default function AcceptProject() {
             <CardDescription>{error}</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button onClick={() => window.location.href = '/'}>
+            <Button onClick={() => (window.location.href = "/")}>
               بازگشت به صفحه اصلی
             </Button>
           </CardContent>
@@ -165,8 +171,12 @@ export default function AcceptProject() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto max-w-4xl px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">دعوت به همکاری</h1>
-          <p className="text-gray-600">شما برای همکاری در پروژه زیر دعوت شده‌اید</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            دعوت به همکاری
+          </h1>
+          <p className="text-gray-600">
+            شما برای همکاری در پروژه زیر دعوت شده‌اید
+          </p>
         </div>
 
         {!user && (
@@ -198,7 +208,9 @@ export default function AcceptProject() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium mb-2">توضیحات پروژه:</h4>
-                    <p className="text-gray-700 leading-relaxed">{project.description}</p>
+                    <p className="text-gray-700 leading-relaxed">
+                      {project.description}
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
@@ -221,13 +233,17 @@ export default function AcceptProject() {
                     {project.milestones.map((milestone, index) => (
                       <div key={milestone.id} className="border rounded-lg p-4">
                         <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-medium">مرحله {index + 1}: {milestone.title}</h4>
+                          <h4 className="font-medium">
+                            مرحله {index + 1}: {milestone.title}
+                          </h4>
                           <span className="font-medium text-blue-600">
                             {formatCurrency(milestone.amount)}
                           </span>
                         </div>
                         {milestone.description && (
-                          <p className="text-gray-600 text-sm">{milestone.description}</p>
+                          <p className="text-gray-600 text-sm">
+                            {milestone.description}
+                          </p>
                         )}
                       </div>
                     ))}
@@ -247,14 +263,20 @@ export default function AcceptProject() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <p className="font-medium">{project.employer.firstName} {project.employer.lastName}</p>
+                  <p className="font-medium">
+                    {project.employer.firstName} {project.employer.lastName}
+                  </p>
                   <div className="flex justify-between text-sm">
                     <span>امتیاز:</span>
-                    <span className="font-medium">{project.employer.rating}/۵</span>
+                    <span className="font-medium">
+                      {project.employer.rating}/۵
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>پروژه‌های تکمیل شده:</span>
-                    <span className="font-medium">{project.employer.completedProjects}</span>
+                    <span className="font-medium">
+                      {project.employer.completedProjects}
+                    </span>
                   </div>
                 </div>
               </CardContent>

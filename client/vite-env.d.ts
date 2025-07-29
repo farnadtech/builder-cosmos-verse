@@ -2,7 +2,10 @@
 
 declare global {
   interface Window {
-    authenticatedFetch?: (url: string, options?: RequestInit) => Promise<Response>;
+    authenticatedFetch?: (
+      url: string,
+      options?: RequestInit,
+    ) => Promise<Response>;
   }
 }
 

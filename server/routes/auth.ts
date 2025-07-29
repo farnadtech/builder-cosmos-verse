@@ -121,7 +121,8 @@ router.post(
       if (existingUser.rows.length > 0) {
         return res.status(409).json({
           success: false,
-          message: "کاربری با این ایمیل یا شماره موبایل ق��لاً ثبت نام کرده است",
+          message:
+            "کاربری با این ایمیل یا شماره موبایل ق��لاً ثبت نام کرده است",
           messageFA:
             "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
         });
@@ -398,10 +399,10 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
 
     if (isValid) {
       // Update user verification status
-      await query(
-        "UPDATE users SET is_verified = $1 WHERE phone_number = $2",
-        [1, normalizedPhone],
-      );
+      await query("UPDATE users SET is_verified = $1 WHERE phone_number = $2", [
+        1,
+        normalizedPhone,
+      ]);
 
       res.json({
         success: true,
@@ -580,9 +581,9 @@ router.post(
       // Check if user is already verified
       const userResult = await query(
         "SELECT is_verified FROM users WHERE id = $1",
-        [req.user!.userId]
+        [req.user!.userId],
       );
-      
+
       const isUserVerified = userResult.rows[0]?.is_verified;
 
       // Only verify OTP if user is not already verified

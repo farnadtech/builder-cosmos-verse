@@ -106,7 +106,7 @@ export default function VerificationForm() {
   // Redirect if user is already verified
   useEffect(() => {
     if (user?.isVerified) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
@@ -309,7 +309,10 @@ export default function VerificationForm() {
       if (response.ok) {
         const data = await response.json();
         // Show success message and redirect to dashboard
-        alert(data.message || "مدارک شما با موفقیت ارسال شد و در انتظار بررسی ادمین است");
+        alert(
+          data.message ||
+            "مدارک شما با موفقیت ارسال شد و در انتظار بررسی ادمین است",
+        );
         navigate("/dashboard");
       } else {
         const data = await response.json();
@@ -589,10 +592,13 @@ export default function VerificationForm() {
                   <div className="p-4 bg-green-50 rounded-lg">
                     <div className="flex items-center gap-2 text-green-800">
                       <CheckCircle className="w-5 h-5" />
-                      <span className="font-medium">شماره موبایل تایید شده</span>
+                      <span className="font-medium">
+                        شماره موبایل تایید شده
+                      </span>
                     </div>
                     <p className="text-sm text-green-700 mt-1">
-                      شماره موبایل شما قبلاً تایید شده است. پس از آپلود مدارک، احرا�� هویت تکمیل خواهد شد.
+                      شماره موبایل شما قبلاً تایید شده است. پس از آپلود مدارک،
+                      احرا�� هویت تکمیل خواهد شد.
                     </p>
                   </div>
                 )}

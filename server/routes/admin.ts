@@ -1,8 +1,12 @@
-import { Router, Response } from 'express';
-import { body, param, validationResult } from 'express-validator';
-import { authenticateToken, AuthenticatedRequest, requireAdmin } from '../middleware/auth';
+import { Router, Response } from "express";
+import { body, param, validationResult } from "express-validator";
+import {
+  authenticateToken,
+  AuthenticatedRequest,
+  requireAdmin,
+} from "../middleware/auth";
 import { query, executeTransaction } from "../database/query-wrapper";
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 
 const router = Router();
 
@@ -10,9 +14,11 @@ const router = Router();
 router.use(authenticateToken, requireAdmin);
 
 // Get pending verifications
-router.get('/verifications/pending', async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const pendingVerifications = await query(`
+router.get(
+  "/verifications/pending",
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const pendingVerifications = await query(`
       SELECT
         vd.*,
         u.first_name,
@@ -26,34 +32,36 @@ router.get('/verifications/pending', async (req: AuthenticatedRequest, res: Resp
       ORDER BY vd.created_at DESC
     `);
 
-    res.json({
-      success: true,
-      data: {
-        verifications: pendingVerifications.rows
-      }
-    });
-  } catch (error) {
-    console.error('Get pending verifications error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'خطا در دریافت لیست احراز هویت‌های در انتظار'
-    });
-  }
-});
+      res.json({
+        success: true,
+        data: {
+          verifications: pendingVerifications.rows,
+        },
+      });
+    } catch (error) {
+      console.error("Get pending verifications error:", error);
+      res.status(500).json({
+        success: false,
+        message: "خطا در دریافت لیست احراز هویت‌های در انتظار",
+      });
+    }
+  },
+);
 
 // Approve or reject verification
-router.patch('/verifications/:id',
-  param('id').isInt(),
-  body('status').isIn(['approved', 'rejected']),
-  body('admin_notes').optional().isString(),
+router.patch(
+  "/verifications/:id",
+  param("id").isInt(),
+  body("status").isIn(["approved", "rejected"]),
+  body("admin_notes").optional().isString(),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          message: 'اطلاعات ورودی نامعتبر است',
-          errors: errors.array()
+          message: "اطلاعات ورودی نامعتبر است",
+          errors: errors.array(),
         });
       }
 
@@ -62,14 +70,14 @@ router.patch('/verifications/:id',
 
       // Get verification document info
       const verificationResult = await query(
-        'SELECT user_id FROM verification_documents WHERE id = $1',
-        [verificationId]
+        "SELECT user_id FROM verification_documents WHERE id = $1",
+        [verificationId],
       );
 
       if (verificationResult.rows.length === 0) {
         return res.status(404).json({
           success: false,
-          message: 'سند احراز هویت یافت نشد'
+          message: "سند احراز هویت یافت نشد",
         });
       }
 
@@ -83,34 +91,31 @@ router.patch('/verifications/:id',
              reviewed_at = CURRENT_TIMESTAMP,
              reviewed_by = $3
          WHERE id = $4`,
-        [status, admin_notes || null, req.user!.userId, verificationId]
+        [status, admin_notes || null, req.user!.userId, verificationId],
       );
 
       // If approved, update user verification status
-      if (status === 'approved') {
-        await query(
-          'UPDATE users SET is_verified = 1 WHERE id = $1',
-          [userId]
-        );
+      if (status === "approved") {
+        await query("UPDATE users SET is_verified = 1 WHERE id = $1", [userId]);
       }
 
       res.json({
         success: true,
-        message: status === 'approved' ? 'احراز هویت تایید شد' : 'احراز هویت رد شد'
+        message:
+          status === "approved" ? "احراز هویت تایید شد" : "احراز هویت رد شد",
       });
-
     } catch (error) {
-      console.error('Update verification status error:', error);
+      console.error("Update verification status error:", error);
       res.status(500).json({
         success: false,
-        message: 'خطا در به‌روزرسانی وضعیت احراز هویت'
+        message: "خطا در به‌روزرسانی وضعیت احراز هویت",
       });
     }
-  }
+  },
 );
 
 // Get dashboard statistics
-router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
+router.get("/dashboard", async (req: AuthenticatedRequest, res: Response) => {
   try {
     // Get user statistics
     const userStatsResult = await query(`
@@ -190,7 +195,7 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
           arbitrators: parseInt(userStats.total_arbitrators),
           verified: parseInt(userStats.verified_users),
           active: parseInt(userStats.active_users),
-          newLast30Days: parseInt(userStats.new_users_30_days)
+          newLast30Days: parseInt(userStats.new_users_30_days),
         },
         projects: {
           total: parseInt(projectStats.total_projects),
@@ -199,80 +204,81 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
           completed: parseInt(projectStats.completed_projects),
           disputed: parseInt(projectStats.disputed_projects),
           averageBudget: parseFloat(projectStats.average_budget) || 0,
-          totalValue: parseFloat(projectStats.total_project_value) || 0
+          totalValue: parseFloat(projectStats.total_project_value) || 0,
         },
         financial: {
           totalTransactions: parseInt(financialStats.total_transactions),
           heldTransactions: parseInt(financialStats.held_transactions),
           releasedTransactions: parseInt(financialStats.released_transactions),
           totalHeldAmount: parseFloat(financialStats.total_held_amount) || 0,
-          totalReleasedAmount: parseFloat(financialStats.total_released_amount) || 0,
-          totalVolume: parseFloat(financialStats.total_transaction_volume) || 0
+          totalReleasedAmount:
+            parseFloat(financialStats.total_released_amount) || 0,
+          totalVolume: parseFloat(financialStats.total_transaction_volume) || 0,
         },
         arbitration: {
           total: parseInt(arbitrationStats.total_arbitrations),
           pending: parseInt(arbitrationStats.pending_arbitrations),
           resolved: parseInt(arbitrationStats.resolved_arbitrations),
-          avgResolutionDays: parseFloat(arbitrationStats.avg_resolution_days) || 0
+          avgResolutionDays:
+            parseFloat(arbitrationStats.avg_resolution_days) || 0,
         },
-        recentActivities: recentActivitiesResult.rows
-      }
+        recentActivities: recentActivitiesResult.rows,
+      },
     });
-
   } catch (error) {
-    console.error('Get admin dashboard error:', error);
+    console.error("Get admin dashboard error:", error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دریافت آمار داشبورد'
+      message: "خطا در دریافت آمار داشبورد",
     });
   }
 });
 
 // Get all users with filtering and pagination
-router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
+router.get("/users", async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const {
-      page = 1,
-      limit = 20,
-      role,
-      status,
-      search,
-      verified
-    } = req.query;
+    const { page = 1, limit = 20, role, status, search, verified } = req.query;
 
     const offset = (Number(page) - 1) * Number(limit);
     let whereConditions: string[] = ["role != 'admin'"];
     let queryParams: any[] = [];
     let paramCount = 0;
 
-    if (role && role !== 'all') {
+    if (role && role !== "all") {
       whereConditions.push(`role = $${++paramCount}`);
       queryParams.push(role);
     }
 
-    if (status && status !== 'all') {
-      if (status === 'active') {
+    if (status && status !== "all") {
+      if (status === "active") {
         whereConditions.push(`is_active = true`);
-      } else if (status === 'inactive') {
+      } else if (status === "inactive") {
         whereConditions.push(`is_active = false`);
       }
     }
 
-    if (verified && verified !== 'all') {
-      if (verified === 'verified') {
+    if (verified && verified !== "all") {
+      if (verified === "verified") {
         whereConditions.push(`is_verified = true`);
-      } else if (verified === 'unverified') {
+      } else if (verified === "unverified") {
         whereConditions.push(`is_verified = false`);
       }
     }
 
     if (search) {
-      whereConditions.push(`(first_name ILIKE $${++paramCount} OR last_name ILIKE $${++paramCount} OR email ILIKE $${++paramCount} OR phone_number ILIKE $${++paramCount})`);
-      queryParams.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+      whereConditions.push(
+        `(first_name ILIKE $${++paramCount} OR last_name ILIKE $${++paramCount} OR email ILIKE $${++paramCount} OR phone_number ILIKE $${++paramCount})`,
+      );
+      queryParams.push(
+        `%${search}%`,
+        `%${search}%`,
+        `%${search}%`,
+        `%${search}%`,
+      );
       paramCount += 3; // We added 4 parameters but increment by 3 more
     }
 
-    const whereClause = whereConditions.join(' AND ');
+    const whereClause = whereConditions.join(" AND ");
 
     const usersQuery = `
       SELECT 
@@ -288,7 +294,8 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     queryParams.push(Number(limit), offset);
 
     const usersResult = await query(usersQuery, queryParams);
-    const totalCount = usersResult.rows.length > 0 ? usersResult.rows[0].total_count : 0;
+    const totalCount =
+      usersResult.rows.length > 0 ? usersResult.rows[0].total_count : 0;
 
     res.json({
       success: true,
@@ -298,67 +305,71 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
           page: Number(page),
           limit: Number(limit),
           total: Number(totalCount),
-          totalPages: Math.ceil(Number(totalCount) / Number(limit))
-        }
-      }
+          totalPages: Math.ceil(Number(totalCount) / Number(limit)),
+        },
+      },
     });
-
   } catch (error) {
-    console.error('Get admin users error:', error);
+    console.error("Get admin users error:", error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دریافت لیست کاربران'
+      message: "خطا در دریافت لیست کاربران",
     });
   }
 });
 
 // Get user details
-router.get('/users/:id', [
-  param('id').isInt()
-], async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'شناسه کاربر نامعتبر است'
-      });
-    }
+router.get(
+  "/users/:id",
+  [param("id").isInt()],
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: "شناسه کاربر نامعتبر است",
+        });
+      }
 
-    const { id } = req.params;
+      const { id } = req.params;
 
-    // Get user details
-    const userResult = await query(
-      `SELECT id, first_name, last_name, email, phone_number, role, 
+      // Get user details
+      const userResult = await query(
+        `SELECT id, first_name, last_name, email, phone_number, role, 
               is_verified, is_active, profile_image, national_id, 
               birth_date, address, created_at
        FROM users WHERE id = $1`,
-      [id]
-    );
+        [id],
+      );
 
-    if (userResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'کاربر یافت نشد'
-      });
-    }
+      if (userResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "کاربر یافت نشد",
+        });
+      }
 
-    const user = userResult.rows[0];
+      const user = userResult.rows[0];
 
-    // Get user statistics
-    let userStats = {};
+      // Get user statistics
+      let userStats = {};
 
-    if (user.role === 'employer') {
-      const statsResult = await query(`
+      if (user.role === "employer") {
+        const statsResult = await query(
+          `
         SELECT 
           COUNT(*) as total_projects,
           COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_projects,
           SUM(budget) as total_spent
         FROM projects WHERE employer_id = $1
-      `, [id]);
-      userStats = statsResult.rows[0];
-    } else if (user.role === 'contractor') {
-      const statsResult = await query(`
+      `,
+          [id],
+        );
+        userStats = statsResult.rows[0];
+      } else if (user.role === "contractor") {
+        const statsResult = await query(
+          `
         SELECT 
           COUNT(*) as total_projects,
           COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_projects,
@@ -366,10 +377,13 @@ router.get('/users/:id', [
         FROM projects p
         LEFT JOIN escrow_transactions et ON p.id = et.project_id AND et.status = 'released'
         WHERE p.contractor_id = $1
-      `, [id]);
-      userStats = statsResult.rows[0];
-    } else if (user.role === 'arbitrator') {
-      const statsResult = await query(`
+      `,
+          [id],
+        );
+        userStats = statsResult.rows[0];
+      } else if (user.role === "arbitrator") {
+        const statsResult = await query(
+          `
         SELECT 
           COUNT(*) as total_cases,
           COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved_cases,
@@ -377,12 +391,15 @@ router.get('/users/:id', [
         FROM arbitrations a
         LEFT JOIN arbitrator_ratings ar ON a.id = ar.arbitration_id
         WHERE a.arbitrator_id = $1
-      `, [id]);
-      userStats = statsResult.rows[0];
-    }
+      `,
+          [id],
+        );
+        userStats = statsResult.rows[0];
+      }
 
-    // Get recent activities
-    const activitiesResult = await query(`
+      // Get recent activities
+      const activitiesResult = await query(
+        `
       (SELECT 'project_created' as type, title as description, created_at as date
        FROM projects WHERE employer_id = $1
        ORDER BY created_at DESC LIMIT 5)
@@ -391,189 +408,215 @@ router.get('/users/:id', [
        FROM projects WHERE contractor_id = $1
        ORDER BY updated_at DESC LIMIT 5)
       ORDER BY date DESC LIMIT 10
-    `, [id, id]);
+    `,
+        [id, id],
+      );
 
-    res.json({
-      success: true,
-      data: {
-        user,
-        statistics: userStats,
-        recentActivities: activitiesResult.rows
-      }
-    });
-
-  } catch (error) {
-    console.error('Get user details error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'خطا در دریافت جزئیات کاربر'
-    });
-  }
-});
+      res.json({
+        success: true,
+        data: {
+          user,
+          statistics: userStats,
+          recentActivities: activitiesResult.rows,
+        },
+      });
+    } catch (error) {
+      console.error("Get user details error:", error);
+      res.status(500).json({
+        success: false,
+        message: "خطا در دریافت جزئیات کاربر",
+      });
+    }
+  },
+);
 
 // Update user status (activate/deactivate)
-router.patch('/users/:id/status', [
-  param('id').isInt(),
-  body('isActive').isBoolean().withMessage('وضعیت فعال بودن نامعتبر است')
-], async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
+router.patch(
+  "/users/:id/status",
+  [
+    param("id").isInt(),
+    body("isActive").isBoolean().withMessage("وضعیت فعال بودن نامعتبر است"),
+  ],
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: "اطلاعات ورودی نامعتبر است",
+          errors: errors.array(),
+        });
+      }
+
+      const { id } = req.params;
+      const { isActive } = req.body;
+
+      // Prevent admin from deactivating themselves
+      if (parseInt(id) === req.user!.id) {
+        return res.status(400).json({
+          success: false,
+          message: "نمی‌توانید حساب خود را غیرفعال کنید",
+        });
+      }
+
+      // Update user status
+      const updateResult = await query(
+        "UPDATE users SET is_active = $1, updated_at = NOW() WHERE id = $2 AND role != 'admin' RETURNING first_name, last_name",
+        [isActive, id],
+      );
+
+      if (updateResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "کاربر یافت نشد",
+        });
+      }
+
+      const user = updateResult.rows[0];
+
+      res.json({
+        success: true,
+        message: `حساب کاربری ${user.first_name} ${user.last_name} ${isActive ? "فعال" : "غیرفعال"} شد`,
+      });
+    } catch (error) {
+      console.error("Update user status error:", error);
+      res.status(500).json({
         success: false,
-        message: 'اطلاعات ورودی نامعتبر است',
-        errors: errors.array()
+        message: "خطا در به‌روزرسانی وضعیت کاربر",
       });
     }
-
-    const { id } = req.params;
-    const { isActive } = req.body;
-
-    // Prevent admin from deactivating themselves
-    if (parseInt(id) === req.user!.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'نمی‌توانید حساب خود را غیرفعال کنید'
-      });
-    }
-
-    // Update user status
-    const updateResult = await query(
-      'UPDATE users SET is_active = $1, updated_at = NOW() WHERE id = $2 AND role != \'admin\' RETURNING first_name, last_name',
-      [isActive, id]
-    );
-
-    if (updateResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'کاربر یافت نشد'
-      });
-    }
-
-    const user = updateResult.rows[0];
-
-    res.json({
-      success: true,
-      message: `حساب کاربری ${user.first_name} ${user.last_name} ${isActive ? 'فعال' : 'غیرفعال'} شد`
-    });
-
-  } catch (error) {
-    console.error('Update user status error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'خطا در به‌روزرسانی وضعیت کاربر'
-    });
-  }
-});
+  },
+);
 
 // Create new arbitrator
-router.post('/arbitrators', [
-  body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('نام باید بین 2 تا 50 کاراکتر باشد'),
-  body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('نام خانوادگی باید بین 2 تا 50 کاراکتر باشد'),
-  body('email').isEmail().withMessage('فرمت ایمیل صحیح نیست').normalizeEmail(),
-  body('phoneNumber').matches(/^(\+98|0)?9\d{9}$/).withMessage('شماره موبایل صحیح نیست'),
-  body('password').isLength({ min: 8 }).withMessage('رمز عبور باید حداقل 8 کاراکتر باشد'),
-  body('specialty').optional().trim().isLength({ max: 200 }).withMessage('تخصص نباید بیش از 200 کاراکتر باشد')
-], async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'اطلاعات ورودی نامعتبر است',
-        errors: errors.array()
-      });
-    }
+router.post(
+  "/arbitrators",
+  [
+    body("firstName")
+      .trim()
+      .isLength({ min: 2, max: 50 })
+      .withMessage("نام باید بین 2 تا 50 کاراکتر باشد"),
+    body("lastName")
+      .trim()
+      .isLength({ min: 2, max: 50 })
+      .withMessage("نام خانوادگی باید بین 2 تا 50 کاراکتر باشد"),
+    body("email")
+      .isEmail()
+      .withMessage("فرمت ایمیل صحیح نیست")
+      .normalizeEmail(),
+    body("phoneNumber")
+      .matches(/^(\+98|0)?9\d{9}$/)
+      .withMessage("شماره موبایل صحیح نیست"),
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("رمز عبور باید حداقل 8 کاراکتر باشد"),
+    body("specialty")
+      .optional()
+      .trim()
+      .isLength({ max: 200 })
+      .withMessage("تخصص نباید بیش از 200 کاراکتر باشد"),
+  ],
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: "اطلاعات ورودی نامعتبر است",
+          errors: errors.array(),
+        });
+      }
 
-    const { firstName, lastName, email, phoneNumber, password, specialty } = req.body;
+      const { firstName, lastName, email, phoneNumber, password, specialty } =
+        req.body;
 
-    // Normalize phone number
-    const normalizedPhone = phoneNumber.replace(/^(\+98|0)/, '+98');
+      // Normalize phone number
+      const normalizedPhone = phoneNumber.replace(/^(\+98|0)/, "+98");
 
-    // Check if user already exists
-    const existingUser = await query(
-      'SELECT id FROM users WHERE email = $1 OR phone_number = $2',
-      [email, normalizedPhone]
-    );
+      // Check if user already exists
+      const existingUser = await query(
+        "SELECT id FROM users WHERE email = $1 OR phone_number = $2",
+        [email, normalizedPhone],
+      );
 
-    if (existingUser.rows.length > 0) {
-      return res.status(409).json({
-        success: false,
-        message: 'کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است'
-      });
-    }
+      if (existingUser.rows.length > 0) {
+        return res.status(409).json({
+          success: false,
+          message: "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
+        });
+      }
 
-    // Hash password
-    const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+      // Hash password
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Create arbitrator
-    const userResult = await query(
-      `INSERT INTO users (
+      // Create arbitrator
+      const userResult = await query(
+        `INSERT INTO users (
          first_name, last_name, email, phone_number, password_hash, 
          role, is_verified, is_active, created_at
        ) VALUES ($1, $2, $3, $4, $5, 'arbitrator', true, true, NOW())
        RETURNING id, email`,
-      [firstName, lastName, email, normalizedPhone, passwordHash]
-    );
+        [firstName, lastName, email, normalizedPhone, passwordHash],
+      );
 
-    const user = userResult.rows[0];
+      const user = userResult.rows[0];
 
-    // Create wallet for arbitrator
-    await query(
-      'INSERT INTO wallets (user_id, balance, total_earned, total_spent) VALUES ($1, 0, 0, 0)',
-      [user.id]
-    );
+      // Create wallet for arbitrator
+      await query(
+        "INSERT INTO wallets (user_id, balance, total_earned, total_spent) VALUES ($1, 0, 0, 0)",
+        [user.id],
+      );
 
-    res.status(201).json({
-      success: true,
-      message: 'حساب داور با موفقیت ایجاد شد',
-      data: {
-        userId: user.id,
-        firstName,
-        lastName,
-        email: user.email,
-        phoneNumber: normalizedPhone,
-        role: 'arbitrator'
-      }
-    });
-
-  } catch (error) {
-    console.error('Create arbitrator error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'خطا در ایجاد حساب داور'
-    });
-  }
-});
+      res.status(201).json({
+        success: true,
+        message: "حساب داور با موفقیت ایجاد شد",
+        data: {
+          userId: user.id,
+          firstName,
+          lastName,
+          email: user.email,
+          phoneNumber: normalizedPhone,
+          role: "arbitrator",
+        },
+      });
+    } catch (error) {
+      console.error("Create arbitrator error:", error);
+      res.status(500).json({
+        success: false,
+        message: "خطا در ایجاد حساب داور",
+      });
+    }
+  },
+);
 
 // Get all projects with admin view
-router.get('/projects', async (req: AuthenticatedRequest, res: Response) => {
+router.get("/projects", async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const {
-      page = 1,
-      limit = 20,
-      status,
-      search
-    } = req.query;
+    const { page = 1, limit = 20, status, search } = req.query;
 
     const offset = (Number(page) - 1) * Number(limit);
     let whereConditions: string[] = [];
     let queryParams: any[] = [];
     let paramCount = 0;
 
-    if (status && status !== 'all') {
+    if (status && status !== "all") {
       whereConditions.push(`p.status = $${++paramCount}`);
       queryParams.push(status);
     }
 
     if (search) {
-      whereConditions.push(`(p.title ILIKE $${++paramCount} OR p.description ILIKE $${++paramCount})`);
+      whereConditions.push(
+        `(p.title ILIKE $${++paramCount} OR p.description ILIKE $${++paramCount})`,
+      );
       queryParams.push(`%${search}%`, `%${search}%`);
       paramCount++;
     }
 
-    const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
+    const whereClause =
+      whereConditions.length > 0
+        ? "WHERE " + whereConditions.join(" AND ")
+        : "";
 
     const projectsQuery = `
       SELECT 
@@ -594,7 +637,8 @@ router.get('/projects', async (req: AuthenticatedRequest, res: Response) => {
     queryParams.push(Number(limit), offset);
 
     const projectsResult = await query(projectsQuery, queryParams);
-    const totalCount = projectsResult.rows.length > 0 ? projectsResult.rows[0].total_count : 0;
+    const totalCount =
+      projectsResult.rows.length > 0 ? projectsResult.rows[0].total_count : 0;
 
     res.json({
       success: true,
@@ -604,103 +648,97 @@ router.get('/projects', async (req: AuthenticatedRequest, res: Response) => {
           page: Number(page),
           limit: Number(limit),
           total: Number(totalCount),
-          totalPages: Math.ceil(Number(totalCount) / Number(limit))
-        }
-      }
+          totalPages: Math.ceil(Number(totalCount) / Number(limit)),
+        },
+      },
     });
-
   } catch (error) {
-    console.error('Get admin projects error:', error);
+    console.error("Get admin projects error:", error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دریافت لیست پروژه‌ها'
+      message: "خطا در دریافت لیست پروژه‌ها",
     });
   }
 });
 
 // Get system settings
-router.get('/settings', async (req: AuthenticatedRequest, res: Response) => {
+router.get("/settings", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const settingsResult = await query(
-      'SELECT key, value, description FROM system_settings ORDER BY key'
+      "SELECT key, value, description FROM system_settings ORDER BY key",
     );
 
     const settings: { [key: string]: any } = {};
-    settingsResult.rows.forEach(row => {
+    settingsResult.rows.forEach((row) => {
       settings[row.key] = {
         value: row.value,
-        description: row.description
+        description: row.description,
       };
     });
 
     res.json({
       success: true,
-      data: { settings }
+      data: { settings },
     });
-
   } catch (error) {
-    console.error('Get system settings error:', error);
+    console.error("Get system settings error:", error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دریافت تنظیمات سیستم'
+      message: "خطا در دریافت تنظیمات سیستم",
     });
   }
 });
 
 // Update system settings
-router.patch('/settings', [
-  body('settings').isObject().withMessage('تنظیمات باید آبجکت باشد')
-], async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
+router.patch(
+  "/settings",
+  [body("settings").isObject().withMessage("تنظیمات باید آبجکت باشد")],
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: "اطلاعات ورودی نامعتبر است",
+          errors: errors.array(),
+        });
+      }
+
+      const { settings } = req.body;
+
+      // Update each setting
+      for (const [key, value] of Object.entries(settings)) {
+        await query(
+          "UPDATE system_settings SET value = $1, updated_at = NOW() WHERE key = $2",
+          [value, key],
+        );
+      }
+
+      res.json({
+        success: true,
+        message: "تنظیمات ��یستم به‌روزرسانی شد",
+      });
+    } catch (error) {
+      console.error("Update system settings error:", error);
+      res.status(500).json({
         success: false,
-        message: 'اطلاعات ورودی نامعتبر است',
-        errors: errors.array()
+        message: "خطا در به‌روزرسانی تنظیمات سیستم",
       });
     }
-
-    const { settings } = req.body;
-
-    // Update each setting
-    for (const [key, value] of Object.entries(settings)) {
-      await query(
-        'UPDATE system_settings SET value = $1, updated_at = NOW() WHERE key = $2',
-        [value, key]
-      );
-    }
-
-    res.json({
-      success: true,
-      message: 'تنظیمات ��یستم به‌روزرسانی شد'
-    });
-
-  } catch (error) {
-    console.error('Update system settings error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'خطا در به‌روزرسانی تنظیمات سیستم'
-    });
-  }
-});
+  },
+);
 
 // Get audit logs
-router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
+router.get("/logs", async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const {
-      page = 1,
-      limit = 50,
-      action,
-      userId
-    } = req.query;
+    const { page = 1, limit = 50, action, userId } = req.query;
 
     const offset = (Number(page) - 1) * Number(limit);
     let whereConditions: string[] = [];
     let queryParams: any[] = [];
     let paramCount = 0;
 
-    if (action && action !== 'all') {
+    if (action && action !== "all") {
       whereConditions.push(`action = $${++paramCount}`);
       queryParams.push(action);
     }
@@ -710,7 +748,10 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
       queryParams.push(userId);
     }
 
-    const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
+    const whereClause =
+      whereConditions.length > 0
+        ? "WHERE " + whereConditions.join(" AND ")
+        : "";
 
     const logsQuery = `
       SELECT 
@@ -728,7 +769,8 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
     queryParams.push(Number(limit), offset);
 
     const logsResult = await query(logsQuery, queryParams);
-    const totalCount = logsResult.rows.length > 0 ? logsResult.rows[0].total_count : 0;
+    const totalCount =
+      logsResult.rows.length > 0 ? logsResult.rows[0].total_count : 0;
 
     res.json({
       success: true,
@@ -738,16 +780,15 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
           page: Number(page),
           limit: Number(limit),
           total: Number(totalCount),
-          totalPages: Math.ceil(Number(totalCount) / Number(limit))
-        }
-      }
+          totalPages: Math.ceil(Number(totalCount) / Number(limit)),
+        },
+      },
     });
-
   } catch (error) {
-    console.error('Get audit logs error:', error);
+    console.error("Get audit logs error:", error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دریافت گزارش‌های سیستم'
+      message: "خطا در دریافت گزارش‌های سیستم",
     });
   }
 });
