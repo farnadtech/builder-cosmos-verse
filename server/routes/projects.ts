@@ -767,6 +767,7 @@ router.get('/invite/:token', async (req, res: Response) => {
     console.log(`📋 Query result: ${result.rows.length} rows found`);
 
     if (result.rows.length === 0) {
+      console.log(`❌ No invite found for token: ${token}`);
       return res.status(404).json({
         success: false,
         message: 'لینک دعوت نامعتبر یا منقضی شده است'
