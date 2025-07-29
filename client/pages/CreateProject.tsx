@@ -205,25 +205,30 @@ export default function CreateProject() {
         }),
       });
 
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        console.error("Error parsing response JSON:", jsonError);
-        setErrors({ submit: "خطا در پردازش پاسخ سرور" });
-        return;
-      }
-
+      // Check if response is ok first
       if (response.ok) {
-        const projectId = data.project?.id;
-        if (projectId) {
-          // Navigate to invite contractor page
-          navigate(`/projects/${projectId}/invite`);
-        } else {
-          setErrors({ submit: "خطا در دریافت شناسه پروژه" });
+        try {
+          const data = await response.json();
+          const projectId = data.project?.id;
+          if (projectId) {
+            // Navigate to invite contractor page
+            navigate(`/projects/${projectId}/invite`);
+          } else {
+            setErrors({ submit: "خطا در دریافت شناسه پروژه" });
+          }
+        } catch (jsonError) {
+          console.error("Error parsing success response:", jsonError);
+          setErrors({ submit: "خطا در پردازش پاسخ سرور" });
         }
       } else {
-        setErrors({ submit: data.message || "خطا در ایجاد پروژه" });
+        // Handle error response
+        try {
+          const errorData = await response.json();
+          setErrors({ submit: errorData.message || "خطا در ایجاد پروژه" });
+        } catch (jsonError) {
+          console.error("Error parsing error response:", jsonError);
+          setErrors({ submit: `خطا در ایجاد پروژه (کد ${response.status})` });
+        }
       }
     } catch (error) {
       console.error("Error creating project:", error);
@@ -286,7 +291,7 @@ export default function CreateProject() {
                   className={errors.description ? "border-red-500" : ""}
                 />
                 <p className="text-sm text-gray-500">
-                  {formData.description.length} کاراکتر (حداقل ۲۰ کاراکتر)
+                  {formData.description.length} کاراکتر (حد��قل ۲۰ کاراکتر)
                 </p>
                 {errors.description && (
                   <p className="text-sm text-red-500 flex items-center gap-1">
