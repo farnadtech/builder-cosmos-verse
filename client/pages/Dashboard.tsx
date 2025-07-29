@@ -239,12 +239,19 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="mt-4 md:mt-0">
-                <Button asChild variant="outline">
-                  <Link to="/verification">
-                    <Settings className="h-4 w-4 mr-2" />
-                    تنظیمات حسا��
-                  </Link>
-                </Button>
+                {user.isVerified ? (
+                  <Button variant="outline" disabled className="text-green-600 border-green-600">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    شما احراز شده‌اید
+                  </Button>
+                ) : (
+                  <Button asChild variant="outline" className="text-orange-600 border-orange-600">
+                    <Link to="/verification">
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      احراز هویت
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -381,7 +388,7 @@ export default function Dashboard() {
                 <div>
                   <Card>
                     <CardHeader>
-                      <CardTitle>��علان‌ها</CardTitle>
+                      <CardTitle>اعلان‌ها</CardTitle>
                     </CardHeader>
                     <CardContent>
                       {notifications.length === 0 ? (
