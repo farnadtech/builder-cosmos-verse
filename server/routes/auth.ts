@@ -389,7 +389,7 @@ router.post("/verify-otp", async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: "شماره موبایل و کد تایید الزامی است",
-        messageFA: "شماره موبایل و کد ��ایید الز��می است",
+        messageFA: "شماره موبایل و کد ��ایید الزامی است",
       });
     }
 
@@ -484,7 +484,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
     if (newPassword.length < 8) {
       return res.status(400).json({
         success: false,
-        message: "رمز عبور باید حداقل 8 کاراکتر باشد",
+        message: "رمز ��بور باید حداقل 8 کاراکتر باشد",
       });
     }
 
@@ -581,7 +581,7 @@ router.post(
       if (!isValidOTP) {
         return res.status(400).json({
           success: false,
-          message: "کد تایید نا��عتبر ی���� منقضی شده است",
+          message: "کد تایید نا��عتبر ی�� منقضی شده است",
         });
       }
 
@@ -621,7 +621,7 @@ router.post(
            birth_date,
            verification_status,
            created_at
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'approved', NOW())`,
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'approved', CURRENT_TIMESTAMP)`,
           [
             req.user!.userId,
             files.nationalCardImage[0].path,
