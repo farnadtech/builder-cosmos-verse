@@ -240,6 +240,8 @@ CREATE TABLE IF NOT EXISTS verification_documents (
     birth_date DATE,
     verification_status VARCHAR(20) DEFAULT 'pending' CHECK (verification_status IN ('pending', 'approved', 'rejected')),
     admin_notes TEXT,
+    reviewed_at DATETIME,
+    reviewed_by INTEGER REFERENCES users(id),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
