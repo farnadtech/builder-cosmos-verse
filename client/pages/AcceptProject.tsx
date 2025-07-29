@@ -103,7 +103,7 @@ export default function AcceptProject() {
           setProject(data.project);
         } else {
           console.error('Invalid response structure:', data);
-          setError("ساختار پاسخ سرور نامعتبر است");
+          setError(`ساختار پاسخ سرور نامعتبر است. دریافت شده: ${JSON.stringify(data)}`);
         }
       } else {
         const errorData = await response.json();
@@ -194,7 +194,7 @@ export default function AcceptProject() {
           </CardHeader>
           <CardContent className="text-center">
             <Button asChild>
-              <a href="/">باز��شت به صفحه اصلی</a>
+              <a href="/">بازگشت به صفحه اصلی</a>
             </Button>
           </CardContent>
         </Card>
