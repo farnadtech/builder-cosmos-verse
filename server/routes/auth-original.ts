@@ -581,7 +581,7 @@ router.post(
       if (!isValidOTP) {
         return res.status(400).json({
           success: false,
-          message: "کد تایید نا��عتبر ی�� منقضی شده اس��",
+          message: "کد تایید نا��عتبر ی�� منقضی شده است",
         });
       }
 
@@ -605,7 +605,7 @@ router.post(
             normalizedPhone,
             birthDate,
             `${city}, ${province}`,
-            req.user!.userId,
+            req.user!.id,
           ],
         );
 
@@ -623,7 +623,7 @@ router.post(
            created_at
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'approved', NOW())`,
           [
-            req.user!.userId,
+            req.user!.id,
             files.nationalCardImage[0].path,
             files.selfieImage[0].path,
             nationalId,
