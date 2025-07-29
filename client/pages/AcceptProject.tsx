@@ -89,9 +89,12 @@ export default function AcceptProject() {
 
         if (data.success && data.data && data.data.project) {
           setProject(data.data.project);
+        } else if (data.project) {
+          // Fallback for direct project data
+          setProject(data.project);
         } else {
           console.error('Invalid response structure:', data);
-          setError("ساختار پاسخ سرور نامعت��ر است");
+          setError("ساختار پاسخ سرور نامعتبر است");
         }
       } else {
         const errorData = await response.json();
@@ -182,7 +185,7 @@ export default function AcceptProject() {
           </CardHeader>
           <CardContent className="text-center">
             <Button asChild>
-              <a href="/">بازگشت به صفحه اصلی</a>
+              <a href="/">بازگشت به صفحه ا��لی</a>
             </Button>
           </CardContent>
         </Card>
@@ -415,7 +418,7 @@ export default function AcceptProject() {
               <h4 className="font-medium text-blue-900 mb-2">نکات مهم:</h4>
               <ul className="text-sm text-blue-700 space-y-1">
                 <li>��� با پذیرش پروژه، قرارداد بین شما و کارفرما منعقد می‌شود</li>
-                <li>• پرداخت‌ها ط��ق مراحل تعریف شده انجام می‌��ود</li>
+                <li>• پرداخت‌ها طبق مراحل تعریف شده انجام می‌��ود</li>
                 <li>• در صورت اختلاف، امکان مراجعه به داوری وجود دارد</li>
                 <li>• رعایت مهلت‌های تعیین شده الزامی است</li>
               </ul>
