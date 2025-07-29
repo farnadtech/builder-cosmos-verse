@@ -19,6 +19,7 @@ import Arbitration from "./pages/Arbitration";
 import VerificationForm from "./pages/VerificationForm";
 import InviteContractor from "./pages/InviteContractor";
 import AcceptProject from "./pages/AcceptProject";
+import ProjectDetails from "./pages/ProjectDetails";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./pages/PlaceholderPage";
 
@@ -45,7 +46,7 @@ const App = () => (
               <Route path="/projects/accept/:inviteToken" element={<AcceptProject />} />
               <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
               <Route path="/arbitration" element={<Arbitration />} />
-              <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
+              <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضم��نو" />} />
               <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
               <Route path="/help" element={<PlaceholderPage title="راهنما" description="راهنمای استفاده از سیستم" />} />
               <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوالات پرتکرار" />} />
