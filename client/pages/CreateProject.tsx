@@ -35,6 +35,7 @@ interface Milestone {
 
 export default function CreateProject() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form state
@@ -274,7 +275,7 @@ export default function CreateProject() {
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="عنوان جذاب و توصیفی برای پروژه خود بنویسید"
+                  placeholder="عنوان جذاب و توصیفی برای پروژ�� خود بنویسید"
                   className={errors.title ? "border-red-500" : ""}
                 />
                 {errors.title && (
@@ -450,7 +451,7 @@ export default function CreateProject() {
                 مراحل انجام کار
               </CardTitle>
               <CardDescription>
-                پروژه را به مراحل مختلف تقسیم ��نید تا پرداخت‌ها مرحله‌ای انجام شود
+                پروژه را به مراحل مختلف تقسیم ��نید تا پرداخت‌ها مرحله‌ا�� انجام شود
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
