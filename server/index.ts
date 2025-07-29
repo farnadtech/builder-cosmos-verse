@@ -109,6 +109,7 @@ export function createServer() {
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/upload', uploadRoutes);
+  app.use('/api/dashboard', dashboardRoutes);
 
   // Legacy demo routes (for development)
   app.get("/api/ping", (_req, res) => {
@@ -142,7 +143,7 @@ export function createServer() {
     if (err.type === 'entity.parse.failed') {
       return res.status(400).json({
         success: false,
-        message: '��رمت داده‌های ارسالی نامعتبر است',
+        message: 'فرمت داده‌های ارسالی نامعتبر است',
         messageFA: 'فرمت داده‌های ارسالی نامعتبر است'
       });
     }
