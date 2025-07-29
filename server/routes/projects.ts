@@ -45,7 +45,7 @@ const upload = multer({
 const createProjectValidation = [
   body('title').trim().isLength({ min: 5, max: 255 }).withMessage('عنوان پروژه باید بین 5 تا 255 کاراکتر باشد'),
   body('description').trim().isLength({ min: 20 }).withMessage('توضیحات پروژه باید حداقل 20 کاراکتر باشد'),
-  body('category').trim().isLength({ min: 2, max: 100 }).withMessage('دست��‌بندی پروژه الزامی است'),
+  body('category').trim().isLength({ min: 2, max: 100 }).withMessage('دست��‌بندی پروژه الز��می است'),
   body('budget').isFloat({ min: 10000 }).withMessage('بودجه پروژه باید حداقل 10,000 ریال باشد'),
   body('deadline').isISO8601().withMessage('تاریخ پایان پروژه نامعتبر است'),
   body('milestones').isArray({ min: 1 }).withMessage('حداقل یک مرحله برای پروژ�� تعریف کنید'),
@@ -222,8 +222,8 @@ router.get('/:id', authenticateToken, param('id').isInt(), async (req: Authentic
 
     // Check if user has access to this project
     const hasAccess = req.user!.role === 'admin' || 
-                     project.employer_id === req.user!.id || 
-                     project.contractor_id === req.user!.id;
+                     project.employer_id === req.user!.userId || 
+                     project.contractor_id === req.user!.userId;
 
     if (!hasAccess) {
       return res.status(403).json({
@@ -404,17 +404,17 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
       });
     }
 
-    if (project.employer_id === req.user!.id) {
+    if (project.employer_id === req.user!.userId) {
       return res.status(400).json({
         success: false,
-        message: 'نمی‌توانید برای پروژه خود درخواست دهید'
+        message: 'نمی‌توانید برا�� پروژه خود درخواست دهید'
       });
     }
 
     // Check if already applied
     const existingApplication = await query(
       'SELECT id FROM project_applications WHERE project_id = $1 AND contractor_id = $2',
-      [projectId, req.user!.id]
+      [projectId, req.user!.userId]
     );
 
     if (existingApplication.rows.length > 0) {
@@ -428,7 +428,7 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
     await query(
       `INSERT INTO project_applications (project_id, contractor_id, proposal, estimated_days, status, created_at)
        VALUES ($1, $2, $3, $4, 'pending', NOW())`,
-      [projectId, req.user!.id, proposal, estimatedDays]
+      [projectId, req.user!.userId, proposal, estimatedDays]
     );
 
     // Send notification to employer
@@ -439,7 +439,7 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
         project.employer_id,
         'درخواست جدید برای پروژه',
         `درخواست جدیدی برای پروژه "${project.title}" دریافت شد`,
-        JSON.stringify({ projectId, contractorId: req.user!.id })
+        JSON.stringify({ projectId, contractorId: req.user!.userId })
       ]
     );
 
@@ -474,7 +474,7 @@ router.post('/:id/assign', authenticateToken, requireEmployer, param('id').isInt
     // Verify project ownership and status
     const projectResult = await query(
       'SELECT id, title, status, employer_id FROM projects WHERE id = $1 AND employer_id = $2',
-      [projectId, req.user!.id]
+      [projectId, req.user!.userId]
     );
 
     if (projectResult.rows.length === 0) {
@@ -569,7 +569,7 @@ router.post('/:id/invite-link', authenticateToken, requireEmployer, param('id').
     // Verify project ownership
     const projectResult = await query(
       'SELECT id, title FROM projects WHERE id = $1 AND employer_id = $2',
-      [projectId, req.user!.id]
+      [projectId, req.user!.userId]
     );
 
     if (projectResult.rows.length === 0) {
@@ -624,7 +624,7 @@ router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt
     // Verify project ownership
     const projectResult = await query(
       'SELECT id, title FROM projects WHERE id = $1 AND employer_id = $2',
-      [projectId, req.user!.id]
+      [projectId, req.user!.userId]
     );
 
     if (projectResult.rows.length === 0) {
@@ -822,7 +822,7 @@ router.post('/accept/:token', authenticateToken, requireContractor, async (req: 
     // Update project with contractor and change status to active
     await query(
       'UPDATE projects SET contractor_id = $1, status = \'active\', updated_at = NOW() WHERE id = $2',
-      [req.user!.id, invite.project_id]
+      [req.user!.userId, invite.project_id]
     );
 
     // TODO: Generate PDF contract
@@ -879,8 +879,8 @@ router.patch('/:id/status', authenticateToken, param('id').isInt(), async (req: 
 
     const project = projectResult.rows[0];
     const hasAccess = req.user!.role === 'admin' || 
-                     project.employer_id === req.user!.id || 
-                     project.contractor_id === req.user!.id;
+                     project.employer_id === req.user!.userId || 
+                     project.contractor_id === req.user!.userId;
 
     if (!hasAccess) {
       return res.status(403).json({
