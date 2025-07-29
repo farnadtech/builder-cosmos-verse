@@ -63,7 +63,19 @@ export default function Projects() {
         const data = await response.json();
         // Handle both paginated and non-paginated responses
         const projectsData = data.data?.projects || data.data || [];
-        setProjects(projectsData);
+
+        // Map employer/contractor names
+        const mappedProjects = projectsData.map((project: any) => ({
+          ...project,
+          employer_name: project.employer_first_name && project.employer_last_name
+            ? `${project.employer_first_name} ${project.employer_last_name}`
+            : null,
+          contractor_name: project.contractor_first_name && project.contractor_last_name
+            ? `${project.contractor_first_name} ${project.contractor_last_name}`
+            : null,
+        }));
+
+        setProjects(mappedProjects);
       } else {
         console.error('خطا در دریافت پروژه‌ها');
       }
