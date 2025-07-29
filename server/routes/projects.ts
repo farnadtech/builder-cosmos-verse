@@ -188,7 +188,7 @@ router.get('/:id', authenticateToken, param('id').isInt(), async (req: Authentic
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'شناسه پروژه نامعتبر است'
+        message: 'شناسه پروژه نامعتبر ا��ت'
       });
     }
 
@@ -310,9 +310,13 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
       [title, description, category, parseFloat(budget), deadline, req.user!.userId, attachmentPath]
     );
 
+    console.log('Project creation result:', projectResult);
+
     const projectId = projectResult.rows[0]?.id;
+    console.log('Extracted project ID:', projectId);
 
     if (!projectId) {
+      console.error('Failed to get project ID from result:', projectResult);
       return res.status(500).json({
         success: false,
         message: 'خطا در ایجاد پروژه'
@@ -607,7 +611,7 @@ router.post('/:id/invite-link', authenticateToken, requireEmployer, param('id').
     console.error('Generate invite link error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطا در تولید لینک دعوت'
+      message: 'خط�� در تولید لینک دعوت'
     });
   }
 });
