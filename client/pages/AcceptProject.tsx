@@ -64,10 +64,13 @@ export default function AcceptProject() {
 
   const fetchProjectData = async () => {
     if (!inviteToken) {
+      console.error('No invite token provided');
       setError("لینک دعوت معتبر نیست");
       setLoading(false);
       return;
     }
+
+    console.log('Fetching project data for token:', inviteToken);
 
     try {
       const response = await fetch(`/api/projects/invite/${inviteToken}`, {
@@ -76,14 +79,25 @@ export default function AcceptProject() {
         },
       });
 
+      console.log('Response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
-        setProject(data.project);
+        console.log('Response data:', data);
+
+        if (data.success && data.data && data.data.project) {
+          setProject(data.data.project);
+        } else {
+          console.error('Invalid response structure:', data);
+          setError("ساختار پاسخ سرور نامعتبر است");
+        }
       } else {
         const errorData = await response.json();
+        console.error('Error response:', errorData);
         setError(errorData.message || "خطا در دریافت اطلاعات پروژه");
       }
     } catch (err) {
+      console.error('Fetch error:', err);
       setError("خطا در ارتباط با سرور");
     } finally {
       setLoading(false);
