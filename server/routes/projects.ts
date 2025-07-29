@@ -305,7 +305,7 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
     const queries = [
       {
         text: `INSERT INTO projects (title, description, category, budget, deadline, employer_id, attachment_path, status, created_at)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, 'open', NOW())
+               VALUES ($1, $2, $3, $4, $5, $6, $7, 'open', CURRENT_TIMESTAMP)
                RETURNING id`,
         params: [title, description, category, parseFloat(budget), deadline, req.user!.userId, attachmentPath]
       }
