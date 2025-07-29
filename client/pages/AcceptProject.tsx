@@ -1,22 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  CheckCircle, 
-  AlertCircle, 
-  Calendar, 
-  DollarSign, 
-  User, 
-  FileText,
-  Clock,
-  Briefcase,
-  Loader2
-} from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { useParams } from "react-router-dom";
 
 interface ProjectData {
   id: number;
