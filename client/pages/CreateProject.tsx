@@ -202,12 +202,18 @@ export default function CreateProject() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/projects', {
+      // Use authenticated fetch if available, fallback to regular fetch
+      const fetchFn = window.authenticatedFetch || fetch;
+      const headers: HeadersInit = {};
+
+      if (!window.authenticatedFetch) {
+        headers['Authorization'] = `Bearer ${localStorage.getItem('zemano_token')}`;
+      }
+      headers['Content-Type'] = 'application/json';
+
+      const response = await fetchFn('/api/projects', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('zemano_token')}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           ...formData,
           milestones,
