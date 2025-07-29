@@ -47,15 +47,27 @@ export default function InviteContractor() {
   const generateInviteLink = async () => {
     if (!projectId) return;
 
+    // Check if user is authenticated
+    const token = localStorage.getItem('zemano_token');
+    if (!token) {
+      setError('لطفاً دوباره وارد سیستم شوید');
+      return;
+    }
+
+    console.log('Generating invite link for project:', projectId);
+    console.log('User authenticated:', !!user);
+    console.log('Token exists:', !!token);
+
     setLoading(true);
     try {
       const fetchFn = window.authenticatedFetch || fetch;
       const headers: HeadersInit = {};
       if (!window.authenticatedFetch) {
-        headers['Authorization'] = `Bearer ${localStorage.getItem('zemano_token')}`;
+        headers['Authorization'] = `Bearer ${token}`;
       }
       headers['Content-Type'] = 'application/json';
 
+      console.log('Making request to:', `/api/projects/${projectId}/invite-link`);
       const response = await fetchFn(`/api/projects/${projectId}/invite-link`, {
         method: 'POST',
         headers,
@@ -291,7 +303,7 @@ export default function InviteContractor() {
               {formData.method === 'email' && (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="emailInput">آدرس ایمیل مجری</Label>
+                    <Label htmlFor="emailInput">آدرس ��یمیل مجری</Label>
                     <Input
                       id="emailInput"
                       type="email"
