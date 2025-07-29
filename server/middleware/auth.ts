@@ -90,6 +90,7 @@ export const authenticateToken = async (
 
       req.user = {
         id: user.id,
+        userId: user.id,
         email: user.email,
         role: user.role,
         firstName: user.first_name,
