@@ -50,17 +50,33 @@ interface ProjectData {
 }
 
 export default function AcceptProject() {
+  console.log('🚀 AcceptProject component loading...');
+
   const params = useParams();
   const { inviteToken } = params;
+
+  console.log('📋 URL params:', params);
+  console.log('🔑 Extracted inviteToken:', inviteToken);
+
+  // Early return if no token
+  if (!inviteToken) {
+    console.error('❌ No invite token found in URL');
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">خطا در لینک دعوت</h1>
+          <p className="text-gray-600">لینک دعوت نامعتبر است</p>
+        </div>
+      </div>
+    );
+  }
+
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState("");
   const [project, setProject] = useState<ProjectData | null>(null);
-
-  console.log('All URL params:', params);
-  console.log('Extracted inviteToken:', inviteToken);
 
   useEffect(() => {
     console.log('AcceptProject loaded with token:', inviteToken);
