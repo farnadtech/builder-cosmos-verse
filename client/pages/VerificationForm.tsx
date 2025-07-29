@@ -184,7 +184,7 @@ export default function VerificationForm() {
 
   const validateStep2 = () => {
     if (!formData.province || !formData.city) {
-      setError("انتخاب استان و شهر الزامی است");
+      setError("انتخاب ��ستان و شهر الزامی است");
       return false;
     }
     if (!formData.birthDate) {
@@ -307,12 +307,10 @@ export default function VerificationForm() {
       });
 
       if (response.ok) {
-        // Redirect based on user role
-        if (user?.role === "employer") {
-          navigate("/projects/create");
-        } else {
-          navigate("/dashboard");
-        }
+        const data = await response.json();
+        // Show success message and redirect to dashboard
+        alert(data.message || "مدارک شما با موفقیت ارسال شد و در انتظار بررسی ادمین است");
+        navigate("/dashboard");
       } else {
         const data = await response.json();
         setError(data.message || "خطا در تکمیل احراز هویت");
