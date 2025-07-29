@@ -103,6 +103,13 @@ export default function VerificationForm() {
     otpCode: "",
   });
 
+  // Redirect if user is already verified
+  useEffect(() => {
+    if (user?.isVerified) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
   const handleInputChange = (field: keyof VerificationData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setError("");
@@ -200,7 +207,7 @@ export default function VerificationForm() {
         return false;
       }
     } catch (error) {
-      setError("تاریخ تولد وارد شد�� صحیح نیست");
+      setError("تاریخ تولد وارد شده صحیح نیست");
       return false;
     }
 
@@ -360,7 +367,7 @@ export default function VerificationForm() {
             <span>اطلاعات پایه</span>
             <span>آدرس</span>
             <span>مدارک</span>
-            {!user?.isVerified && <span>تأی��د</span>}
+            {!user?.isVerified && <span>تأیید</span>}
           </div>
         </div>
 
@@ -587,7 +594,7 @@ export default function VerificationForm() {
                       <span className="font-medium">شماره موبایل تایید شده</span>
                     </div>
                     <p className="text-sm text-green-700 mt-1">
-                      شماره موبایل شما قبلاً تایید شده است. پس از آپلود مدارک، احراز هویت تکمیل خواهد شد.
+                      شماره موبایل شما قبلاً تایید شده است. پس از آپلود مدارک، احرا�� هویت تکمیل خواهد شد.
                     </p>
                   </div>
                 )}
