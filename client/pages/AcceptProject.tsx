@@ -79,8 +79,9 @@ export default function AcceptProject() {
   const [project, setProject] = useState<ProjectData | null>(null);
 
   useEffect(() => {
-    console.log('AcceptProject loaded with token:', inviteToken);
-    console.log('Current URL:', window.location.href);
+    console.log('🔄 useEffect triggered with token:', inviteToken);
+    console.log('🌐 Current URL:', window.location.href);
+    console.log('👤 User state:', user ? 'logged in' : 'not logged in');
     fetchProjectData();
   }, [inviteToken]);
 
@@ -383,7 +384,7 @@ export default function AcceptProject() {
                     <span className="font-medium">{project.employer.rating}/۵</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>پروژه‌های تکمیل شده:</span>
+                    <span>پروژه‌ه��ی تکمیل شده:</span>
                     <span className="font-medium">{project.employer.completedProjects}</span>
                   </div>
                 </div>
@@ -444,7 +445,7 @@ export default function AcceptProject() {
               <ul className="text-sm text-blue-700 space-y-1">
                 <li>��� با پذیرش پروژه، قرارداد بین شما و کارفرما منعقد می‌شود</li>
                 <li>• پرداخت‌ها طبق مراحل تعریف شده انجام می‌��ود</li>
-                <li>• در صورت اختلاف، امکان مراجعه به داوری وجود دارد</li>
+                <li>• د�� صورت اختلاف، امکان مراجعه به داوری وجود دارد</li>
                 <li>• رعایت مهلت‌های تعیین شده الزامی است</li>
               </ul>
             </div>
