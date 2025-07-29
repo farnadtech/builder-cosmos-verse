@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -200,7 +200,7 @@ export default function VerificationForm() {
         return false;
       }
     } catch (error) {
-      setError("تاریخ تولد وارد شده صحیح نیست");
+      setError("تاریخ تولد وارد شد�� صحیح نیست");
       return false;
     }
 
@@ -360,7 +360,7 @@ export default function VerificationForm() {
             <span>اطلاعات پایه</span>
             <span>آدرس</span>
             <span>مدارک</span>
-            {!user?.isVerified && <span>تأیید</span>}
+            {!user?.isVerified && <span>تأی��د</span>}
           </div>
         </div>
 
