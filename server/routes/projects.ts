@@ -129,22 +129,25 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     const projectsResult = await query(projectsQuery, queryParams);
 
-    // Get milestones for each project
+    // Get milestones for each project (simplified for SQLite)
     const projectIds = projectsResult.rows.map(p => p.id);
     let milestones: any[] = [];
-    
+
     if (projectIds.length > 0) {
-      const milestonesQuery = `
-        SELECT m.*, 
-               COALESCE(et.status, 'pending') as payment_status,
-               et.zarinpal_ref_id
-        FROM milestones m
-        LEFT JOIN escrow_transactions et ON m.id = et.milestone_id
-        WHERE m.project_id = ANY($1)
-        ORDER BY m.project_id, m.order_index
-      `;
-      const milestonesResult = await query(milestonesQuery, [projectIds]);
-      milestones = milestonesResult.rows;
+      // For SQLite, we'll fetch milestones for all projects in separate queries
+      for (const projectId of projectIds) {
+        const milestonesQuery = `
+          SELECT m.*,
+                 COALESCE(et.status, 'pending') as payment_status,
+                 et.zarinpal_ref_id
+          FROM milestones m
+          LEFT JOIN escrow_transactions et ON m.id = et.milestone_id
+          WHERE m.project_id = $1
+          ORDER BY m.order_index
+        `;
+        const milestonesResult = await query(milestonesQuery, [projectId]);
+        milestones.push(...milestonesResult.rows);
+      }
     }
 
     // Group milestones by project
@@ -698,7 +701,7 @@ router.get('/invite/:token', async (req, res: Response) => {
     if (new Date() > new Date(data.expires_at)) {
       return res.status(400).json({
         success: false,
-        message: 'لینک دعوت منقضی شده است'
+        message: 'لینک دعوت من��ضی شده است'
       });
     }
 
