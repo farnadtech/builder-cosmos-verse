@@ -32,32 +32,36 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/otp-verification" element={<OTPVerification />} />
-              <Route path="/verification" element={<VerificationForm />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/projects/create" element={<CreateProject />} />
-              <Route path="/projects/:id" element={<ProjectDetails />} />
-              <Route path="/projects/:projectId/invite" element={<InviteContractor />} />
-              <Route path="/projects/accept/:inviteToken" element={<AcceptProjectTest />} />
-              <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
-              <Route path="/arbitration" element={<Arbitration />} />
-              <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
-              <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
-              <Route path="/help" element={<PlaceholderPage title="راهنم��" description="راهنمای استفاده از سیستم" />} />
-              <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوالات پرتکرار" />} />
-              <Route path="/terms" element={<PlaceholderPage title="قوانین و مقررات" description="شرایط و قوانین استفاده" />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
-        </AuthProvider>
+        <Routes>
+          {/* Test route outside of AuthProvider and Layout */}
+          <Route path="/projects/accept/:inviteToken" element={<AcceptProjectTest />} />
+          <Route path="*" element={
+            <AuthProvider>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/otp-verification" element={<OTPVerification />} />
+                  <Route path="/verification" element={<VerificationForm />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/projects" element={<Projects />} />
+                  <Route path="/projects/create" element={<CreateProject />} />
+                  <Route path="/projects/:id" element={<ProjectDetails />} />
+                  <Route path="/projects/:projectId/invite" element={<InviteContractor />} />
+                  <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
+                  <Route path="/arbitration" element={<Arbitration />} />
+                  <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
+                  <Route path="/contact" element={<PlaceholderPage title="تماس با ما" description="راه‌های ارتباط با پشتیبانی" />} />
+                  <Route path="/help" element={<PlaceholderPage title="راهنما" description="راهنمای استفاده از سیستم" />} />
+                  <Route path="/faq" element={<PlaceholderPage title="سوالات متداول" description="پاسخ سوالات پرتکرار" />} />
+                  <Route path="/terms" element={<PlaceholderPage title="قوانین و مقررات" description="شرایط و قوانین استفاده" />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            </AuthProvider>
+          } />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
