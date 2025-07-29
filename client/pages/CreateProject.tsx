@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -171,7 +171,7 @@ export default function CreateProject() {
         hasMilestoneError = true;
       }
       if (!milestone.amount || milestone.amount < 1000) {
-        newErrors[`milestone_amount_${index}`] = "مبلغ مرحله باید حداقل ۱,۰۰۰ ریال باشد";
+        newErrors[`milestone_amount_${index}`] = "مبلغ مرحله باید حداقل ۱,۰۰۰ ریال ب��شد";
         hasMilestoneError = true;
       }
     });
@@ -483,7 +483,7 @@ export default function CreateProject() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Milestone Title */}
                     <div className="space-y-2">
-                      <Label>عنوان مرحله *</Label>
+                      <Label>عنوان مر��له *</Label>
                       <Input
                         value={milestone.title}
                         onChange={(e) => updateMilestone(milestone.id, 'title', e.target.value)}
