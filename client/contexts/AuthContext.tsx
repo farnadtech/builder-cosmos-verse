@@ -94,44 +94,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  // Setup axios interceptor for automatic token refresh
+  // Setup global authenticated fetch function for automatic token refresh
   useEffect(() => {
-    // Function to make authenticated requests with automatic token refresh
-    window.authenticatedFetch = async (url: string, options: RequestInit = {}) => {
-      let token = localStorage.getItem('zemano_token');
+    if (user) {
+      console.log('Setting up authenticatedFetch for user:', user.email);
+      // Function to make authenticated requests with automatic token refresh
+      window.authenticatedFetch = async (url: string, options: RequestInit = {}) => {
+        let token = localStorage.getItem('zemano_token');
+        console.log('Making authenticated request to:', url, 'with token:', token ? 'exists' : 'missing');
 
-      // First attempt with current token
-      const headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': options.headers?.['Content-Type'] || 'application/json'
-      };
+        // First attempt with current token
+        const headers = {
+          ...options.headers,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+        };
 
-      let response = await fetch(url, { ...options, headers });
+        let response = await fetch(url, { ...options, headers });
+        console.log('Response status:', response.status);
 
-      // If token is expired (401), try to refresh
-      if (response.status === 401) {
-        const refreshed = await refreshAuthToken();
+        // If token is expired (401), try to refresh
+        if (response.status === 401) {
+          console.log('Token expired, attempting refresh...');
+          const refreshed = await refreshAuthToken();
 
-        if (refreshed) {
-          // Retry with new token
-          token = localStorage.getItem('zemano_token');
-          const newHeaders = {
-            ...options.headers,
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': options.headers?.['Content-Type'] || 'application/json'
-          };
-          response = await fetch(url, { ...options, headers: newHeaders });
-        } else {
-          // Refresh failed, logout user
-          logout();
-          return response;
+          if (refreshed) {
+            console.log('Token refreshed successfully, retrying request...');
+            // Retry with new token
+            token = localStorage.getItem('zemano_token');
+            const newHeaders = {
+              ...options.headers,
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+            };
+            response = await fetch(url, { ...options, headers: newHeaders });
+            console.log('Retry response status:', response.status);
+          } else {
+            console.log('Token refresh failed, logging out user');
+            // Refresh failed, logout user
+            logout();
+            return response;
+          }
         }
-      }
 
-      return response;
-    };
-  }, []);
+        return response;
+      };
+    } else {
+      // Remove the global fetch function when user is not logged in
+      console.log('User not logged in, removing authenticatedFetch');
+      delete window.authenticatedFetch;
+    }
+  }, [user]);
 
   const login = async (phoneNumber: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
