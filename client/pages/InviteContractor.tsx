@@ -98,30 +98,57 @@ export default function InviteContractor() {
       return;
     }
 
-    try {
-      // Try modern clipboard API first
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(inviteLink);
-      } else {
-        // Fallback for older browsers or non-secure contexts
+    // Function to use fallback copy method
+    const fallbackCopy = () => {
+      try {
         const textArea = document.createElement('textarea');
         textArea.value = inviteLink;
         textArea.style.position = 'fixed';
         textArea.style.left = '-999999px';
         textArea.style.top = '-999999px';
+        textArea.style.opacity = '0';
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        document.execCommand('copy');
-        textArea.remove();
-      }
 
+        const successful = document.execCommand('copy');
+        textArea.remove();
+
+        if (!successful) {
+          throw new Error('execCommand failed');
+        }
+
+        return true;
+      } catch (fallbackErr) {
+        console.error('Fallback copy failed:', fallbackErr);
+        return false;
+      }
+    };
+
+    let copySuccessful = false;
+
+    // Try modern clipboard API first, but handle permissions errors gracefully
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(inviteLink);
+        copySuccessful = true;
+      } catch (clipboardErr) {
+        console.warn('Clipboard API failed, trying fallback:', clipboardErr);
+        // If clipboard API fails due to permissions or any other reason, use fallback
+        copySuccessful = fallbackCopy();
+      }
+    } else {
+      // Use fallback if clipboard API is not available
+      copySuccessful = fallbackCopy();
+    }
+
+    if (copySuccessful) {
       setLinkCopied(true);
       toast.success("لینک کپی شد");
       setTimeout(() => setLinkCopied(false), 2000);
-    } catch (err) {
-      console.error('Copy failed:', err);
-      toast.error("خطا در کپی لینک");
+    } else {
+      // If all methods fail, show manual copy instruction
+      toast.error("امکان کپی خودکار وجود ندارد. لطفاً لینک را دستی کپی کنید");
     }
   };
 
@@ -190,7 +217,7 @@ export default function InviteContractor() {
         <div className="container mx-auto max-w-2xl px-4">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">دعوت مجری</h1>
-            <p className="text-gray-600">مجری موردنظر خود را برای این پروژه دعوت کنید</p>
+            <p className="text-gray-600">مجری موردنظر خود را برای ای�� پروژه دعوت کنید</p>
           </div>
 
           <Card>
