@@ -371,15 +371,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('zemano_token');
-    localStorage.removeItem('zemano_refresh_token');
-    localStorage.removeItem('zemano_user');
-    // Remove the global fetch function
-    delete window.authenticatedFetch;
-    navigate('/');
-  };
+
 
   const value: AuthContextType = {
     user,
