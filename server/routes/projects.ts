@@ -85,7 +85,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
     }
 
     if (search) {
-      whereConditions.push(`(p.title ILIKE $${++paramCount} OR p.description ILIKE $${++paramCount})`);
+      whereConditions.push(`(p.title LIKE $${++paramCount} OR p.description LIKE $${++paramCount})`);
       queryParams.push(`%${search}%`, `%${search}%`);
       paramCount++;
     }
@@ -727,7 +727,7 @@ router.get('/invite/:token', async (req, res: Response) => {
       attachments: [], // TODO: Get actual attachments
       contractTerms: `قرارداد همکاری برای پروژه "${data.title}"
 
-شرایط عمومی:
+شرا��ط عمومی:
 - پرداخت بر اساس مراحل تعریف شده انجام می‌شود
 - رعایت کیفیت و مهلت‌های تعیین شده الزامی است
 - در صورت اختلاف، پرونده به داوری ارجاع می‌شود
