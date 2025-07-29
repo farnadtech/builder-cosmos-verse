@@ -82,10 +82,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = localStorage.getItem('zemano_token');
     const userData = localStorage.getItem('zemano_user');
 
+    console.log('AuthContext: Checking for existing session...', {
+      hasToken: !!token,
+      hasUserData: !!userData
+    });
+
     if (token && userData) {
       try {
-        setUser(JSON.parse(userData));
+        const user = JSON.parse(userData);
+        console.log('AuthContext: Loaded user from localStorage:', user);
+        setUser(user);
       } catch (error) {
+        console.error('AuthContext: Failed to parse user data:', error);
         localStorage.removeItem('zemano_token');
         localStorage.removeItem('zemano_user');
         localStorage.removeItem('zemano_refresh_token');
