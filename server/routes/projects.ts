@@ -271,7 +271,7 @@ router.get('/:id', authenticateToken, param('id').isInt(), async (req: Authentic
     console.error('Get project error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دریافت اطلاعات پروژه'
+      message: 'خطا در دریافت اطلا��ات پروژه'
     });
   }
 });
@@ -664,17 +664,31 @@ router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-    // Save invite record
-    await query(
-      `INSERT INTO project_invites (project_id, invite_token, contractor_email, contractor_phone, message, expires_at, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
-       ON CONFLICT (invite_token) DO UPDATE SET
-       contractor_email = EXCLUDED.contractor_email,
-       contractor_phone = EXCLUDED.contractor_phone,
-       message = EXCLUDED.message,
-       expires_at = EXCLUDED.expires_at`,
-      [projectId, inviteToken, email || null, phoneNumber || null, message, expiresAt]
+    // Save invite record (check if token exists first for SQLite compatibility)
+    const existingInvite = await query(
+      'SELECT id FROM project_invites WHERE invite_token = $1',
+      [inviteToken]
     );
+
+    if (existingInvite.rows.length > 0) {
+      // Update existing invite
+      await query(
+        `UPDATE project_invites SET
+         contractor_email = $1,
+         contractor_phone = $2,
+         message = $3,
+         expires_at = $4
+         WHERE invite_token = $5`,
+        [email || null, phoneNumber || null, message, expiresAt, inviteToken]
+      );
+    } else {
+      // Insert new invite
+      await query(
+        `INSERT INTO project_invites (project_id, invite_token, contractor_email, contractor_phone, message, expires_at, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)`,
+        [projectId, inviteToken, email || null, phoneNumber || null, message, expiresAt]
+      );
+    }
 
     // Simulate email/SMS sending (for demo purposes)
     let sendResult = { success: false, message: '' };
@@ -685,7 +699,7 @@ router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt
       console.log(`📧 [DEMO] Subject: دعوت برای همکاری در پروژه "${project.title}"`);
       console.log(`📧 [DEMO] Message: ${message}`);
       console.log(`📧 [DEMO] Invite Link: ${inviteLink || `${process.env.FRONTEND_URL || 'http://localhost:3000'}/projects/accept/${inviteToken}`}`);
-      sendResult = { success: true, message: 'ایمیل ارسال شد (حالت ن��ایشی)' };
+      sendResult = { success: true, message: 'ایمیل ارسال شد (حالت نمایشی)' };
     } else if (method === 'phone' && phoneNumber) {
       // Simulate SMS sending
       console.log(`📱 [DEMO] Sending SMS to: ${phoneNumber}`);
