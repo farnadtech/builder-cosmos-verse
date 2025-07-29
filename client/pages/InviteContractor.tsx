@@ -34,7 +34,7 @@ export default function InviteContractor() {
 
 من شما را برای همکاری در پروژه زیر دعوت می‌کنم:
 
-لطفاً لینک زیر را کلیک کنید تا جزئ��ات پروژه را مشاهده کرده و در صورت تمایل پذیرش کنید:
+لطفاً لینک زیر را کلیک کنید تا جزئیات پروژه را مشاهده کرده و در صورت تمایل پذیرش کنید:
 
 با تشکر`
   });
@@ -66,12 +66,16 @@ export default function InviteContractor() {
         console.log('Invite link response:', data);
 
         const inviteToken = data.data?.inviteToken || data.inviteToken;
+        console.log('Extracted invite token:', inviteToken);
+
         if (!inviteToken) {
+          console.error('No invite token found in response:', data);
           setError('خطا در دریافت توکن دعوت');
           return;
         }
 
         const link = `${window.location.origin}/projects/accept/${inviteToken}`;
+        console.log('Generated invite link:', link);
         setInviteLink(link);
         setFormData(prev => ({
           ...prev,
