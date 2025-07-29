@@ -245,7 +245,15 @@ export default function CreateProject() {
         // Handle error response
         try {
           const errorData = await response.json();
-          setErrors({ submit: errorData.message || "خطا در ایجاد پروژه" });
+          console.error("Project creation error:", errorData);
+
+          if (response.status === 401) {
+            setErrors({ submit: "لطفاً دوباره وارد شوید" });
+            // Optionally redirect to login
+            // navigate('/login');
+          } else {
+            setErrors({ submit: errorData.message || "خطا در ایجاد پروژه" });
+          }
         } catch (jsonError) {
           console.error("Error parsing error response:", jsonError);
           setErrors({ submit: `خطا در ایجاد پروژه (کد ${response.status})` });
@@ -327,7 +335,7 @@ export default function CreateProject() {
                 <Label htmlFor="category">دسته‌بندی *</Label>
                 <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                   <SelectTrigger className={errors.category ? "border-red-500" : ""}>
-                    <SelectValue placeholder="دسته‌بندی پروژه را انتخاب کنید" />
+                    <SelectValue placeholder="دسته‌بندی پروژه را انتخاب ک��ید" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -359,7 +367,7 @@ export default function CreateProject() {
                   <label htmlFor="attachment" className="cursor-pointer">
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600 mb-1">
-                      {formData.attachment ? formData.attachment.name : "فایل خود را بارگذاری کنید"}
+                      {formData.attachment ? formData.attachment.name : "��ایل خود را بارگذاری کنید"}
                     </p>
                     <p className="text-xs text-gray-500">
                       فرمت‌��ای مجاز: JPG, PNG, PDF, DOC, ZIP (حداکثر ۱۰ مگابایت)
