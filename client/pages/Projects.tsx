@@ -15,128 +15,137 @@ import {
   User,
   Eye,
   MessageSquare,
-  Clock
+  Clock,
+  FileText
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-// Mock data - این باید از API دریافت شود
-const mockProjects = [
-  {
-    id: 1,
-    title: "طراحی وب‌سایت فروشگاهی مدرن",
-    description: "طراحی و توسعه یک وب‌سایت فروشگاهی کامل با پنل مدیریت و درگاه پرداخت",
-    budget: 15000000,
-    status: "open",
-    category: "طراحی وب",
-    deadline: "1403/10/15",
-    employerName: "احمد محمدی",
-    contractorName: null,
-    applicantsCount: 12,
-    createdAt: "1403/08/01"
-  },
-  {
-    id: 2,
-    title: "اپلیکیشن موبایل سفارش غذا",
-    description: "توسعه اپلیکیشن موبایل برای سفارش آنلاین غذا با قابلیت ردیابی",
-    budget: 25000000,
-    status: "in_progress",
-    category: "توسعه موبایل",
-    deadline: "1403/11/30",
-    employerName: "فاطمه احمدی",
-    contractorName: "علی رضایی",
-    applicantsCount: 0,
-    createdAt: "1403/07/15"
-  },
-  {
-    id: 3,
-    title: "طراحی لوگو و هویت بصری",
-    description: "طراحی لوگو و هویت بصری کامل برای شرکت تکنولوژی",
-    budget: 8000000,
-    status: "completed",
-    category: "طراحی گرافیک",
-    deadline: "1403/09/01",
-    employerName: "محمد کریمی",
-    contractorName: "زهرا حسینی",
-    applicantsCount: 0,
-    createdAt: "1403/06/10"
-  },
-  {
-    id: 4,
-    title: "ترجمه متون تخصصی پزشکی",
-    description: "ترجمه کتاب تخصصی پزشکی از انگلیسی به فارسی",
-    budget: 12000000,
-    status: "disputed",
-    category: "ترجمه",
-    deadline: "1403/09/20",
-    employerName: "دکتر احمد نژاد",
-    contractorName: "مریم فراهانی",
-    applicantsCount: 0,
-    createdAt: "1403/07/01"
-  }
-];
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  budget: number;
+  status: string;
+  category?: string;
+  deadline?: string;
+  employer_name?: string;
+  contractor_name?: string;
+  applicants_count?: number;
+  created_at: string;
+}
 
-export default function ProjectsPage() {
+export default function Projects() {
   const { user } = useAuth();
-  const [projects, setProjects] = useState(mockProjects);
-  const [filteredProjects, setFilteredProjects] = useState(mockProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  // Filter projects based on search and filters
   useEffect(() => {
-    let filtered = projects;
+    fetchProjects();
+  }, []);
 
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(project =>
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('zemano_token');
+      
+      const response = await fetch('/api/projects', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data.data || []);
+      } else {
+        console.error('خطا در دریافت پروژه‌ها');
+      }
+    } catch (error) {
+      console.error('خطا در دریافت پروژه‌ها:', error);
+    } finally {
+      setLoading(false);
     }
-
-    // Status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(project => project.status === statusFilter);
-    }
-
-    // Category filter
-    if (categoryFilter !== "all") {
-      filtered = filtered.filter(project => project.category === categoryFilter);
-    }
-
-    setFilteredProjects(filtered);
-  }, [searchTerm, statusFilter, categoryFilter, projects]);
-
-  const getStatusBadge = (status: string) => {
-    const statusMap = {
-      open: { label: "باز", className: "bg-green-100 text-green-800" },
-      assigned: { label: "تخصیص یافته", className: "bg-blue-100 text-blue-800" },
-      in_progress: { label: "در حال انجام", className: "bg-yellow-100 text-yellow-800" },
-      completed: { label: "تکمیل شده", className: "bg-emerald-100 text-emerald-800" },
-      cancelled: { label: "لغو شده", className: "bg-gray-100 text-gray-800" },
-      disputed: { label: "در حال داوری", className: "bg-red-100 text-red-800" }
-    };
-
-    const statusInfo = statusMap[status as keyof typeof statusMap] || statusMap.open;
-    
-    return (
-      <Badge className={statusInfo.className}>
-        {statusInfo.label}
-      </Badge>
-    );
   };
 
-  const categories = [
-    "طراحی وب",
-    "توسعه موبایل", 
-    "طراحی گراف��ک",
-    "ترجمه",
-    "تولید محتوا",
-    "بازاریابی دیجیتال",
-    "مشاوره کسب‌وکار"
-  ];
+  // Filter projects based on search and filters
+  const filteredProjects = projects.filter(project => {
+    const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         project.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || project.status === statusFilter;
+    const matchesCategory = categoryFilter === "all" || project.category === categoryFilter;
+    
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
+  // تابع برای تبدیل وضعیت پروژه به فارسی
+  const getStatusName = (status: string) => {
+    switch (status) {
+      case 'open': return 'باز';
+      case 'assigned': return 'تخصیص یافته';
+      case 'in_progress': return 'در حال انجام';
+      case 'completed': return 'تکمیل شده';
+      case 'cancelled': return 'لغو شده';
+      case 'disputed': return 'در حال داوری';
+      default: return status;
+    }
+  };
+
+  // تابع برای رنگ وضعیت
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'open': return 'bg-blue-100 text-blue-800';
+      case 'assigned': return 'bg-purple-100 text-purple-800';
+      case 'in_progress': return 'bg-yellow-100 text-yellow-800';
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      case 'disputed': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // تابع برای فرمت کردن قیمت
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('fa-IR').format(price);
+  };
+
+  // تابع برای فرمت کردن تاریخ
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('fa-IR');
+  };
+
+  // Empty state component
+  const EmptyState = () => (
+    <div className="text-center py-16">
+      <Briefcase className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+      <h3 className="text-xl font-medium text-gray-900 mb-4">
+        {user?.role === 'employer' ? 'هنوز پروژه‌ای ایجاد نکرده‌اید' : 'پروژه‌ای موجود نیست'}
+      </h3>
+      <p className="text-gray-500 mb-8 max-w-md mx-auto">
+        {user?.role === 'employer' 
+          ? 'اولین پروژه خود را ایجاد کنید و با بهترین مجریان کار کنید'
+          : 'هنوز پروژه‌ای برای شرکت در آن موجود نیست'
+        }
+      </p>
+      {user?.role === 'employer' && (
+        <Button asChild>
+          <Link to="/projects/create">
+            <Plus className="h-4 w-4 mr-2" />
+            ایجاد پروژه جدید
+          </Link>
+        </Button>
+      )}
+    </div>
+  );
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <ProtectedRoute>
@@ -146,17 +155,22 @@ export default function ProjectsPage() {
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">پروژه‌ها</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {user.role === 'employer' ? 'پروژه‌های من' : 'پروژه‌ها'}
+                </h1>
                 <p className="text-gray-600">
-                  {user?.role === 'employer' ? 'پروژه‌های خود را مدیریت کنید' : 'پروژه‌های مناسب را پیدا کنید'}
+                  {user.role === 'employer' 
+                    ? 'مدیریت و نظارت بر پروژه‌های شما'
+                    : 'مشاهده و شرکت در پروژه‌های موجود'
+                  }
                 </p>
               </div>
-              {user?.role === 'employer' && (
+              {user.role === 'employer' && (
                 <div className="mt-4 md:mt-0">
-                  <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600">
+                  <Button asChild>
                     <Link to="/projects/create">
-                      <Plus className="w-4 h-4 ml-2" />
-                      پروژه جدید
+                      <Plus className="h-4 w-4 mr-2" />
+                      ایجاد پروژه جدید
                     </Link>
                   </Button>
                 </div>
@@ -165,172 +179,190 @@ export default function ProjectsPage() {
           </div>
 
           {/* Filters */}
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {/* Search */}
-                <div className="relative">
-                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="جستجو در پروژه‌ها..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pr-10"
-                  />
+          <div className="mb-8">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row gap-4">
+                  {/* Search */}
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="جستجو در پروژه‌ها..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pr-10"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Status Filter */}
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full md:w-48">
+                      <SelectValue placeholder="وضعیت" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">همه وضعیت‌ها</SelectItem>
+                      <SelectItem value="open">باز</SelectItem>
+                      <SelectItem value="assigned">تخصیص یافته</SelectItem>
+                      <SelectItem value="in_progress">در حال انجام</SelectItem>
+                      <SelectItem value="completed">تکمیل شده</SelectItem>
+                      <SelectItem value="cancelled">لغو شده</SelectItem>
+                      <SelectItem value="disputed">در حال داوری</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Category Filter */}
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-full md:w-48">
+                      <SelectValue placeholder="دسته‌بندی" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">همه دسته‌ها</SelectItem>
+                      <SelectItem value="طراحی وب">طراحی وب</SelectItem>
+                      <SelectItem value="توسعه موبایل">توسعه موبایل</SelectItem>
+                      <SelectItem value="طراحی گرافیک">طراحی گرافیک</SelectItem>
+                      <SelectItem value="تولید محتوا">تولید محتوا</SelectItem>
+                      <SelectItem value="ترجمه">ترجمه</SelectItem>
+                      <SelectItem value="سایر">سایر</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-
-                {/* Status Filter */}
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="وضعیت" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">همه وضعیت‌ها</SelectItem>
-                    <SelectItem value="open">باز</SelectItem>
-                    <SelectItem value="assigned">تخصیص یافته</SelectItem>
-                    <SelectItem value="in_progress">در حال انجام</SelectItem>
-                    <SelectItem value="completed">تکمیل شده</SelectItem>
-                    <SelectItem value="disputed">در حال داوری</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {/* Category Filter */}
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="دسته‌بندی" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">همه دسته‌ها</SelectItem>
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {/* Clear Filters */}
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSearchTerm("");
-                    setStatusFilter("all");
-                    setCategoryFilter("all");
-                  }}
-                  className="w-full"
-                >
-                  <Filter className="w-4 h-4 ml-2" />
-                  پاک کردن فیلترها
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Projects Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredProjects.map((project) => (
-              <Card key={project.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg line-clamp-2 mb-2">
-                        {project.title}
-                      </CardTitle>
-                      <CardDescription className="line-clamp-3">
-                        {project.description}
-                      </CardDescription>
-                    </div>
-                    {getStatusBadge(project.status)}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Project Details */}
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-gray-500" />
-                        <span>{project.budget.toLocaleString('fa-IR')} ریال</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <span>{project.deadline}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Briefcase className="w-4 h-4 text-gray-500" />
-                        <span>{project.category}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <span>{project.employerName}</span>
-                      </div>
-                    </div>
-
-                    {/* Additional Info */}
-                    {project.status === 'open' && project.applicantsCount > 0 && (
-                      <div className="text-sm text-gray-600">
-                        {project.applicantsCount} نفر درخواست داده‌اند
-                      </div>
-                    )}
-
-                    {project.contractorName && (
-                      <div className="text-sm text-green-600">
-                        مجری: {project.contractorName}
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" asChild className="flex-1">
-                        <Link to={`/projects/${project.id}`}>
-                          <Eye className="w-4 h-4 ml-2" />
-                          مشاهده
-                        </Link>
-                      </Button>
-                      
-                      {user?.role === 'contractor' && project.status === 'open' && (
-                        <Button size="sm" className="flex-1 bg-zemano-600 hover:bg-zemano-700">
-                          درخواست انجام
-                        </Button>
-                      )}
-
-                      {((user?.role === 'employer' && project.employerName === `${user.firstName} ${user.lastName}`) ||
-                        (user?.role === 'contractor' && project.contractorName === `${user.firstName} ${user.lastName}`)) &&
-                        project.status === 'in_progress' && (
-                        <Button variant="outline" size="sm">
-                          <MessageSquare className="w-4 h-4 ml-2" />
-                          چت
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Empty State */}
-          {filteredProjects.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Briefcase className="w-12 h-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">پروژه‌ای یافت نشد</h3>
-              <p className="text-gray-600 mb-6">
-                {searchTerm || statusFilter !== "all" || categoryFilter !== "all"
-                  ? "با فیلترهای انتخاب شده پروژه‌ای وجود ندارد"
-                  : "هنوز پروژه‌ای ثبت نشده است"
-                }
-              </p>
-              {user?.role === 'employer' && (
-                <Button asChild className="bg-gradient-to-r from-zemano-500 to-zemano-600">
-                  <Link to="/projects/create">
-                    <Plus className="w-4 h-4 ml-2" />
-                    اولین پروژه را ایجاد کنید
-                  </Link>
-                </Button>
-              )}
+          {/* Projects List */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-gray-200 rounded"></div>
+                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-8 bg-gray-200 rounded w-1/3 mt-4"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProjects.map((project) => (
+                <Card key={project.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg line-clamp-2">{project.title}</CardTitle>
+                        <CardDescription className="mt-2 line-clamp-2">
+                          {project.description}
+                        </CardDescription>
+                      </div>
+                      <Badge className={getStatusColor(project.status)}>
+                        {getStatusName(project.status)}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Budget */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500">بودجه:</span>
+                        <span className="font-semibold text-zemano-600">
+                          {formatPrice(project.budget)} ریال
+                        </span>
+                      </div>
+
+                      {/* Category */}
+                      {project.category && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500">دسته‌بندی:</span>
+                          <span className="text-sm">{project.category}</span>
+                        </div>
+                      )}
+
+                      {/* Deadline */}
+                      {project.deadline && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500">موعد تحویل:</span>
+                          <span className="text-sm flex items-center">
+                            <Calendar className="h-3 w-3 ml-1" />
+                            {formatDate(project.deadline)}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Employer/Contractor */}
+                      {project.employer_name && user.role !== 'employer' && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500">کارفرما:</span>
+                          <span className="text-sm">{project.employer_name}</span>
+                        </div>
+                      )}
+                      
+                      {project.contractor_name && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500">مجری:</span>
+                          <span className="text-sm">{project.contractor_name}</span>
+                        </div>
+                      )}
+
+                      {/* Applicants count for open projects */}
+                      {project.status === 'open' && project.applicants_count !== undefined && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500">متقاضیان:</span>
+                          <span className="text-sm">{project.applicants_count} نفر</span>
+                        </div>
+                      )}
+
+                      {/* Created date */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500">ایجاد شده:</span>
+                        <span className="text-sm">{formatDate(project.created_at)}</span>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex gap-2 pt-4 border-t">
+                        <Button asChild variant="outline" size="sm" className="flex-1">
+                          <Link to={`/projects/${project.id}`}>
+                            <Eye className="h-3 w-3 ml-1" />
+                            مشاهده
+                          </Link>
+                        </Button>
+                        
+                        {user.role === 'contractor' && project.status === 'open' && (
+                          <Button asChild size="sm" className="flex-1">
+                            <Link to={`/projects/${project.id}/apply`}>
+                              <FileText className="h-3 w-3 ml-1" />
+                              درخواست
+                            </Link>
+                          </Button>
+                        )}
+                        
+                        {(project.status === 'in_progress' || project.status === 'assigned') && (
+                          <Button asChild variant="outline" size="sm">
+                            <Link to={`/projects/${project.id}/chat`}>
+                              <MessageSquare className="h-3 w-3" />
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
+
+          {/* Pagination would go here if needed */}
         </div>
       </div>
     </ProtectedRoute>
