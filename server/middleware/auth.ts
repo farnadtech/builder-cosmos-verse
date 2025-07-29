@@ -13,6 +13,7 @@ interface JWTPayload {
 export interface AuthenticatedRequest extends Request {
   user?: {
     id: number;
+    userId: number;
     email: string;
     role: string;
     firstName: string;
