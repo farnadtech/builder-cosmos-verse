@@ -123,7 +123,7 @@ router.post(
           success: false,
           message: "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
           messageFA:
-            "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام کرده است",
+            "کاربری با این ایمیل یا شماره موبایل قبلاً ثبت نام ��رده است",
         });
       }
 
@@ -166,7 +166,7 @@ router.post(
       const responseData = {
         success: true,
         message:
-          "ثبت نام با موفقیت انجام شد. لطفاً شماره موبایل خود را تایید کنید",
+          "ثبت نام با موفقیت انجام شد. لطفاً شماره موبایل خود را ت��یید کنید",
         data: {
           user: {
             id: user.id,
@@ -524,7 +524,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
     console.error("Reset password error:", error);
     res.status(500).json({
       success: false,
-      message: "خطای سیس��می در تغییر رمز عبو��",
+      message: "خطای سیس��می در تغییر رم�� عبو��",
     });
   }
 });
@@ -575,7 +575,7 @@ router.post(
         });
       }
 
-      // Verify OTP
+      // Check verification status and conditionally verify OTP
       const normalizedPhone = phoneNumber.replace(/^(\+98|0)/, "+98");
       const isValidOTP = await smsService.verifyOTP(normalizedPhone, otpCode);
       if (!isValidOTP) {
