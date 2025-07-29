@@ -335,7 +335,7 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
     if (req.file) {
       await query(
         `INSERT INTO uploads (user_id, original_name, file_path, file_size, mime_type, purpose, reference_id, created_at)
-         VALUES ($1, $2, $3, $4, $5, 'project', $6, NOW())`,
+         VALUES ($1, $2, $3, $4, $5, 'project', $6, CURRENT_TIMESTAMP)`,
         [req.user!.userId, req.file.originalname, req.file.path, req.file.size, req.file.mimetype, projectId]
       );
     }
@@ -400,7 +400,7 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
     if (project.status !== 'open') {
       return res.status(400).json({
         success: false,
-        message: 'این پروژه دیگر برای د��خواست باز نیست'
+        message: 'این پروژه دیگر برای درخواست باز نیست'
       });
     }
 
@@ -445,7 +445,7 @@ router.post('/:id/apply', authenticateToken, requireContractor, param('id').isIn
 
     res.status(201).json({
       success: true,
-      message: 'درخواست شما ���ا موفقیت ارسال شد'
+      message: 'درخواست شما ��ا موفقیت ارسال شد'
     });
 
   } catch (error) {
@@ -738,7 +738,7 @@ router.get('/invite/:token', async (req, res: Response) => {
 
 مسئولیت‌های مجری:
 - اجرای پروژه طبق مشخصات ارائه شده
-- ارائه گزارش پی��رفت به‌موقع
+- ارائه گزارش پیشرفت به‌موقع
 - رعایت استانداردهای کیفی
 
 مسئولیت‌های کارفرما:
