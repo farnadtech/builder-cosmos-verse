@@ -45,7 +45,7 @@ const App = () => (
               <Route path="/projects/create" element={<CreateProject />} />
               <Route path="/projects/:id" element={<ProjectDetails />} />
               <Route path="/projects/:projectId/invite" element={<InviteContractor />} />
-              <Route path="/projects/accept/:inviteToken" element={<AcceptProjectMinimal />} />
+              <Route path="/projects/accept/:inviteToken" element={<AcceptProject />} />
               <Route path="/wallet" element={<PlaceholderPage title="کیف پول" description="مدیریت کیف پول" />} />
               <Route path="/arbitration" element={<Arbitration />} />
               <Route path="/about" element={<PlaceholderPage title="درباره ما" description="اطلاعات درباره ضمانو" />} />
