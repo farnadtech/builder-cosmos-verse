@@ -205,15 +205,15 @@ export default function CreateProject() {
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         const projectId = data.project.id;
 
         // Navigate to invite contractor page
         navigate(`/projects/${projectId}/invite`);
       } else {
-        const errorData = await response.json();
-        setErrors({ submit: errorData.message || "خطا در ایجاد پروژه" });
+        setErrors({ submit: data.message || "خطا در ایجاد پروژه" });
       }
     } catch (error) {
       console.error("Error creating project:", error);
@@ -229,7 +229,7 @@ export default function CreateProject() {
         <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">ایجاد پروژه جدید</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">ایجاد پروژه جد��د</h1>
           <p className="text-gray-600">اطلاعات کامل پروژه خود را وارد کنید</p>
         </div>
 
