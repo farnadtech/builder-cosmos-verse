@@ -102,6 +102,7 @@ export const authenticateToken = async (
       // Fallback to token data when database is not available
       req.user = {
         id: decoded.userId,
+        userId: decoded.userId,
         email: decoded.email,
         role: decoded.role,
         firstName: "کاربر",
