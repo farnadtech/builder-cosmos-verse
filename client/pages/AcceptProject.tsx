@@ -187,12 +187,15 @@ export default function AcceptProject() {
     }
   };
 
+  console.log('🔍 Render state check:', { loading, error, project: !!project });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zemano-600 mx-auto mb-4"></div>
           <p className="text-gray-600">در حال بارگذاری...</p>
+          <p className="text-xs text-gray-400 mt-2">Token: {inviteToken}</p>
         </div>
       </div>
     );
@@ -384,7 +387,7 @@ export default function AcceptProject() {
                     <span className="font-medium">{project.employer.rating}/۵</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>پروژه‌ه��ی تکمیل شده:</span>
+                    <span>پروژه‌های تکمیل شده:</span>
                     <span className="font-medium">{project.employer.completedProjects}</span>
                   </div>
                 </div>
@@ -445,7 +448,7 @@ export default function AcceptProject() {
               <ul className="text-sm text-blue-700 space-y-1">
                 <li>��� با پذیرش پروژه، قرارداد بین شما و کارفرما منعقد می‌شود</li>
                 <li>• پرداخت‌ها طبق مراحل تعریف شده انجام می‌��ود</li>
-                <li>• د�� صورت اختلاف، امکان مراجعه به داوری وجود دارد</li>
+                <li>• در صورت اختلاف، امکان مراجعه به داوری وجود دارد</li>
                 <li>• رعایت مهلت‌های تعیین شده الزامی است</li>
               </ul>
             </div>
