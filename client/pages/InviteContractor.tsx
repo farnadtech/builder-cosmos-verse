@@ -91,11 +91,20 @@ export default function InviteContractor() {
         setInviteLink(link);
         setFormData(prev => ({
           ...prev,
-          message: prev.message.replace(/لینک زیر را کلیک کنید:.*$/m, `لینک زیر را کلیک کنید:\n${link}`)
+          message: prev.message.replace(/لینک زیر را کلیک کنید:.*$/m, `لینک زیر را کلی�� کنید:\n${link}`)
         }));
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || "خطا در تولید لینک دعوت");
+        console.log('❌ Invite link generation failed with status:', response.status);
+        const errorText = await response.text();
+        console.log('❌ Error response (raw):', errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          console.log('❌ Error response (parsed):', errorData);
+          setError(errorData.message || "خطا در تولید لینک دعوت");
+        } catch (parseError) {
+          console.error('Could not parse error response:', parseError);
+          setError(`خطا در تولید لینک دعوت (${response.status}): ${errorText}`);
+        }
       }
     } catch (err) {
       setError("خطا در ارتباط با سرور");
