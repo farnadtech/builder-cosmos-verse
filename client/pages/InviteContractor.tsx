@@ -34,7 +34,7 @@ export default function InviteContractor() {
 
 من شما را برای همکاری در پروژه زیر دعوت می‌کنم:
 
-لطفاً لینک زیر را کلیک کنید تا جزئیات پروژه را مشاهده کرده و در صورت تمایل ��ذیرش کنید:
+لطفاً لینک زیر را کلیک کنید تا جزئ��ات پروژه را مشاهده کرده و در صورت تمایل پذیرش کنید:
 
 با تشکر`
   });
@@ -49,12 +49,16 @@ export default function InviteContractor() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/projects/${projectId}/invite-link`, {
+      const fetchFn = window.authenticatedFetch || fetch;
+      const headers: HeadersInit = {};
+      if (!window.authenticatedFetch) {
+        headers['Authorization'] = `Bearer ${localStorage.getItem('zemano_token')}`;
+      }
+      headers['Content-Type'] = 'application/json';
+
+      const response = await fetchFn(`/api/projects/${projectId}/invite-link`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('zemano_token')}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
 
       if (response.ok) {
@@ -75,7 +79,7 @@ export default function InviteContractor() {
         }));
       } else {
         const errorData = await response.json();
-        setError(errorData.message || "��طا در تولید لینک دعوت");
+        setError(errorData.message || "خطا در تولید لینک دعوت");
       }
     } catch (err) {
       setError("خطا در ارتباط با سرور");
@@ -135,12 +139,16 @@ export default function InviteContractor() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/projects/${projectId}/invite`, {
+      const fetchFn = window.authenticatedFetch || fetch;
+      const headers: HeadersInit = {};
+      if (!window.authenticatedFetch) {
+        headers['Authorization'] = `Bearer ${localStorage.getItem('zemano_token')}`;
+      }
+      headers['Content-Type'] = 'application/json';
+
+      const response = await fetchFn(`/api/projects/${projectId}/invite`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('zemano_token')}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           method: formData.method,
           email: formData.email || undefined,
@@ -151,14 +159,15 @@ export default function InviteContractor() {
       });
 
       if (response.ok) {
-        toast.success("دعوت‌نامه ارسال شد");
+        const data = await response.json();
+        toast.success(data.message || "دعوت‌نامه ارسال شد");
         navigate(`/projects/${projectId}`);
       } else {
         const errorData = await response.json();
         setError(errorData.message || "خطا در ارسال دعوت‌نامه");
       }
     } catch (err) {
-      setError("خطا در ارسال دعوت‌��امه");
+      setError("خطا در ارسال دعوت‌نامه");
     } finally {
       setLoading(false);
     }
@@ -302,7 +311,7 @@ export default function InviteContractor() {
                     </Button>
                   </div>
                   <p className="text-sm text-gray-600">
-                    این لینک را به مجری موردنظر ارسال کنید. او با کلیک روی آن می‌تواند جزئیات پروژ�� را مشاهده کند.
+                    این لینک را به مجری موردنظر ارسال کنید. او با کلیک روی آن می‌تواند جزئیات پروژه را مشاهده کند.
                   </p>
                 </div>
               )}
