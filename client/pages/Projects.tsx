@@ -50,19 +50,23 @@ export default function Projects() {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('zemano_token');
+      const fetchFn = window.authenticatedFetch || fetch;
 
-      if (!token) {
-        console.error('Token not found in localStorage');
-        setProjects([]);
-        return;
-      }
-
-      const response = await fetch('/api/projects', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      // Create headers for fallback fetch
+      const headers: HeadersInit = {};
+      if (!window.authenticatedFetch) {
+        const token = localStorage.getItem('zemano_token');
+        if (!token) {
+          console.error('Token not found in localStorage');
+          setProjects([]);
+          return;
         }
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      headers['Content-Type'] = 'application/json';
+
+      const response = await fetchFn('/api/projects', {
+        headers
       });
 
       if (response.ok) {
