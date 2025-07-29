@@ -146,7 +146,7 @@ export default function Dashboard() {
     }
   };
 
-  // تابع برای تبدیل وضعیت پروژه ب�� فارسی
+  // تابع برای تبدیل وضعیت پروژه به فارسی
   const getStatusName = (status: string) => {
     switch (status) {
       case 'open': return 'باز';
@@ -333,7 +333,7 @@ export default function Dashboard() {
                       {recentProjects.length === 0 ? (
                         <EmptyState
                           icon={Briefcase}
-                          title="هنوز ��روژه‌ای ندارید"
+                          title="هنوز پروژه‌ای ندارید"
                           description={
                             user.role === 'employer' 
                               ? "اولین پروژه خود را ایجاد کنید و با بهترین مجریان کار کنید"
@@ -344,7 +344,7 @@ export default function Dashboard() {
                         />
                       ) : (
                         <div className="space-y-4">
-                          {recentProjects.slice(0, 5).map((project) => (
+                          {(recentProjects || []).slice(0, 5).map((project) => (
                             <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg">
                               <div className="flex-1">
                                 <h4 className="font-medium">{project.title}</h4>
@@ -380,7 +380,7 @@ export default function Dashboard() {
                 <div>
                   <Card>
                     <CardHeader>
-                      <CardTitle>اعلان‌ها</CardTitle>
+                      <CardTitle>��علان‌ها</CardTitle>
                     </CardHeader>
                     <CardContent>
                       {notifications.length === 0 ? (
