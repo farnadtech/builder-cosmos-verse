@@ -9,6 +9,106 @@ const router = Router();
 // All admin routes require admin role
 router.use(authenticateToken, requireAdmin);
 
+// Get pending verifications
+router.get('/verifications/pending', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const pendingVerifications = await query(`
+      SELECT
+        vd.*,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.phone_number,
+        u.created_at as user_created_at
+      FROM verification_documents vd
+      JOIN users u ON vd.user_id = u.id
+      WHERE vd.verification_status = 'pending'
+      ORDER BY vd.created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      data: {
+        verifications: pendingVerifications.rows
+      }
+    });
+  } catch (error) {
+    console.error('Get pending verifications error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطا در دریافت لیست احراز هویت‌های در انتظار'
+    });
+  }
+});
+
+// Approve or reject verification
+router.patch('/verifications/:id',
+  param('id').isInt(),
+  body('status').isIn(['approved', 'rejected']),
+  body('admin_notes').optional().isString(),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'اطلاعات ورودی نامعتبر است',
+          errors: errors.array()
+        });
+      }
+
+      const verificationId = req.params.id;
+      const { status, admin_notes } = req.body;
+
+      // Get verification document info
+      const verificationResult = await query(
+        'SELECT user_id FROM verification_documents WHERE id = $1',
+        [verificationId]
+      );
+
+      if (verificationResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'سند احراز هویت یافت نشد'
+        });
+      }
+
+      const userId = verificationResult.rows[0].user_id;
+
+      // Update verification status
+      await query(
+        `UPDATE verification_documents
+         SET verification_status = $1,
+             admin_notes = $2,
+             reviewed_at = CURRENT_TIMESTAMP,
+             reviewed_by = $3
+         WHERE id = $4`,
+        [status, admin_notes || null, req.user!.userId, verificationId]
+      );
+
+      // If approved, update user verification status
+      if (status === 'approved') {
+        await query(
+          'UPDATE users SET is_verified = 1 WHERE id = $1',
+          [userId]
+        );
+      }
+
+      res.json({
+        success: true,
+        message: status === 'approved' ? 'احراز هویت تایید شد' : 'احراز هویت رد شد'
+      });
+
+    } catch (error) {
+      console.error('Update verification status error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'خطا در به‌روزرسانی وضعیت احراز هویت'
+      });
+    }
+  }
+);
+
 // Get dashboard statistics
 router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
   try {
