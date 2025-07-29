@@ -648,28 +648,69 @@ router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt
 
     const project = projectResult.rows[0];
 
+    // Extract token from invite link if provided
+    let inviteToken = '';
+    if (inviteLink) {
+      const tokenMatch = inviteLink.match(/\/projects\/accept\/([^/?]+)/);
+      if (tokenMatch) {
+        inviteToken = tokenMatch[1];
+      }
+    }
+
+    // If no token from link, generate a new one
+    if (!inviteToken) {
+      inviteToken = crypto.randomBytes(32).toString('hex');
+    }
+
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    // Save invite record
+    await query(
+      `INSERT INTO project_invites (project_id, invite_token, contractor_email, contractor_phone, message, expires_at, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
+       ON CONFLICT (invite_token) DO UPDATE SET
+       contractor_email = EXCLUDED.contractor_email,
+       contractor_phone = EXCLUDED.contractor_phone,
+       message = EXCLUDED.message,
+       expires_at = EXCLUDED.expires_at`,
+      [projectId, inviteToken, email || null, phoneNumber || null, message, expiresAt]
+    );
+
+    // Simulate email/SMS sending (for demo purposes)
+    let sendResult = { success: false, message: '' };
+
+    if (method === 'email' && email) {
+      // Simulate email sending
+      console.log(`📧 [DEMO] Sending email to: ${email}`);
+      console.log(`📧 [DEMO] Subject: دعوت برای همکاری در پروژه "${project.title}"`);
+      console.log(`📧 [DEMO] Message: ${message}`);
+      console.log(`📧 [DEMO] Invite Link: ${inviteLink || `${process.env.FRONTEND_URL || 'http://localhost:3000'}/projects/accept/${inviteToken}`}`);
+      sendResult = { success: true, message: 'ایمیل ارسال شد (حالت ن��ایشی)' };
+    } else if (method === 'phone' && phoneNumber) {
+      // Simulate SMS sending
+      console.log(`📱 [DEMO] Sending SMS to: ${phoneNumber}`);
+      console.log(`📱 [DEMO] Message: ${message}`);
+      console.log(`📱 [DEMO] Invite Link: ${inviteLink || `${process.env.FRONTEND_URL || 'http://localhost:3000'}/projects/accept/${inviteToken}`}`);
+      sendResult = { success: true, message: 'پیامک ارسال شد (حالت نمایشی)' };
+    } else if (method === 'link') {
+      // For link method, just confirm the link is ready
+      sendResult = { success: true, message: 'لینک آماده ارسال است' };
+    }
+
     // Update project status to waiting for acceptance
     await query(
       'UPDATE projects SET status = \'waiting_for_acceptance\', updated_at = CURRENT_TIMESTAMP WHERE id = $1',
       [projectId]
     );
 
-    // Save invite record
-    const inviteToken = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-    await query(
-      `INSERT INTO project_invites (project_id, invite_token, contractor_email, contractor_phone, message, expires_at, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)`,
-      [projectId, inviteToken, email || null, phoneNumber || null, message, expiresAt]
-    );
-
-    // TODO: Implement actual email/SMS sending based on method
-    console.log('Sending invite:', { method, email, phoneNumber, message, inviteLink });
-
     res.json({
       success: true,
-      message: 'دعوت‌نامه با موفقیت ارسال شد'
+      message: sendResult.success ? sendResult.message : 'دعوت‌نامه ثبت شد',
+      data: {
+        inviteToken,
+        method,
+        sentTo: email || phoneNumber || 'manual'
+      }
     });
 
   } catch (error) {
