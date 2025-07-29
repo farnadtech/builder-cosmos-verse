@@ -229,7 +229,7 @@ router.get('/:id', authenticateToken, param('id').isInt(), async (req: Authentic
     if (!hasAccess) {
       return res.status(403).json({
         success: false,
-        message: 'دسترسی به این پروژه ندارید'
+        message: 'دسترسی به این پ��وژه ندارید'
       });
     }
 
@@ -775,6 +775,7 @@ router.get('/invite/:token', async (req, res: Response) => {
     }
 
     const data = result.rows[0];
+    console.log(`✅ Found project: ${data.title} (ID: ${data.id})`);
 
     // Check if invite is expired
     if (new Date() > new Date(data.expires_at)) {
@@ -823,7 +824,7 @@ router.get('/invite/:token', async (req, res: Response) => {
 مسئولیت‌های کارفرما:
 - پرداخت به‌موقع طبق مراحل تعریف شده
 - ارائه اطلاعات و منابع مورد نیاز
-- بازخورد سریع به درخواست‌های مجری`
+- بازخورد سریع به درخ��است‌های مجری`
     };
 
     res.json({
