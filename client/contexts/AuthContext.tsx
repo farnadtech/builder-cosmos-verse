@@ -144,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('User not logged in, removing authenticatedFetch');
       delete window.authenticatedFetch;
     }
-  }, [user]);
+  }, [user, logout]);
 
   const login = async (phoneNumber: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
