@@ -215,8 +215,8 @@ export default function CreateProject() {
           console.log("Extracted project ID:", projectId);
 
           if (projectId) {
-            // Navigate to invite contractor page
-            navigate(`/projects/${projectId}/invite`);
+            // Navigate to project details page
+            navigate(`/projects/${projectId}`);
           } else {
             console.error("Project ID not found in response:", data);
             setErrors({ submit: "خطا در دریافت شناسه پروژه" });
@@ -237,7 +237,7 @@ export default function CreateProject() {
       }
     } catch (error) {
       console.error("Error creating project:", error);
-      setErrors({ submit: "خطا در ایجاد پروژه. لطفاً دوباره تلاش کنید." });
+      setErrors({ submit: "خطا در ایجاد پروژه. لطفاً دوباره تلاش ک��ید." });
     } finally {
       setIsSubmitting(false);
     }
@@ -449,7 +449,7 @@ export default function CreateProject() {
                 مراحل انجام کار
               </CardTitle>
               <CardDescription>
-                پروژه را به مراحل مختلف تقسیم ��نید تا پرداخت���ها مرحله‌ای انجام شود
+                پروژه را به مراحل مختلف تقسیم ��نید تا پرداخت‌ها مرحله‌ای انجام شود
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -528,7 +528,7 @@ export default function CreateProject() {
                           {milestone.deadline ? (
                             format(milestone.deadline, "PPP", { locale: faIR })
                           ) : (
-                            "مهلت این مرحل�� (اختیاری)"
+                            "مهلت این مرحله (اختیاری)"
                           )}
                         </Button>
                       </PopoverTrigger>
