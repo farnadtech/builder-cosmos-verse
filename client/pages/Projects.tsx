@@ -51,7 +51,13 @@ export default function Projects() {
     try {
       setLoading(true);
       const token = localStorage.getItem('zemano_token');
-      
+
+      if (!token) {
+        console.error('Token not found in localStorage');
+        setProjects([]);
+        return;
+      }
+
       const response = await fetch('/api/projects', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -61,6 +67,8 @@ export default function Projects() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Projects response:', data);
+
         // Handle both paginated and non-paginated responses
         const projectsData = data.data?.projects || data.data || [];
 
@@ -77,10 +85,20 @@ export default function Projects() {
 
         setProjects(mappedProjects);
       } else {
-        console.error('خطا در دریافت پروژه‌ها');
+        console.error('خطا در دریافت پروژه‌ها - Status:', response.status);
+        if (response.status === 401) {
+          console.error('Authentication failed - Invalid or expired token');
+          // Clear invalid token
+          localStorage.removeItem('zemano_token');
+          setProjects([]);
+        } else {
+          const errorData = await response.json().catch(() => null);
+          console.error('Error data:', errorData);
+        }
       }
     } catch (error) {
       console.error('خطا در دریافت پروژه‌ها:', error);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
