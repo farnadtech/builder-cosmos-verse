@@ -180,12 +180,19 @@ export default function InviteContractor() {
       return;
     }
 
+    // Check authentication
+    const token = localStorage.getItem('zemano_token');
+    if (!token) {
+      setError('لطفاً دوباره وارد سیستم شوید');
+      return;
+    }
+
     setLoading(true);
     try {
       const fetchFn = window.authenticatedFetch || fetch;
       const headers: HeadersInit = {};
       if (!window.authenticatedFetch) {
-        headers['Authorization'] = `Bearer ${localStorage.getItem('zemano_token')}`;
+        headers['Authorization'] = `Bearer ${token}`;
       }
       headers['Content-Type'] = 'application/json';
 
@@ -303,7 +310,7 @@ export default function InviteContractor() {
               {formData.method === 'email' && (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="emailInput">آدرس ��یمیل مجری</Label>
+                    <Label htmlFor="emailInput">آدرس ایمیل مجری</Label>
                     <Input
                       id="emailInput"
                       type="email"
