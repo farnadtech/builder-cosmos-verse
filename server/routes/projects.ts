@@ -188,7 +188,7 @@ router.get('/:id', authenticateToken, param('id').isInt(), async (req: Authentic
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'شناسه پروژه نامعتبر ا��ت'
+        message: 'شناسه پروژه نامعتبر ا���ت'
       });
     }
 
@@ -748,6 +748,7 @@ router.post('/:id/invite', authenticateToken, requireEmployer, param('id').isInt
 router.get('/invite/:token', async (req, res: Response) => {
   try {
     const { token } = req.params;
+    console.log(`🔗 Fetching project data for invite token: ${token}`);
 
     // Get invite and project info
     const result = await query(`
@@ -762,6 +763,8 @@ router.get('/invite/:token', async (req, res: Response) => {
       JOIN users e ON p.employer_id = e.id
       WHERE pi.invite_token = $1
     `, [token]);
+
+    console.log(`📋 Query result: ${result.rows.length} rows found`);
 
     if (result.rows.length === 0) {
       return res.status(404).json({
@@ -807,7 +810,7 @@ router.get('/invite/:token', async (req, res: Response) => {
 
 شرا��ط عمومی:
 - پرداخت بر اساس مراحل تعریف شده انجام می‌شود
-- رعایت کیفیت و مهلت‌ه��ی تعیین شده الزامی است
+- رعایت کیفیت و مهلت‌های تعیین شده الزامی است
 - در صورت اختلاف، پرونده به داوری ارجاع می‌شود
 - تمام حقوق طرفین محفوظ است
 
