@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { query } from "../database/connection";
+import { query } from "../database/query-wrapper";
 
 interface JWTPayload {
   userId: number;
