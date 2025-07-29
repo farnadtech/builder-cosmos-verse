@@ -137,27 +137,6 @@ export default function AcceptProject() {
     return new Intl.NumberFormat('fa-IR').format(amount) + ' ریال';
   };
 
-  // Always show a test message for debugging
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center p-8 bg-white rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">تست AcceptProject</h1>
-        <p className="mb-2">URL: {window.location.href}</p>
-        <p className="mb-2">Token: {inviteToken || 'No token'}</p>
-        <p className="mb-2">Loading: {loading ? 'true' : 'false'}</p>
-        <p className="mb-2">Error: {error || 'No error'}</p>
-        <p className="mb-2">User: {user ? user.firstName : 'No user'}</p>
-        <p className="mb-2">Project: {project ? project.title : 'No project'}</p>
-        {loading && (
-          <div className="mt-4">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">در حال بارگذاری...</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
