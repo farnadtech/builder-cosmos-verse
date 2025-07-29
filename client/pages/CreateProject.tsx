@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { faIR } from "date-fns/locale";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Milestone {
   id: string;
