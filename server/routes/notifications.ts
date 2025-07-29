@@ -17,7 +17,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     const offset = (Number(page) - 1) * Number(limit);
     let whereConditions = ['user_id = $1'];
-    let queryParams: any[] = [req.user!.id];
+    let queryParams: any[] = [req.user!.userId];
     let paramCount = 1;
 
     if (type !== 'all') {
@@ -92,7 +92,7 @@ router.patch('/:id/read', authenticateToken, [
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'شناسه اعلان نامعتبر است'
+        message: 'شناسه اعلان نامعت��ر است'
       });
     }
 
