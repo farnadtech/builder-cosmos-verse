@@ -59,7 +59,15 @@ export default function InviteContractor() {
 
       if (response.ok) {
         const data = await response.json();
-        const link = `${window.location.origin}/projects/accept/${data.inviteToken}`;
+        console.log('Invite link response:', data);
+
+        const inviteToken = data.data?.inviteToken || data.inviteToken;
+        if (!inviteToken) {
+          setError('خطا در دریافت توکن دعوت');
+          return;
+        }
+
+        const link = `${window.location.origin}/projects/accept/${inviteToken}`;
         setInviteLink(link);
         setFormData(prev => ({
           ...prev,
@@ -77,14 +85,34 @@ export default function InviteContractor() {
   };
 
   const copyInviteLink = async () => {
-    if (!inviteLink) return;
+    if (!inviteLink) {
+      toast.error('لینک موجود نیست');
+      return;
+    }
 
     try {
-      await navigator.clipboard.writeText(inviteLink);
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(inviteLink);
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        const textArea = document.createElement('textarea');
+        textArea.value = inviteLink;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+
       setLinkCopied(true);
       toast.success("لینک کپی شد");
       setTimeout(() => setLinkCopied(false), 2000);
     } catch (err) {
+      console.error('Copy failed:', err);
       toast.error("خطا در کپی لینک");
     }
   };
@@ -137,11 +165,11 @@ export default function InviteContractor() {
   };
 
   // Generate invite link on component mount if method is 'link'
-  useState(() => {
+  useEffect(() => {
     if (formData.method === 'link' && !inviteLink) {
       generateInviteLink();
     }
-  });
+  }, [formData.method, inviteLink]);
 
   return (
     <ProtectedRoute requiredRole={['employer']}>
