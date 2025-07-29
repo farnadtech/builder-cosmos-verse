@@ -62,7 +62,7 @@ export default function CreateProject() {
   const categories = [
     "طراحی وب",
     "توسعه نرم‌افزار",
-    "طراحی گرافیک",
+    "طر��حی گرافیک",
     "تولید محتوا",
     "ترجمه",
     "بازاریابی دیجیتال",
@@ -205,13 +205,23 @@ export default function CreateProject() {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Error parsing response JSON:", jsonError);
+        setErrors({ submit: "خطا در پردازش پاسخ سرور" });
+        return;
+      }
 
       if (response.ok) {
-        const projectId = data.project.id;
-
-        // Navigate to invite contractor page
-        navigate(`/projects/${projectId}/invite`);
+        const projectId = data.project?.id;
+        if (projectId) {
+          // Navigate to invite contractor page
+          navigate(`/projects/${projectId}/invite`);
+        } else {
+          setErrors({ submit: "خطا در دریافت شناسه پروژه" });
+        }
       } else {
         setErrors({ submit: data.message || "خطا در ایجاد پروژه" });
       }
@@ -248,7 +258,7 @@ export default function CreateProject() {
             <CardContent className="space-y-6">
               {/* Project Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">عنوان پروژه *</Label>
+                <Label htmlFor="title">��نوان پروژه *</Label>
                 <Input
                   id="title"
                   value={formData.title}
