@@ -51,7 +51,7 @@ const createProjectValidation = [
   body('milestones').isArray({ min: 1 }).withMessage('حداقل یک مرحله برای پروژ�� تعریف کنید'),
   body('milestones.*.title').trim().isLength({ min: 2 }).withMessage('عنوان مرحله الزامی است'),
   body('milestones.*.amount').isFloat({ min: 1000 }).withMessage('مبلغ مرحله باید حداقل 1,000 ریال باشد'),
-  body('milestones.*.deadline').optional().isISO8601().withMessage('تاریخ پایان مرحله نامعتبر اس��')
+  body('milestones.*.deadline').optional().isISO8601().withMessage('تاریخ پایان مرحله نامعتبر است')
 ];
 
 // Get all projects with filters and pagination
@@ -270,7 +270,7 @@ router.get('/:id', authenticateToken, param('id').isInt(), async (req: Authentic
     console.error('Get project error:', error);
     res.status(500).json({
       success: false,
-      message: 'خطا در دری��فت اطلاعات پروژه'
+      message: 'خطا در دریافت اطلاعات پروژه'
     });
   }
 });
@@ -336,7 +336,7 @@ router.post('/', authenticateToken, requireEmployer, upload.single('attachment')
       await query(
         `INSERT INTO uploads (user_id, original_name, file_path, file_size, mime_type, purpose, reference_id, created_at)
          VALUES ($1, $2, $3, $4, $5, 'project', $6, NOW())`,
-        [req.user!.id, req.file.originalname, req.file.path, req.file.size, req.file.mimetype, projectId]
+        [req.user!.userId, req.file.originalname, req.file.path, req.file.size, req.file.mimetype, projectId]
       );
     }
 
