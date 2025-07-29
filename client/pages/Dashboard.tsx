@@ -115,7 +115,8 @@ export default function Dashboard() {
 
       if (projectsResponse.ok) {
         const projectsData = await projectsResponse.json();
-        setRecentProjects(projectsData.data || []);
+        const projects = projectsData.data || [];
+        setRecentProjects(Array.isArray(projects) ? projects : []);
       }
 
       if (notificationsResponse.ok) {
@@ -243,7 +244,7 @@ export default function Dashboard() {
                 <Button asChild variant="outline">
                   <Link to="/verification">
                     <Settings className="h-4 w-4 mr-2" />
-                    تنظیمات حساب
+                    تنظیمات حسا��
                   </Link>
                 </Button>
               </div>
@@ -326,7 +327,7 @@ export default function Dashboard() {
                         <CardTitle>پروژه‌های اخیر</CardTitle>
                         <Button asChild variant="outline" size="sm">
                           <Link to="/projects">
-                            مشاهد�� همه
+                            مشاهده همه
                           </Link>
                         </Button>
                       </div>
