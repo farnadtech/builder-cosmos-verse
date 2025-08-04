@@ -60,19 +60,28 @@ export default function AcceptProject() {
   console.log("🚀 AcceptProject loaded with token:", inviteToken);
 
   useEffect(() => {
+    console.log("🔗 AcceptProject useEffect - inviteToken:", inviteToken);
+    console.log("🔗 Location pathname:", window.location.pathname);
+    console.log("🔗 URL params:", useParams());
+
     if (inviteToken) {
+      console.log("✅ Valid invite token found, fetching project data...");
       fetchProjectData();
     } else {
+      console.log("❌ No invite token found");
       setError("لینک دعوت نامعتبر است");
       setLoading(false);
     }
   }, [inviteToken]);
 
   const fetchProjectData = async () => {
-    console.log("📡 Fetching project data...");
+    console.log("📡 Fetching project data for token:", inviteToken);
 
     try {
-      const response = await fetch(`/api/projects/invite/${inviteToken}`, {
+      const apiUrl = `/api/projects/invite/${inviteToken}`;
+      console.log("📡 Making request to:", apiUrl);
+
+      const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -80,18 +89,23 @@ export default function AcceptProject() {
       });
 
       console.log("📡 Response status:", response.status);
+      console.log("📡 Response headers:", Object.fromEntries(response.headers));
 
       if (response.ok) {
         const data = await response.json();
         console.log("📡 Response data:", data);
 
         if (data.success && data.data && data.data.project) {
+          console.log("✅ Project data loaded successfully");
           setProject(data.data.project);
         } else {
+          console.log("❌ Invalid response structure:", data);
           setError("خطا در دریافت اطلاعات پروژه");
         }
       } else {
-        const errorData = await response.json();
+        console.log("❌ Request failed with status:", response.status);
+        const errorData = await response.json().catch(() => ({}));
+        console.log("❌ Error data:", errorData);
         setError(errorData.message || "خطا در دریافت اطلاعات پروژه");
       }
     } catch (err) {
