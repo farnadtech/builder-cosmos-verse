@@ -77,7 +77,7 @@ const createProjectValidation = [
   body("budget")
     .isFloat({ min: 10000 })
     .withMessage("بودجه پروژه باید حداقل 10,000 ریال باشد"),
-  body("deadline").isISO8601().withMessage("تاریخ پایان پروژه نامعتبر است"),
+  body("deadline").isISO8601().withMessage("تاریخ پای��ن پروژه نامعتبر است"),
   body("milestones")
     .isArray({ min: 1 })
     .withMessage("حداقل یک مرحله برای پروژ�� تعریف کنید"),
@@ -956,10 +956,10 @@ router.get("/invite/:token", async (req, res: Response) => {
 - ارائه گزارش پیشرفت به‌موقع
 - رعایت استانداردهای کیفی
 
-مسئولیت‌های کارفرما:
+مسئولیت‌��ای کارفرما:
 - پرداخت به‌موقع طبق مراحل تعریف شده
 - ارائه اطلاعات و منابع مورد نیاز
-- بازخورد سریع به درخ��است‌های مجری`,
+- بازخورد سریع به درخ��است‌ها�� مجری`,
     };
 
     res.json({
@@ -977,12 +977,10 @@ router.get("/invite/:token", async (req, res: Response) => {
   }
 });
 
-// Accept project invitation (contractor only)
+// Accept project invitation with registration (public endpoint)
 router.post(
   "/accept/:token",
-  authenticateToken,
-  requireContractor,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req, res: Response) => {
     try {
       const { token } = req.params;
 
