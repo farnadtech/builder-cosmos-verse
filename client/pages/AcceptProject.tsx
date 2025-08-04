@@ -69,10 +69,20 @@ export default function AcceptProject() {
   }, [inviteToken]);
 
   const fetchProjectData = async () => {
-    console.log("📡 Fetching project data...");
+    console.log("📡 Fetching project data for token:", inviteToken);
+
+    if (!inviteToken) {
+      console.error("❌ No invite token provided");
+      setError("لینک دعوت نامعتبر است");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await fetch(`/api/projects/invite/${inviteToken}`, {
+      const url = `/api/projects/invite/${inviteToken}`;
+      console.log("📡 Making request to:", url);
+
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -183,7 +193,7 @@ export default function AcceptProject() {
           <Alert className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              برای پذیرش این پروژه باید ابتدا وارد سیستم شوید یا ثبت‌نام کنید.
+              برای پذیرش این پروژه باید ابتدا وارد سیستم شوید ی�� ثبت‌نام کنید.
             </AlertDescription>
           </Alert>
         )}
