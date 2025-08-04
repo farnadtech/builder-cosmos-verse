@@ -111,7 +111,7 @@ export default function AcceptProject() {
     setAccepting(true);
     try {
       const token = localStorage.getItem("zemano_token");
-      const response = await fetch(`/api/projects/accept/${actualToken}`, {
+      const response = await fetch(`/api/projects/accept/${inviteToken}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -273,7 +273,7 @@ export default function AcceptProject() {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>پروژه‌های تکمیل شده:</span>
+                    <span>پروژه‌های تک��یل شده:</span>
                     <span className="font-medium">
                       {project.employer.completedProjects}
                     </span>
