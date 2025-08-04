@@ -28,6 +28,9 @@ export default function AcceptProject() {
   const [error, setError] = useState<string | null>(null);
   const [accepting, setAccepting] = useState(false);
 
+  console.log("AcceptProject component loaded with token:", inviteToken);
+  console.log("Current location:", window.location.href);
+
   useEffect(() => {
     const fetchInviteData = async () => {
       try {
