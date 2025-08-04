@@ -67,9 +67,13 @@ export default function AcceptProject() {
   }
 
   useEffect(() => {
+    console.log("🚀 useEffect triggered with inviteToken:", inviteToken);
+
     if (inviteToken) {
+      console.log("✅ Token exists, calling fetchProjectData");
       fetchProjectData();
     } else {
+      console.error("❌ No token, setting error");
       setError("لینک دعوت نامعتبر است");
       setLoading(false);
     }
@@ -107,7 +111,7 @@ export default function AcceptProject() {
           console.log("✅ Project data loaded successfully");
           setProject(data.data.project);
         } else {
-          console.error("�� Invalid response structure:", data);
+          console.error("❌ Invalid response structure:", data);
           setError("خطا در دریافت اطلاعات پروژه");
         }
       } else {
@@ -146,7 +150,7 @@ export default function AcceptProject() {
         navigate(`/projects/${project?.id}`);
       } else {
         const errorData = await response.json();
-        setError(errorData.message || "خطا در پذیرش پر��ژه");
+        setError(errorData.message || "خطا در پذیرش پروژه");
       }
     } catch (err) {
       setError("خطا در پذیرش پروژه");
