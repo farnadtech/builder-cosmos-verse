@@ -49,11 +49,14 @@ export default function AcceptProject() {
         console.log("Response data:", data);
 
         if (data.success) {
+          console.log("Project data received:", data.data.project);
           setProject(data.data.project);
         } else {
+          console.log("API error:", data.message);
           setError(data.message || "دعوت‌نامه معتبر نیست");
         }
       } catch (err) {
+        console.error("Fetch error:", err);
         setError("خطا در بارگذاری اطلاعات دعوت");
       } finally {
         setLoading(false);
