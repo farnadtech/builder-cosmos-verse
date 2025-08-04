@@ -64,6 +64,15 @@ export async function initializeSQLiteDatabase(): Promise<void> {
       console.log('👤 Admin user already exists');
     }
 
+    // Fix database file permissions
+    const dbPath = path.join(process.cwd(), 'data', 'zemano.db');
+    try {
+      fs.chmodSync(dbPath, 0o666);
+      console.log('✅ Database file permissions set to writable');
+    } catch (permError) {
+      console.warn('⚠️ Could not set database file permissions:', permError.message);
+    }
+
     console.log('🎉 SQLite database initialization completed!');
 
   } catch (error) {
