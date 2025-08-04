@@ -28,6 +28,12 @@ export default function Register() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if this is an invite flow
+  const isInviteFlow = location.state?.isInviteFlow;
+  const inviteToken = location.state?.inviteToken;
+  const projectId = location.state?.projectId;
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -235,7 +241,7 @@ export default function Register() {
                     <Input
                       id="passwordRegister"
                       type={showPassword ? "text" : "password"}
-                      placeholder="رمز عبور قوی انتخاب کنید"
+                      placeholder="رم�� عبور قوی انتخاب کنید"
                       value={formData.password}
                       onChange={(e) => handleInputChange("password", e.target.value)}
                       className="pr-10 pl-10"
