@@ -137,7 +137,7 @@ export default function AcceptProject() {
     setAccepting(true);
     try {
       const token = localStorage.getItem("zemano_token");
-      const response = await fetch(`/api/projects/accept/${inviteToken}`, {
+      const response = await fetch(`/api/projects/accept/${actualToken}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
