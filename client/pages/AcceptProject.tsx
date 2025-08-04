@@ -81,31 +81,17 @@ export default function AcceptProject() {
 
       console.log("📡 Response status:", response.status);
 
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("📡 Response status:", response.status);
-      console.log("📡 Response headers:", Object.fromEntries(response.headers));
-
       if (response.ok) {
         const data = await response.json();
         console.log("📡 Response data:", data);
 
         if (data.success && data.data && data.data.project) {
-          console.log("✅ Project data loaded successfully");
           setProject(data.data.project);
         } else {
-          console.log("❌ Invalid response structure:", data);
           setError("خطا در دریافت اطلاعات پروژه");
         }
       } else {
-        console.log("❌ Request failed with status:", response.status);
-        const errorData = await response.json().catch(() => ({}));
-        console.log("❌ Error data:", errorData);
+        const errorData = await response.json();
         setError(errorData.message || "خطا در دریافت اطلاعات پروژه");
       }
     } catch (err) {
