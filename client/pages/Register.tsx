@@ -53,7 +53,7 @@ export default function Register() {
       return false;
     }
     if (!formData.phoneNumber.trim()) {
-      toast.error("شماره موبایل الزامی است");
+      toast.error("شماره موبایل ال��امی است");
       return false;
     }
     if (formData.password.length < 8) {
@@ -96,7 +96,13 @@ export default function Register() {
 
       if (result.success) {
         toast.success(result.message);
-        navigate(`/otp-verification?phone=${encodeURIComponent(formData.phoneNumber)}`);
+
+        if (isInviteFlow && inviteToken) {
+          // Navigate to OTP verification with invite context
+          navigate(`/otp-verification?phone=${encodeURIComponent(formData.phoneNumber)}&inviteToken=${inviteToken}&projectId=${projectId}`);
+        } else {
+          navigate(`/otp-verification?phone=${encodeURIComponent(formData.phoneNumber)}`);
+        }
       } else {
         toast.error(result.message);
       }
@@ -265,7 +271,7 @@ export default function Register() {
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="رمز عبور ��ا مجدداً وارد کنید"
+                      placeholder="رمز عبور را مجدداً وارد کنید"
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                       className="pr-10 pl-10"
