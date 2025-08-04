@@ -11,7 +11,24 @@ const getDbPath = () => {
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
   }
-  return path.join(dbDir, 'zemano.db');
+  const dbPath = path.join(dbDir, 'zemano.db');
+
+  // Ensure the database file exists and has write permissions
+  if (fs.existsSync(dbPath)) {
+    try {
+      fs.accessSync(dbPath, fs.constants.W_OK);
+    } catch (error) {
+      console.warn('⚠️ Database file is read-only, attempting to fix permissions...');
+      try {
+        fs.chmodSync(dbPath, 0o666);
+        console.log('✅ Database file permissions fixed');
+      } catch (chmodError) {
+        console.error('❌ Failed to fix database permissions:', chmodError);
+      }
+    }
+  }
+
+  return dbPath;
 };
 
 // Initialize SQLite connection
