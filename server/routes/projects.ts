@@ -55,7 +55,7 @@ const upload = multer({
     if (allowedTypes.includes(fileExt)) {
       cb(null, true);
     } else {
-      cb(new Error("فرمت فایل مجاز نیست"));
+      cb(new Error("فرمت فایل مجا�� نیست"));
     }
   },
 });
@@ -943,7 +943,7 @@ router.get("/invite/:token", async (req, res: Response) => {
         completedProjects: 12, // Mock data
       },
       attachments: [], // TODO: Get actual attachments
-      contractTerms: `قرارداد همکاری برای پروژه "${data.title}"
+      contractTerms: `قرارداد هم��اری برای پروژه "${data.title}"
 
 شرا��ط عمومی:
 - پرداخت بر اساس مراحل تعریف شده انجام می‌شود
@@ -1032,24 +1032,20 @@ router.post(
         });
       }
 
-      // Accept the invitation
+      // For public accept, we just update the invite status but don't assign contractor yet
+      // The contractor assignment will happen after user registers/logs in
       await query(
-        "UPDATE project_invites SET status = 'accepted', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
+        "UPDATE project_invites SET status = 'pending_registration', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
         [token],
       );
 
-      // Update project with contractor and change status to active
-      await query(
-        "UPDATE projects SET contractor_id = $1, status = 'active', updated_at = CURRENT_TIMESTAMP WHERE id = $2",
-        [req.user!.userId, invite.project_id],
-      );
-
-      // TODO: Generate PDF contract
-      // TODO: Send notifications to both parties
-
       res.json({
         success: true,
-        message: "پروژه با موفقیت پذیرش شد",
+        message: "دعوت پذیرش شد. برای ادامه باید وارد حساب کاربری خود شوید یا ثبت نام کنید.",
+        data: {
+          requiresLogin: true,
+          inviteToken: token
+        }
       });
     } catch (error) {
       console.error("Accept project error:", error);
