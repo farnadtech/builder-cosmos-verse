@@ -86,11 +86,11 @@ export default function AcceptProject() {
     }
   }, [actualToken]);
 
-  const fetchProjectData = async () => {
-    console.log("📡 Fetching project data for token:", inviteToken);
+  const fetchProjectData = async (token: string) => {
+    console.log("📡 Fetching project data for token:", token);
 
     try {
-      const apiUrl = `/api/projects/invite/${inviteToken}`;
+      const apiUrl = `/api/projects/invite/${token}`;
       console.log("📡 Making request to:", apiUrl);
 
       const response = await fetch(apiUrl, {
