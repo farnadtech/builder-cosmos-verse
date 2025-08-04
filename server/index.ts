@@ -109,6 +109,11 @@ export function createServer() {
   // Static file serving for uploads
   app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+  // Serve static files for production frontend
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(process.cwd(), "dist/spa")));
+  }
+
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({
