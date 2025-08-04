@@ -37,10 +37,16 @@ export default function AcceptProject() {
         // Use production API endpoint
         const API_BASE_URL = window.location.hostname.includes('bc26f25ef94748d9abb2f5dcb4730530')
           ? window.location.origin
-          : '/api';
+          : '';
+
+        console.log("API_BASE_URL:", API_BASE_URL);
+        console.log("Full API URL:", `${API_BASE_URL}/api/projects/invite/${inviteToken}`);
 
         const response = await fetch(`${API_BASE_URL}/api/projects/invite/${inviteToken}`);
+        console.log("Response status:", response.status);
+
         const data = await response.json();
+        console.log("Response data:", data);
 
         if (data.success) {
           setProject(data.data.project);
