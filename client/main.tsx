@@ -32,7 +32,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <Layout>
+            <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -41,11 +42,11 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/create" element={<CreateProject />} />
+              <Route path="/projects/:id" element={<ProjectDetails />} />
               <Route
                 path="/projects/accept/:inviteToken"
                 element={<AcceptProject />}
               />
-              <Route path="/projects/:id" element={<ProjectDetails />} />
               <Route
                 path="/projects/:projectId/invite"
                 element={<InviteContractor />}
@@ -100,14 +101,15 @@ const App = () => (
                 path="/terms"
                 element={
                   <PlaceholderPage
-                    title="قوانین و ��قررات"
+                    title="قوانین و مقررات"
                     description="شرایط و قوانین استفاده"
                   />
                 }
               />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
-          </Routes>
+            </Routes>
+          </Layout>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
