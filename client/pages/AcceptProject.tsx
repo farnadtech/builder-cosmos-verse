@@ -57,7 +57,14 @@ export default function AcceptProject() {
   const [error, setError] = useState("");
   const [project, setProject] = useState<ProjectData | null>(null);
 
-  console.log("🚀 AcceptProject loaded with token:", inviteToken);
+  console.log("🚀 AcceptProject COMPONENT RENDERED");
+  console.log("🚀 Invite token from params:", inviteToken);
+  console.log("🚀 Current user:", user);
+
+  // Add a simple test message to the page
+  if (!inviteToken) {
+    console.error("❌ No invite token in URL params!");
+  }
 
   useEffect(() => {
     if (inviteToken) {
@@ -100,7 +107,7 @@ export default function AcceptProject() {
           console.log("✅ Project data loaded successfully");
           setProject(data.data.project);
         } else {
-          console.error("❌ Invalid response structure:", data);
+          console.error("�� Invalid response structure:", data);
           setError("خطا در دریافت اطلاعات پروژه");
         }
       } else {
@@ -139,7 +146,7 @@ export default function AcceptProject() {
         navigate(`/projects/${project?.id}`);
       } else {
         const errorData = await response.json();
-        setError(errorData.message || "خطا در پذیرش پروژه");
+        setError(errorData.message || "خطا در پذیرش پر��ژه");
       }
     } catch (err) {
       setError("خطا در پذیرش پروژه");
