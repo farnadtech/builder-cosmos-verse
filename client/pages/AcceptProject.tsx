@@ -62,7 +62,12 @@ export default function AcceptProject() {
   const handleAcceptInvite = async () => {
     setAccepting(true);
     try {
-      const response = await fetch(`/api/projects/accept/${inviteToken}`, {
+      // Use production API endpoint
+      const API_BASE_URL = window.location.hostname.includes('bc26f25ef94748d9abb2f5dcb4730530')
+        ? window.location.origin
+        : '/api';
+
+      const response = await fetch(`${API_BASE_URL}/api/projects/accept/${inviteToken}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
