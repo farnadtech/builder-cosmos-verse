@@ -1,12 +1,28 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Shield, Eye, EyeOff, Phone, Lock, User, Mail, Briefcase, UserCheck } from "lucide-react";
+import {
+  Shield,
+  Eye,
+  EyeOff,
+  Phone,
+  Lock,
+  User,
+  Mail,
+  Briefcase,
+  UserCheck,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -23,7 +39,7 @@ export default function Register() {
     confirmPassword: "",
     userRole: isInviteFlow ? "contractor" : "employer", // "employer" or "contractor"
     agreeToTerms: false,
-    agreeToNewsletters: false
+    agreeToNewsletters: false,
   });
 
   const { register } = useAuth();
@@ -36,7 +52,7 @@ export default function Register() {
   const projectId = location.state?.projectId;
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const validateForm = () => {
@@ -91,7 +107,7 @@ export default function Register() {
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
-        role: formData.userRole
+        role: formData.userRole,
       });
 
       if (result.success) {
@@ -99,9 +115,13 @@ export default function Register() {
 
         if (isInviteFlow && inviteToken) {
           // Navigate to OTP verification with invite context
-          navigate(`/otp-verification?phone=${encodeURIComponent(formData.phoneNumber)}&inviteToken=${inviteToken}&projectId=${projectId}`);
+          navigate(
+            `/otp-verification?phone=${encodeURIComponent(formData.phoneNumber)}&inviteToken=${inviteToken}&projectId=${projectId}`,
+          );
         } else {
-          navigate(`/otp-verification?phone=${encodeURIComponent(formData.phoneNumber)}`);
+          navigate(
+            `/otp-verification?phone=${encodeURIComponent(formData.phoneNumber)}`,
+          );
         }
       } else {
         toast.error(result.message);
@@ -145,7 +165,9 @@ export default function Register() {
                 {/* Name Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-right block">نام</Label>
+                    <Label htmlFor="firstName" className="text-right block">
+                      نام
+                    </Label>
                     <div className="relative">
                       <User className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -153,20 +175,26 @@ export default function Register() {
                         type="text"
                         placeholder="نام خود را وارد کنید"
                         value={formData.firstName}
-                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("firstName", e.target.value)
+                        }
                         className="pr-10"
                         required
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-right block">نام خانوادگی</Label>
+                    <Label htmlFor="lastName" className="text-right block">
+                      نام خانوادگی
+                    </Label>
                     <Input
                       id="lastName"
                       type="text"
                       placeholder="نام خانوادگی"
                       value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("lastName", e.target.value)
+                      }
                       required
                     />
                   </div>
@@ -174,7 +202,9 @@ export default function Register() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-right block">آدرس ایمیل</Label>
+                  <Label htmlFor="email" className="text-right block">
+                    آدرس ایمیل
+                  </Label>
                   <div className="relative">
                     <Mail className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -182,7 +212,9 @@ export default function Register() {
                       type="email"
                       placeholder="example@email.com"
                       value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
                       className="pr-10 text-left"
                       dir="ltr"
                       required
@@ -192,7 +224,9 @@ export default function Register() {
 
                 {/* Phone Number */}
                 <div className="space-y-2">
-                  <Label htmlFor="phoneRegister" className="text-right block">شماره موبایل</Label>
+                  <Label htmlFor="phoneRegister" className="text-right block">
+                    شماره موبایل
+                  </Label>
                   <div className="relative">
                     <Phone className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -200,7 +234,9 @@ export default function Register() {
                       type="tel"
                       placeholder="۰۹۱۲۳۴۵۶۷۸۹"
                       value={formData.phoneNumber}
-                      onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("phoneNumber", e.target.value)
+                      }
                       className="pr-10 text-right"
                       dir="ltr"
                       required
@@ -213,7 +249,9 @@ export default function Register() {
                   <Label className="text-right block">نقش کاربری</Label>
                   <RadioGroup
                     value={formData.userRole}
-                    onValueChange={(value) => handleInputChange("userRole", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("userRole", value)
+                    }
                     className="space-y-3"
                   >
                     <div className="flex items-center space-x-2 rtl:space-x-reverse p-3 rounded-lg border hover:bg-muted/50 transition-colors">
@@ -221,8 +259,15 @@ export default function Register() {
                       <div className="flex items-center space-x-2 rtl:space-x-reverse flex-1">
                         <Briefcase className="h-4 w-4 text-zemano-600" />
                         <div>
-                          <Label htmlFor="employer" className="font-medium cursor-pointer">کارفرما</Label>
-                          <p className="text-xs text-muted-foreground">پروژه ایجاد می‌کنم و مجری استخدام می‌کنم</p>
+                          <Label
+                            htmlFor="employer"
+                            className="font-medium cursor-pointer"
+                          >
+                            کارفرما
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            پروژه ایجاد می‌کنم و مجری استخدام می‌کنم
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -231,8 +276,15 @@ export default function Register() {
                       <div className="flex items-center space-x-2 rtl:space-x-reverse flex-1">
                         <UserCheck className="h-4 w-4 text-trust-600" />
                         <div>
-                          <Label htmlFor="contractor" className="font-medium cursor-pointer">مجری</Label>
-                          <p className="text-xs text-muted-foreground">پروژه‌ها را انجام می‌دهم و درآمد کسب می‌کنم</p>
+                          <Label
+                            htmlFor="contractor"
+                            className="font-medium cursor-pointer"
+                          >
+                            مجری
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            پروژه‌ها را انجام می‌دهم و درآمد کسب می‌کنم
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -241,7 +293,12 @@ export default function Register() {
 
                 {/* Password */}
                 <div className="space-y-2">
-                  <Label htmlFor="passwordRegister" className="text-right block">رمز عبور</Label>
+                  <Label
+                    htmlFor="passwordRegister"
+                    className="text-right block"
+                  >
+                    رمز عبور
+                  </Label>
                   <div className="relative">
                     <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -249,7 +306,9 @@ export default function Register() {
                       type={showPassword ? "text" : "password"}
                       placeholder="رمز عبور قوی انتخاب کنید"
                       value={formData.password}
-                      onChange={(e) => handleInputChange("password", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("password", e.target.value)
+                      }
                       className="pr-10 pl-10"
                       required
                     />
@@ -258,14 +317,20 @@ export default function Register() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute left-3 top-3 text-muted-foreground hover:text-foreground"
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </div>
 
                 {/* Confirm Password */}
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-right block">تکرار رمز عبور</Label>
+                  <Label htmlFor="confirmPassword" className="text-right block">
+                    تکرار رمز عبور
+                  </Label>
                   <div className="relative">
                     <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -273,16 +338,24 @@ export default function Register() {
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="رمز عبور را مجدداً وارد کنید"
                       value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("confirmPassword", e.target.value)
+                      }
                       className="pr-10 pl-10"
                       required
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute left-3 top-3 text-muted-foreground hover:text-foreground"
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -293,31 +366,50 @@ export default function Register() {
                     <Checkbox
                       id="terms"
                       checked={formData.agreeToTerms}
-                      onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked === true)}
+                      onCheckedChange={(checked) =>
+                        handleInputChange("agreeToTerms", checked === true)
+                      }
                       className="mt-1"
                       required
                     />
-                    <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
+                    <Label
+                      htmlFor="terms"
+                      className="text-sm leading-relaxed cursor-pointer"
+                    >
                       با{" "}
-                      <Link to="/terms" className="text-zemano-600 hover:underline">
+                      <Link
+                        to="/terms"
+                        className="text-zemano-600 hover:underline"
+                      >
                         قوانین و مقررات
                       </Link>{" "}
                       و{" "}
-                      <Link to="/privacy" className="text-zemano-600 hover:underline">
+                      <Link
+                        to="/privacy"
+                        className="text-zemano-600 hover:underline"
+                      >
                         حریم خصو��ی
                       </Link>{" "}
                       ضمانو موافقم
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-start space-x-2 rtl:space-x-reverse">
                     <Checkbox
                       id="newsletter"
                       checked={formData.agreeToNewsletters}
-                      onCheckedChange={(checked) => handleInputChange("agreeToNewsletters", checked === true)}
+                      onCheckedChange={(checked) =>
+                        handleInputChange(
+                          "agreeToNewsletters",
+                          checked === true,
+                        )
+                      }
                       className="mt-1"
                     />
-                    <Label htmlFor="newsletter" className="text-sm leading-relaxed cursor-pointer">
+                    <Label
+                      htmlFor="newsletter"
+                      className="text-sm leading-relaxed cursor-pointer"
+                    >
                       مایل به دریافت اخبار و پیشنهادات ضمانو هستم
                     </Label>
                   </div>
@@ -336,8 +428,8 @@ export default function Register() {
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground">
                     قبلاً حساب دارید؟{" "}
-                    <Link 
-                      to="/login" 
+                    <Link
+                      to="/login"
                       className="text-zemano-600 hover:text-zemano-700 font-medium hover:underline"
                     >
                       وارد شوید

@@ -1,10 +1,22 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, User, DollarSign, Clock, CheckCircle } from "lucide-react";
+import {
+  CalendarDays,
+  User,
+  DollarSign,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
 
 interface Project {
   id: number;
@@ -35,14 +47,21 @@ export default function AcceptProject() {
     const fetchInviteData = async () => {
       try {
         // Use production API endpoint
-        const API_BASE_URL = window.location.hostname.includes('bc26f25ef94748d9abb2f5dcb4730530')
+        const API_BASE_URL = window.location.hostname.includes(
+          "bc26f25ef94748d9abb2f5dcb4730530",
+        )
           ? window.location.origin
-          : '';
+          : "";
 
         console.log("API_BASE_URL:", API_BASE_URL);
-        console.log("Full API URL:", `${API_BASE_URL}/api/projects/invite/${inviteToken}`);
+        console.log(
+          "Full API URL:",
+          `${API_BASE_URL}/api/projects/invite/${inviteToken}`,
+        );
 
-        const response = await fetch(`${API_BASE_URL}/api/projects/invite/${inviteToken}`);
+        const response = await fetch(
+          `${API_BASE_URL}/api/projects/invite/${inviteToken}`,
+        );
         console.log("Response status:", response.status);
 
         const data = await response.json();
@@ -77,16 +96,21 @@ export default function AcceptProject() {
     setAccepting(true);
     try {
       // Use production API endpoint
-      const API_BASE_URL = window.location.hostname.includes('bc26f25ef94748d9abb2f5dcb4730530')
+      const API_BASE_URL = window.location.hostname.includes(
+        "bc26f25ef94748d9abb2f5dcb4730530",
+      )
         ? window.location.origin
-        : '';
+        : "";
 
-      const response = await fetch(`${API_BASE_URL}/api/projects/accept/${inviteToken}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${API_BASE_URL}/api/projects/accept/${inviteToken}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       const data = await response.json();
 
@@ -98,15 +122,15 @@ export default function AcceptProject() {
               message: data.message,
               inviteToken: inviteToken,
               projectId: project?.id,
-              isInviteFlow: true
+              isInviteFlow: true,
             },
           });
         } else {
           // User was already logged in and project was assigned
           navigate(`/projects/${project?.id}`, {
             state: {
-              message: "پروژه با موفقیت پذیرش شد!"
-            }
+              message: "پروژه با موفقیت پذیرش شد!",
+            },
           });
         }
       } else {
@@ -242,7 +266,7 @@ export default function AcceptProject() {
                   </>
                 )}
               </Button>
-              
+
               <Button
                 variant="outline"
                 onClick={() => navigate("/")}
@@ -254,8 +278,9 @@ export default function AcceptProject() {
 
             <Alert>
               <AlertDescription>
-                با پذیرش این دعوت، شما متعهد می‌شوید که پروژه را طبق شرایط مشخص شده انجام دهید.
-                در صورت عدم وجود حساب کاربری، پس از پذیرش دعوت به صفحه ثبت نام هدایت خواهید شد.
+                با پذیرش این دعوت، شما متعهد می‌شوید که پروژه را طبق شرایط مشخص
+                شده انجام دهید. در صورت عدم وجود حساب کاربری، پس از پذیرش دعوت
+                به صفحه ثبت نام هدایت خواهید شد.
               </AlertDescription>
             </Alert>
           </CardContent>

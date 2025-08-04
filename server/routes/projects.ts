@@ -978,15 +978,13 @@ router.get("/invite/:token", async (req, res: Response) => {
 });
 
 // Accept project invitation with registration (public endpoint)
-router.post(
-  "/accept/:token",
-  async (req, res: Response) => {
-    try {
-      const { token } = req.params;
+router.post("/accept/:token", async (req, res: Response) => {
+  try {
+    const { token } = req.params;
 
-      // Get invite and project info
-      const result = await query(
-        `
+    // Get invite and project info
+    const result = await query(
+      `
       SELECT
         pi.*,
         p.id as project_id,
@@ -996,69 +994,72 @@ router.post(
       JOIN projects p ON pi.project_id = p.id
       WHERE pi.invite_token = $1
     `,
-        [token],
-      );
+      [token],
+    );
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "لینک دعوت نامعتبر است",
-        });
-      }
-
-      const invite = result.rows[0];
-
-      // Check if invite is expired
-      if (new Date() > new Date(invite.expires_at)) {
-        return res.status(400).json({
-          success: false,
-          message: "لینک دعوت منقضی شده است",
-        });
-      }
-
-      // Check if invite is already accepted
-      if (invite.status === "accepted") {
-        return res.status(400).json({
-          success: false,
-          message: "این دعوت قبلاً پذیرش شده است",
-        });
-      }
-
-      // Check if project is still waiting for acceptance OR already in pending registration
-      if (invite.project_status !== "waiting_for_acceptance" && invite.status !== "pending_registration") {
-        return res.status(400).json({
-          success: false,
-          message: "این پروژه دیگر قابل پذیرش نیست",
-        });
-      }
-
-      // For public accept, we just update the invite status but don't assign contractor yet
-      // The contractor assignment will happen after user registers/logs in
-      // Only update if not already pending_registration
-      if (invite.status !== "pending_registration") {
-        await query(
-          "UPDATE project_invites SET status = 'pending_registration', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
-          [token],
-        );
-      }
-
-      res.json({
-        success: true,
-        message: "دعوت پذیرش شد. برای ادامه باید وارد حساب کاربری خود شوید یا ثبت نام کنید.",
-        data: {
-          requiresLogin: true,
-          inviteToken: token
-        }
-      });
-    } catch (error) {
-      console.error("Accept project error:", error);
-      res.status(500).json({
+    if (result.rows.length === 0) {
+      return res.status(404).json({
         success: false,
-        message: "خطا د�� پذیرش پروژه",
+        message: "لینک دعوت نامعتبر است",
       });
     }
-  },
-);
+
+    const invite = result.rows[0];
+
+    // Check if invite is expired
+    if (new Date() > new Date(invite.expires_at)) {
+      return res.status(400).json({
+        success: false,
+        message: "لینک دعوت منقضی شده است",
+      });
+    }
+
+    // Check if invite is already accepted
+    if (invite.status === "accepted") {
+      return res.status(400).json({
+        success: false,
+        message: "این دعوت قبلاً پذیرش شده است",
+      });
+    }
+
+    // Check if project is still waiting for acceptance OR already in pending registration
+    if (
+      invite.project_status !== "waiting_for_acceptance" &&
+      invite.status !== "pending_registration"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "این پروژه دیگر قابل پذیرش نیست",
+      });
+    }
+
+    // For public accept, we just update the invite status but don't assign contractor yet
+    // The contractor assignment will happen after user registers/logs in
+    // Only update if not already pending_registration
+    if (invite.status !== "pending_registration") {
+      await query(
+        "UPDATE project_invites SET status = 'pending_registration', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
+        [token],
+      );
+    }
+
+    res.json({
+      success: true,
+      message:
+        "دعوت پذیرش شد. برای ادامه باید وارد حساب کاربری خود شوید یا ثبت نام کنید.",
+      data: {
+        requiresLogin: true,
+        inviteToken: token,
+      },
+    });
+  } catch (error) {
+    console.error("Accept project error:", error);
+    res.status(500).json({
+      success: false,
+      message: "خطا د�� پذیرش پروژه",
+    });
+  }
+});
 
 // Finalize project invite after user registration and verification
 router.post(
@@ -1117,8 +1118,8 @@ router.post(
         success: true,
         message: "پروژه با موفقیت به شما تخصیص یافت",
         data: {
-          projectId: invite.project_id
-        }
+          projectId: invite.project_id,
+        },
       });
     } catch (error) {
       console.error("Finalize invite error:", error);
