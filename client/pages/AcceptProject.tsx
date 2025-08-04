@@ -49,7 +49,8 @@ interface ProjectData {
 }
 
 export default function AcceptProject() {
-  const { inviteToken } = useParams();
+  const params = useParams();
+  const { inviteToken } = params;
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -57,7 +58,18 @@ export default function AcceptProject() {
   const [error, setError] = useState("");
   const [project, setProject] = useState<ProjectData | null>(null);
 
-  console.log("🚀 AcceptProject loaded with token:", inviteToken);
+  // Multiple debugging strategies
+  console.log("🚀 AcceptProject loaded");
+  console.log("🔍 All params:", params);
+  console.log("🔍 inviteToken from params:", inviteToken);
+  console.log("🔍 window.location:", window.location);
+  console.log("🔍 window.location.pathname:", window.location.pathname);
+
+  // Fallback: extract token manually from URL if useParams fails
+  const urlToken = window.location.pathname.split("/").pop();
+  console.log("🔍 Manual token extraction:", urlToken);
+
+  const actualToken = inviteToken || urlToken;
 
   useEffect(() => {
     console.log("🔗 AcceptProject useEffect - inviteToken:", inviteToken);
