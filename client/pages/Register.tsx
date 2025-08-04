@@ -21,7 +21,7 @@ export default function Register() {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
-    userRole: "employer", // "employer" or "contractor"
+    userRole: isInviteFlow ? "contractor" : "employer", // "employer" or "contractor"
     agreeToTerms: false,
     agreeToNewsletters: false
   });
@@ -241,7 +241,7 @@ export default function Register() {
                     <Input
                       id="passwordRegister"
                       type={showPassword ? "text" : "password"}
-                      placeholder="رم�� عبور قوی انتخاب کنید"
+                      placeholder="رمز عبور قوی انتخاب کنید"
                       value={formData.password}
                       onChange={(e) => handleInputChange("password", e.target.value)}
                       className="pr-10 pl-10"
@@ -265,7 +265,7 @@ export default function Register() {
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="رمز عبور را مجدداً وارد کنید"
+                      placeholder="رمز عبور ��ا مجدداً وارد کنید"
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                       className="pr-10 pl-10"
