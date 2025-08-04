@@ -32,8 +32,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Layout>
-            <Routes>
+          <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -101,15 +100,14 @@ const App = () => (
                 path="/terms"
                 element={
                   <PlaceholderPage
-                    title="قوانین و مقررات"
+                    title="قوانین و ��قررات"
                     description="شرایط و قوانین استفاده"
                   />
                 }
               />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+          </Routes>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
