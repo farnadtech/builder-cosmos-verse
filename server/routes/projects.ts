@@ -69,7 +69,7 @@ const createProjectValidation = [
   body("description")
     .trim()
     .isLength({ min: 20 })
-    .withMessage("توضیحات پروژه باید حداقل 20 کاراکتر باشد"),
+    .withMessage("توضیحات پروژه باید ��داقل 20 کاراکتر باشد"),
   body("category")
     .trim()
     .isLength({ min: 2, max: 100 })
@@ -378,7 +378,7 @@ router.post(
       if (Math.abs(totalMilestoneAmount - parseFloat(budget)) > 0.01) {
         return res.status(400).json({
           success: false,
-          message: "مجموع م����لغ مراحل باید برابر بودجه کل پروژه باشد",
+          message: "مجموع مب��لغ مراحل باید برابر بودجه کل پروژه باشد",
         });
       }
 
@@ -550,7 +550,7 @@ router.post(
         [
           project.employer_id,
           "درخواست جدید برای پروژه",
-          `درخواست جدیدی برای پروژه "${project.title}" د����افت شد`,
+          `درخواست جدیدی برای پروژه "${project.title}" د��یافت شد`,
           JSON.stringify({ projectId, contractorId: req.user!.userId }),
         ],
       );
@@ -1024,8 +1024,8 @@ router.post(
         });
       }
 
-      // Check if project is still waiting for acceptance
-      if (invite.project_status !== "waiting_for_acceptance") {
+      // Check if project is still waiting for acceptance OR already in pending registration
+      if (invite.project_status !== "waiting_for_acceptance" && invite.status !== "pending_registration") {
         return res.status(400).json({
           success: false,
           message: "این پروژه دیگر قابل پذیرش نیست",
