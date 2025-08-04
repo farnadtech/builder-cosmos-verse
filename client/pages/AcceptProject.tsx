@@ -31,7 +31,12 @@ export default function AcceptProject() {
   useEffect(() => {
     const fetchInviteData = async () => {
       try {
-        const response = await fetch(`/api/projects/invite/${inviteToken}`);
+        // Use production API endpoint
+        const API_BASE_URL = window.location.hostname.includes('bc26f25ef94748d9abb2f5dcb4730530')
+          ? window.location.origin
+          : '/api';
+
+        const response = await fetch(`${API_BASE_URL}/api/projects/invite/${inviteToken}`);
         const data = await response.json();
 
         if (data.success) {
