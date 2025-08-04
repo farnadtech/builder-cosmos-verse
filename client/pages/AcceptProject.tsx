@@ -91,12 +91,24 @@ export default function AcceptProject() {
       const data = await response.json();
 
       if (data.success) {
-        navigate("/login", {
-          state: {
-            message: "دعوت با موفقیت پذیرفته شد. لطفاً وارد شوید.",
-            redirectTo: `/projects/${project?.id}`,
-          },
-        });
+        if (data.data?.requiresLogin) {
+          // User needs to login/register to complete the process
+          navigate("/register", {
+            state: {
+              message: data.message,
+              inviteToken: inviteToken,
+              projectId: project?.id,
+              isInviteFlow: true
+            },
+          });
+        } else {
+          // User was already logged in and project was assigned
+          navigate(`/projects/${project?.id}`, {
+            state: {
+              message: "پروژه با موفقیت پذیرش شد!"
+            }
+          });
+        }
       } else {
         setError(data.message || "خطا در پذیرش دعوت");
       }
