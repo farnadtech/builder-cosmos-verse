@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Shield, CheckCircle, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -26,6 +32,8 @@ export default function OTPVerification() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const phoneNumber = searchParams.get("phone") || user?.phoneNumber || "";
+  const inviteToken = searchParams.get("inviteToken");
+  const projectId = searchParams.get("projectId");
 
   // Countdown timer for resend button
   useEffect(() => {
@@ -63,11 +71,45 @@ export default function OTPVerification() {
 
       if (result.success) {
         toast.success("شماره موبایل با موفقیت تأیید شد");
-        // Check if user needs identity verification
-        if (user?.role === 'employer') {
-          navigate("/verification");
+
+        // Handle invite flow after verification
+        if (inviteToken && projectId) {
+          try {
+            // Use global authenticated fetch if available
+            const fetchFunction = window.authenticatedFetch || fetch;
+
+            // Finalize the project invite
+            const finalizeResponse = await fetchFunction(
+              `/api/projects/finalize-invite/${inviteToken}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("zemano_token")}`,
+                },
+              },
+            );
+
+            const finalizeData = await finalizeResponse.json();
+
+            if (finalizeData.success) {
+              toast.success("پروژه با موفقیت به شما تخصیص یافت!");
+              navigate(`/projects/${projectId}`);
+            } else {
+              toast.error("خطا در تخصیص پروژه");
+              navigate("/dashboard");
+            }
+          } catch (error) {
+            toast.error("خطا در تکمیل فرآیند دعوت");
+            navigate("/dashboard");
+          }
         } else {
-          navigate("/dashboard");
+          // Normal flow - check if user needs identity verification
+          if (user?.role === "employer") {
+            navigate("/verification");
+          } else {
+            navigate("/dashboard");
+          }
         }
       } else {
         setError(result.message);
@@ -103,10 +145,10 @@ export default function OTPVerification() {
 
   const formatPhoneNumber = (phone: string) => {
     // Format +989123456789 to 0912***6789
-    if (phone.startsWith('+98')) {
+    if (phone.startsWith("+98")) {
       const number = phone.substring(3);
       return `${number.substring(0, 4)}***${number.substring(7)}`;
-    } else if (phone.startsWith('09')) {
+    } else if (phone.startsWith("09")) {
       return `${phone.substring(0, 4)}***${phone.substring(7)}`;
     }
     return phone;
@@ -126,7 +168,7 @@ export default function OTPVerification() {
                 ضمانو
               </span>
             </div>
-            <h1 className="text-2xl font-bold">تأیید شماره موبایل</h1>
+            <h1 className="text-2xl font-bold">تأی��د شماره موبایل</h1>
             <p className="text-muted-foreground mt-2">
               کد تأی��د ارسال شده را وارد کنید
             </p>
@@ -198,7 +240,7 @@ export default function OTPVerification() {
                 <p className="text-sm text-muted-foreground">
                   کد را دریافت نکردید؟
                 </p>
-                
+
                 {canResend ? (
                   <Button
                     variant="outline"

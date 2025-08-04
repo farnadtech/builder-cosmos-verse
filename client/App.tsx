@@ -42,14 +42,14 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/create" element={<CreateProject />} />
+              <Route
+                path="/projects/accept/:inviteToken"
+                element={<AcceptProject />}
+              />
               <Route path="/projects/:id" element={<ProjectDetails />} />
               <Route
                 path="/projects/:projectId/invite"
                 element={<InviteContractor />}
-              />
-              <Route
-                path="/projects/accept/:inviteToken"
-                element={<AcceptProject />}
               />
               <Route
                 path="/wallet"

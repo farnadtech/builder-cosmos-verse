@@ -69,7 +69,7 @@ const createProjectValidation = [
   body("description")
     .trim()
     .isLength({ min: 20 })
-    .withMessage("توضیحات پروژه باید حداقل 20 کاراکتر باشد"),
+    .withMessage("توضیحات پروژه باید ��داقل 20 کاراکتر باشد"),
   body("category")
     .trim()
     .isLength({ min: 2, max: 100 })
@@ -77,7 +77,7 @@ const createProjectValidation = [
   body("budget")
     .isFloat({ min: 10000 })
     .withMessage("بودجه پروژه باید حداقل 10,000 ریال باشد"),
-  body("deadline").isISO8601().withMessage("تاریخ پایان پروژه نامعتبر است"),
+  body("deadline").isISO8601().withMessage("تاریخ پای��ن پروژه نامعتبر است"),
   body("milestones")
     .isArray({ min: 1 })
     .withMessage("حداقل یک مرحله برای پروژ�� تعریف کنید"),
@@ -949,17 +949,17 @@ router.get("/invite/:token", async (req, res: Response) => {
 - پرداخت بر اساس مراحل تعریف شده انجام می‌شود
 - رعایت کیفیت و مهلت‌های تعیین شده الزامی است
 - در صورت اختلاف، پرونده به داوری ارجاع می‌شود
-- تمام حقوق طرفین محفوظ است
+- ��مام حقوق طرفین محفوظ است
 
 مسئولیت‌های مجری:
 - اجرای پروژه طبق مشخصات ارائه شده
 - ارائه گزارش پیشرفت به‌موقع
 - رعایت استانداردهای کیفی
 
-مسئولیت‌های کارفرما:
+مسئولیت����ای کارفرما:
 - پرداخت به‌موقع طبق مراحل تعریف شده
 - ارائه اطلاعات و منابع مورد نیاز
-- بازخورد سریع به درخ��است‌های مجری`,
+- بازخورد سریع به درخ��است‌ها�� مجری`,
     };
 
     res.json({
@@ -977,18 +977,14 @@ router.get("/invite/:token", async (req, res: Response) => {
   }
 });
 
-// Accept project invitation (contractor only)
-router.post(
-  "/accept/:token",
-  authenticateToken,
-  requireContractor,
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { token } = req.params;
+// Accept project invitation with registration (public endpoint)
+router.post("/accept/:token", async (req, res: Response) => {
+  try {
+    const { token } = req.params;
 
-      // Get invite and project info
-      const result = await query(
-        `
+    // Get invite and project info
+    const result = await query(
+      `
       SELECT
         pi.*,
         p.id as project_id,
@@ -998,13 +994,101 @@ router.post(
       JOIN projects p ON pi.project_id = p.id
       WHERE pi.invite_token = $1
     `,
+      [token],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "لینک دعوت نامعتبر است",
+      });
+    }
+
+    const invite = result.rows[0];
+
+    // Check if invite is expired
+    if (new Date() > new Date(invite.expires_at)) {
+      return res.status(400).json({
+        success: false,
+        message: "لینک دعوت منقضی شده است",
+      });
+    }
+
+    // Check if invite is already accepted
+    if (invite.status === "accepted") {
+      return res.status(400).json({
+        success: false,
+        message: "این دعوت قبلاً پذیرش شده است",
+      });
+    }
+
+    // Check if project is still waiting for acceptance OR already in pending registration
+    if (
+      invite.project_status !== "waiting_for_acceptance" &&
+      invite.status !== "pending_registration"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "این پروژه دیگر قابل پذیرش نیست",
+      });
+    }
+
+    // For public accept, we just update the invite status but don't assign contractor yet
+    // The contractor assignment will happen after user registers/logs in
+    // Only update if not already pending_registration
+    if (invite.status !== "pending_registration") {
+      await query(
+        "UPDATE project_invites SET status = 'pending_registration', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
+        [token],
+      );
+    }
+
+    res.json({
+      success: true,
+      message:
+        "دعوت پذیرش شد. برای ادامه باید وارد حساب کاربری خود شوید یا ثبت نام کنید.",
+      data: {
+        requiresLogin: true,
+        inviteToken: token,
+      },
+    });
+  } catch (error) {
+    console.error("Accept project error:", error);
+    res.status(500).json({
+      success: false,
+      message: "خطا د�� پذیرش پروژه",
+    });
+  }
+});
+
+// Finalize project invite after user registration and verification
+router.post(
+  "/finalize-invite/:token",
+  authenticateToken,
+  requireContractor,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { token } = req.params;
+
+      // Get invite and project info
+      const result = await query(
+        `
+        SELECT
+          pi.*,
+          p.id as project_id,
+          p.title,
+          p.status as project_status
+        FROM project_invites pi
+        JOIN projects p ON pi.project_id = p.id
+        WHERE pi.invite_token = $1 AND pi.status = 'pending_registration'
+      `,
         [token],
       );
 
       if (result.rows.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "لینک دعوت نامعتبر است",
+          message: "دعوت نامعتبر یا قبلاً پردازش شده است",
         });
       }
 
@@ -1018,26 +1102,10 @@ router.post(
         });
       }
 
-      // Check if invite is already accepted
-      if (invite.status === "accepted") {
-        return res.status(400).json({
-          success: false,
-          message: "این دعوت قبلاً پذیرش شده است",
-        });
-      }
-
-      // Check if project is still waiting for acceptance
-      if (invite.project_status !== "waiting_for_acceptance") {
-        return res.status(400).json({
-          success: false,
-          message: "این پروژه دیگر قابل پذیرش نیست",
-        });
-      }
-
-      // Accept the invitation
+      // Finalize the invitation - assign contractor to project
       await query(
-        "UPDATE project_invites SET status = 'accepted', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
-        [token],
+        "UPDATE project_invites SET status = 'accepted', contractor_id = $1 WHERE invite_token = $2",
+        [req.user!.userId, token],
       );
 
       // Update project with contractor and change status to active
@@ -1046,18 +1114,18 @@ router.post(
         [req.user!.userId, invite.project_id],
       );
 
-      // TODO: Generate PDF contract
-      // TODO: Send notifications to both parties
-
       res.json({
         success: true,
-        message: "پروژه با موفقیت پذیرش شد",
+        message: "پروژه با موفقیت به شما تخصیص یافت",
+        data: {
+          projectId: invite.project_id,
+        },
       });
     } catch (error) {
-      console.error("Accept project error:", error);
+      console.error("Finalize invite error:", error);
       res.status(500).json({
         success: false,
-        message: "خطا د�� پذیرش پروژه",
+        message: "خطا در تکمیل فرآیند دعوت",
       });
     }
   },

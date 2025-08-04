@@ -109,6 +109,11 @@ export function createServer() {
   // Static file serving for uploads
   app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+  // Serve static files for production frontend
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(process.cwd(), "dist/spa")));
+  }
+
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({
@@ -193,6 +198,13 @@ export function createServer() {
       messageFA: "نقطه پایانی API یافت نشد",
     });
   });
+
+  // SPA fallback - serve index.html for all non-API routes in production
+  if (process.env.NODE_ENV === "production") {
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(process.cwd(), "dist/spa/index.html"));
+    });
+  }
 
   // Initialize SQLite database connection and schema
   async function initDb() {
