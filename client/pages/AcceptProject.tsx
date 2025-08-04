@@ -57,7 +57,7 @@ export default function AcceptProject() {
   const handleAcceptInvite = async () => {
     setAccepting(true);
     try {
-      const response = await fetch(`/api/projects/invite/${inviteToken}/accept`, {
+      const response = await fetch(`/api/projects/accept/${inviteToken}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
