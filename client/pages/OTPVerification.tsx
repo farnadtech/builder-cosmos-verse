@@ -26,6 +26,8 @@ export default function OTPVerification() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const phoneNumber = searchParams.get("phone") || user?.phoneNumber || "";
+  const inviteToken = searchParams.get("inviteToken");
+  const projectId = searchParams.get("projectId");
 
   // Countdown timer for resend button
   useEffect(() => {
