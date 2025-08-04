@@ -73,18 +73,18 @@ export default function AcceptProject() {
 
   useEffect(() => {
     console.log("🔗 AcceptProject useEffect - inviteToken:", inviteToken);
+    console.log("🔗 AcceptProject useEffect - actualToken:", actualToken);
     console.log("🔗 Location pathname:", window.location.pathname);
-    console.log("🔗 URL params:", useParams());
 
-    if (inviteToken) {
+    if (actualToken && actualToken !== 'accept') {
       console.log("✅ Valid invite token found, fetching project data...");
-      fetchProjectData();
+      fetchProjectData(actualToken);
     } else {
       console.log("❌ No invite token found");
       setError("لینک دعوت نامعتبر است");
       setLoading(false);
     }
-  }, [inviteToken]);
+  }, [actualToken]);
 
   const fetchProjectData = async () => {
     console.log("📡 Fetching project data for token:", inviteToken);
