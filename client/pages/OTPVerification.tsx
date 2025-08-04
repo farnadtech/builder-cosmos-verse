@@ -65,11 +65,39 @@ export default function OTPVerification() {
 
       if (result.success) {
         toast.success("شماره موبایل با موفقیت تأیید شد");
-        // Check if user needs identity verification
-        if (user?.role === 'employer') {
-          navigate("/verification");
+
+        // Handle invite flow after verification
+        if (inviteToken && projectId) {
+          try {
+            // Finalize the project invite
+            const finalizeResponse = await fetch(`/api/projects/finalize-invite/${inviteToken}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("zemano_token")}`
+              }
+            });
+
+            const finalizeData = await finalizeResponse.json();
+
+            if (finalizeData.success) {
+              toast.success("پروژه با موفقیت به شما تخصیص یافت!");
+              navigate(`/projects/${projectId}`);
+            } else {
+              toast.error("خطا در تخصیص پروژه");
+              navigate("/dashboard");
+            }
+          } catch (error) {
+            toast.error("خطا در تکمیل فرآیند دعوت");
+            navigate("/dashboard");
+          }
         } else {
-          navigate("/dashboard");
+          // Normal flow - check if user needs identity verification
+          if (user?.role === 'employer') {
+            navigate("/verification");
+          } else {
+            navigate("/dashboard");
+          }
         }
       } else {
         setError(result.message);
