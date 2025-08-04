@@ -90,18 +90,23 @@ export default function AcceptProject() {
       });
 
       console.log("📡 Response status:", response.status);
+      console.log("📡 Response headers:", response.headers);
 
       if (response.ok) {
         const data = await response.json();
         console.log("📡 Response data:", data);
 
         if (data.success && data.data && data.data.project) {
+          console.log("✅ Project data loaded successfully");
           setProject(data.data.project);
         } else {
+          console.error("❌ Invalid response structure:", data);
           setError("خطا در دریافت اطلاعات پروژه");
         }
       } else {
+        console.error("❌ Response not ok:", response.status);
         const errorData = await response.json();
+        console.error("❌ Error data:", errorData);
         setError(errorData.message || "خطا در دریافت اطلاعات پروژه");
       }
     } catch (err) {
@@ -193,7 +198,7 @@ export default function AcceptProject() {
           <Alert className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              برای پذیرش این پروژه باید ابتدا وارد سیستم شوید ی�� ثبت‌نام کنید.
+              برای پذیرش این پروژه باید ابتدا وارد سیستم شوید یا ثبت‌نام کنید.
             </AlertDescription>
           </Alert>
         )}
