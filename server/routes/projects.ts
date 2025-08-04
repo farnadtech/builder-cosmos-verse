@@ -55,7 +55,7 @@ const upload = multer({
     if (allowedTypes.includes(fileExt)) {
       cb(null, true);
     } else {
-      cb(new Error("فرمت فایل مجا�� نیست"));
+      cb(new Error("فرمت فایل مجاز نیست"));
     }
   },
 });
@@ -378,7 +378,7 @@ router.post(
       if (Math.abs(totalMilestoneAmount - parseFloat(budget)) > 0.01) {
         return res.status(400).json({
           success: false,
-          message: "مجموع مب��لغ مراحل باید برابر بودجه کل پروژه باشد",
+          message: "مجموع م����لغ مراحل باید برابر بودجه کل پروژه باشد",
         });
       }
 
@@ -550,7 +550,7 @@ router.post(
         [
           project.employer_id,
           "درخواست جدید برای پروژه",
-          `درخواست جدیدی برای پروژه "${project.title}" د��یافت شد`,
+          `درخواست جدیدی برای پروژه "${project.title}" د����افت شد`,
           JSON.stringify({ projectId, contractorId: req.user!.userId }),
         ],
       );
@@ -943,7 +943,7 @@ router.get("/invite/:token", async (req, res: Response) => {
         completedProjects: 12, // Mock data
       },
       attachments: [], // TODO: Get actual attachments
-      contractTerms: `قرارداد هم��اری برای پروژه "${data.title}"
+      contractTerms: `قرارداد همکاری برای پروژه "${data.title}"
 
 شرا��ط عمومی:
 - پرداخت بر اساس مراحل تعریف شده انجام می‌شود
@@ -1052,6 +1052,76 @@ router.post(
       res.status(500).json({
         success: false,
         message: "خطا د�� پذیرش پروژه",
+      });
+    }
+  },
+);
+
+// Finalize project invite after user registration and verification
+router.post(
+  "/finalize-invite/:token",
+  authenticateToken,
+  requireContractor,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { token } = req.params;
+
+      // Get invite and project info
+      const result = await query(
+        `
+        SELECT
+          pi.*,
+          p.id as project_id,
+          p.title,
+          p.status as project_status
+        FROM project_invites pi
+        JOIN projects p ON pi.project_id = p.id
+        WHERE pi.invite_token = $1 AND pi.status = 'pending_registration'
+      `,
+        [token],
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "دعوت نامعتبر یا قبلاً پردازش شده است",
+        });
+      }
+
+      const invite = result.rows[0];
+
+      // Check if invite is expired
+      if (new Date() > new Date(invite.expires_at)) {
+        return res.status(400).json({
+          success: false,
+          message: "لینک دعوت منقضی شده است",
+        });
+      }
+
+      // Finalize the invitation - assign contractor to project
+      await query(
+        "UPDATE project_invites SET status = 'accepted', contractor_id = $1 WHERE invite_token = $2",
+        [req.user!.userId, token],
+      );
+
+      // Update project with contractor and change status to active
+      await query(
+        "UPDATE projects SET contractor_id = $1, status = 'active', updated_at = CURRENT_TIMESTAMP WHERE id = $2",
+        [req.user!.userId, invite.project_id],
+      );
+
+      res.json({
+        success: true,
+        message: "پروژه با موفقیت به شما تخصیص یافت",
+        data: {
+          projectId: invite.project_id
+        }
+      });
+    } catch (error) {
+      console.error("Finalize invite error:", error);
+      res.status(500).json({
+        success: false,
+        message: "خطا در تکمیل فرآیند دعوت",
       });
     }
   },
