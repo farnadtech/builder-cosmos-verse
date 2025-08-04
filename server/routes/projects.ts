@@ -949,14 +949,14 @@ router.get("/invite/:token", async (req, res: Response) => {
 - پرداخت بر اساس مراحل تعریف شده انجام می‌شود
 - رعایت کیفیت و مهلت‌های تعیین شده الزامی است
 - در صورت اختلاف، پرونده به داوری ارجاع می‌شود
-- تمام حقوق طرفین محفوظ است
+- ��مام حقوق طرفین محفوظ است
 
 مسئولیت‌های مجری:
 - اجرای پروژه طبق مشخصات ارائه شده
 - ارائه گزارش پیشرفت به‌موقع
 - رعایت استانداردهای کیفی
 
-مسئولیت‌��ای کارفرما:
+مسئولیت����ای کارفرما:
 - پرداخت به‌موقع طبق مراحل تعریف شده
 - ارائه اطلاعات و منابع مورد نیاز
 - بازخورد سریع به درخ��است‌ها�� مجری`,
@@ -1034,10 +1034,13 @@ router.post(
 
       // For public accept, we just update the invite status but don't assign contractor yet
       // The contractor assignment will happen after user registers/logs in
-      await query(
-        "UPDATE project_invites SET status = 'pending_registration', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
-        [token],
-      );
+      // Only update if not already pending_registration
+      if (invite.status !== "pending_registration") {
+        await query(
+          "UPDATE project_invites SET status = 'pending_registration', accepted_at = CURRENT_TIMESTAMP WHERE invite_token = $1",
+          [token],
+        );
+      }
 
       res.json({
         success: true,
