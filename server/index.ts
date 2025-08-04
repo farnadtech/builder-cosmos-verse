@@ -199,6 +199,13 @@ export function createServer() {
     });
   });
 
+  // SPA fallback - serve index.html for all non-API routes in production
+  if (process.env.NODE_ENV === "production") {
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(process.cwd(), "dist/spa/index.html"));
+    });
+  }
+
   // Initialize SQLite database connection and schema
   async function initDb() {
     try {
