@@ -64,8 +64,10 @@ export default function AcceptProject() {
     };
 
     if (inviteToken) {
+      console.log("Starting fetch for invite token:", inviteToken);
       fetchInviteData();
     } else {
+      console.log("No invite token found");
       setError("توکن دعوت معتبر نیست");
       setLoading(false);
     }
