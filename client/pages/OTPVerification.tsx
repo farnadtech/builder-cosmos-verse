@@ -69,8 +69,11 @@ export default function OTPVerification() {
         // Handle invite flow after verification
         if (inviteToken && projectId) {
           try {
+            // Use global authenticated fetch if available
+            const fetchFunction = window.authenticatedFetch || fetch;
+
             // Finalize the project invite
-            const finalizeResponse = await fetch(`/api/projects/finalize-invite/${inviteToken}`, {
+            const finalizeResponse = await fetchFunction(`/api/projects/finalize-invite/${inviteToken}`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -156,7 +159,7 @@ export default function OTPVerification() {
                 ضمانو
               </span>
             </div>
-            <h1 className="text-2xl font-bold">تأیید شماره موبایل</h1>
+            <h1 className="text-2xl font-bold">تأی��د شماره موبایل</h1>
             <p className="text-muted-foreground mt-2">
               کد تأی��د ارسال شده را وارد کنید
             </p>
